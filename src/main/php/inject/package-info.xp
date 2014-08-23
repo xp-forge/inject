@@ -1,0 +1,94 @@
+<?php
+/* This file is part of the XP framework
+ *
+ * $Id$
+ */
+
+/**
+ * The inject package contains the XP framework's dependency injection
+ * API. Its entry point class is the "Injector".
+ *
+ * Binding
+ * =======
+ * Values can be bound to the injector by using its addBinding() method.
+ * It accepts the type to bind to, an optional name and three different 
+ * scenarios:
+ * 
+ * <ol>
+ *   <li>
+ *     Binding an class: The typical usecase, where we bind an interface
+ *     to its concrete implementation.
+ *   </li><li>
+ *     Binding an instance: By binding a type to an existing instance, we
+ *     can create a "singleton" model.
+ *   </li><li>
+ *     Binding a Provider: This allows implementing lazy-loading semantics.
+ *     The provider's get() method will be invoked when a binding is looked
+ *     up either by an injection or manually via getBinding().
+ *   </li>
+ * </ol>
+ *
+ * Instance creation
+ * =================
+ * Keep in mind: "newInstance() is the new 'new'". To create objects and 
+ * perform injection, use the Injector's newInstance() method instead of
+ * using the <tt>new</tt> keyword or factories.
+ *
+ * <code>
+ *   // Old way
+ *   $instance= cast(SessionFactory::getSession(), 'scriptlet.Session');
+ *
+ *   // Using the injector
+ *   $instance= $injector->newInstance(XPClass::forName('scriptlet.Session'));
+ * </code>
+ *
+ * Injection
+ * =========
+ * Injection is performed by looking at a type's constructor, its fields and 
+ * methods and checking for the <tt>@inject</tt> annotation.
+ * 
+ * Constructor 
+ * -----------
+ * <code>
+ *   class ReportImpl extends Object implements Report {
+ *     #[@inject]
+ *     public function __construct(ReportWriter $writer) { ... }
+ *   }
+ * </code>
+ *
+ * Field
+ * -----
+ * <code>
+ *   class ReportImpl extends Object implements Report {
+ *     #[@inject, @type = 'ReportWriter']
+ *     public $writer;
+ *   }
+ * </code>
+ *
+ * Method
+ * ------
+ * <code>
+ *   class ReportImpl extends Object implements Report {
+ *     #[@inject]
+ *     public function setWriter(ReportWriter $writer) { ... }
+ *   }
+ * </code>
+ *
+ * Notes
+ * ------
+ * If type hints cannot be used in constructors or methods, <tt>@inject</tt>
+ * supports an optional "type" key, e.g. <tt>#[@inject(type = ...)]</tt>.
+ * Named instances can be queried by supplying the "name" key, e.g.:
+ *
+ * <code>
+ *   class ReportImpl extends Object implements Report {
+ *     #[@inject(type= 'rdbms.DBConnection', name = 'stats')]
+ *     public function useStatDatabase($conn) { ... }
+ *   }
+ * </code>
+ *
+ * @see  http://code.google.com/p/google-guice/
+ * @see  xp://inject.Injector
+ */
+package inject {
+}
