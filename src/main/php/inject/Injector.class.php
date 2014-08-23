@@ -15,19 +15,17 @@ class Injector extends \lang\Object {
   /**
    * Add a binding
    *
-   * @param   var type either a lang.Type instance or a type name
-   * @param   var impl
-   * @param   string name
+   * @param   var $type either a lang.Type instance or a type name
+   * @param   var $impl
+   * @param   string $name
    * @return  self
    */
   public function bind($type, $impl, $name= null) {
     $key= $type instanceof Type ? $type->literal() : Type::forName($type)->literal();
     if ($impl instanceof Provider) {
-      $this->bindings[$key]= $impl;
-    } else if (isset($this->bindings[$key])) {
-      $this->bindings[$key]->add($impl, $name);
+      $this->bindings[$key][$name]= $impl;
     } else {
-      $this->bindings[$key]= new InstanceProvider($impl, $name);
+      $this->bindings[$key][$name]= new InstanceProvider($impl);
     }
     return $this;
   }
@@ -35,15 +33,15 @@ class Injector extends \lang\Object {
   /**
    * Get a binding
    *
-   * @param   var type either a lang.Type instance or a type name
-   * @param   string name
-   * @return  lang.Generic or NULL if none exists
+   * @param   var $type either a lang.Type instance or a type name
+   * @param   string $name
+   * @return  var or NULL if none exists
    */
   public function get($type, $name= null) {
     $key= $type instanceof Type ? $type->literal() : Type::forName($type)->literal();
-    if (!isset($this->bindings[$key])) return null;
+    if (!isset($this->bindings[$key][$name])) return null;
     
-    $bound= $this->bindings[$key]->get($name);
+    $bound= $this->bindings[$key][$name]->get();
     if ($bound instanceof XPClass) {
       $impl= $this->newInstance($bound);
     } else {

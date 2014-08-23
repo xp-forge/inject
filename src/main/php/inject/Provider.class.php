@@ -11,9 +11,8 @@
   /**
    * Gets an instance of "T"
    *
-   * @param   string name
    * @return  T
    */
   #[@generic(return= 'T')]
-  public function get($name= null);
+  public function get();
 }

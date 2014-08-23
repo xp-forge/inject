@@ -2,37 +2,23 @@
 
 #[@generic(implements= ['var'])]
 class InstanceProvider extends \lang\Object implements Provider {
-  protected $instances= array();
+  protected $instance= null;
 
   /**
-   * Creates a new instance with an optional initial (named) instance
+   * Creates a new instance with an instance
    *
    * @param   var instance
-   * @param   string name
    */
-  public function __construct($instance= null, $name= null) {
-    if (null !== $instance) {
-      $this->instances[$name]= $instance;
-    }
+  public function __construct($instance= null) {
+    $this->instance= $instance;
   }
 
-  /**
-   * Adds an instance
-   *
-   * @param   var instance
-   * @param   string name
-   */
-  public function add($instance, $name= null) {
-    $this->instances[$name]= $instance;
-  }
-  
   /**
    * Gets an instance of a service
    *
-   * @param   string name
    * @return  var
    */
-  public function get($name= null) {
-    return isset($this->instances[$name]) ? $this->instances[$name] : null;
+  public function get() {
+    return $this->instance;
   }
 }

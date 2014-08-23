@@ -66,6 +66,26 @@ class InjectorTest extends \unittest\TestCase {
     $this->assertInstanceOf('inject.unittest.fixture.FileSystem', $inject->get($type));
   }
 
+  #[@test, @values('bindings')]
+  public function get_named_implementation_bound_to_interface($type, $impl) {
+    $inject= new Injector();
+    $inject->bind($type, $impl, 'test');
+    $this->assertInstanceOf('inject.unittest.fixture.FileSystem', $inject->get($type, 'test'));
+  }
+
+  #[@test, @values('bindings')]
+  public function get_unbound_named_type_returns_null($type, $impl) {
+    $inject= new Injector();
+    $this->assertNull($inject->get($type, 'any-name-really'));
+  }
+
+  #[@test, @values('bindings')]
+  public function get_type_bound_by_different_name_returns_null($type, $impl) {
+    $inject= new Injector();
+    $inject->bind($type, $impl, 'test');
+    $this->assertNull($inject->get($type, 'another-name-than-the-one-bound'));
+  }
+
   #[@test]
   public function constructor_with_inject_annotation_and_type() {
     $inject= new Injector();
