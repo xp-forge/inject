@@ -51,6 +51,69 @@ class Injector extends \lang\Object {
   }
 
   /**
+   * Retrieve bound value for injection
+   *
+   * @param  var $inject The annotation
+   * @param  lang.Type $type
+   * @return var
+   * @throws inject.ProvisionException
+   */
+  protected function bound($inject, $type) {
+    $binding= $this->get(
+      isset($inject['type']) ? $inject['type'] : $type,
+      isset($inject['name']) ? $inject['name'] : null
+    );
+    if (null === $binding) {
+      throw new ProvisionException(sprintf(
+        'Unknown injection type %s%s',
+        $type,
+        isset($inject['name']) ? 'named "'.$inject['name'].'"' : ''
+      ));
+    }
+    return $binding;
+  }
+
+  /**
+   * Retrieve args for a given routine
+   *
+   * @param  lang.reflect.Routine $routine
+   * @param  var $default Value to return if no injection was performed
+   * @return var
+   * @throws inject.ProvisionException
+   */
+  protected function args($routine, $default) {
+    if ($routine->hasAnnotation('inject')) {
+      if ($routine->numParameters() < 1) {
+        return $default;
+      } else {
+        $param= $routine->getParameter(0);
+        return [$this->bound($routine->getAnnotation('inject'), $param->getTypeRestriction() ?: $param->getType())];
+      }
+    } else {
+      $args= [];
+      $target= false;
+      foreach ($routine->getParameters() as $param) {
+        if ($param->hasAnnotation('inject')) {
+          $target= true;
+          $args[]= $this->bound($param->getAnnotation('inject'), $param->getTypeRestriction() ?: $param->getType());
+        } else if (!$target) {
+          return $default;
+        } else if ($param->isOptional()) {
+          break;
+        } else {
+          throw new ProvisionException(sprintf(
+            'Value required for %s\'s %s() parameter %s',
+            $routine->getDeclaringClass()->getName(),
+            $routine->getName(),
+            $param->getName()
+          ));
+        }
+      }
+      return $target ? $args : $default;
+    }
+  }
+
+  /**
    * Creates a new instance of a given class
    *
    * @param   lang.XPClass class
@@ -60,32 +123,17 @@ class Injector extends \lang\Object {
   public function newInstance(XPClass $class) {
     if ($class->hasConstructor()) {
       $constructor= $class->getConstructor();
-      $args= [];
-      if ($constructor->hasAnnotation('inject')) {
-        $inject= $constructor->getAnnotation('inject');
-        if (isset($inject['type'])) {
-          $type= $inject['type'];
-        } else if ($restriction= $constructor->getParameter(0)->getTypeRestriction()) {
-          $type= $restriction->getName();
-        } else {
-          $type= $constructor->getParameter(0)->getType()->getName();
-        }
-
-        // Inject
-        $binding= $this->get($type, isset($inject['name']) ? $inject['name'] : null);
-        if (null === $binding) {
-          throw new ProvisionException('Unknown injection type "'.$type.'" at '.$class->getName().'\'s constructor');
-        }
-        $args= [$binding];
-      }
       try {
-        $instance= $constructor->newInstance($args);
+        $instance= $constructor->newInstance($this->args($constructor, []));
       } catch (\lang\reflect\TargetInvocationException $e) {
-        throw new ProvisionException('Error creating an instance of '.$class->getName().': '.$e->getCause()->getMessage(), $e);
+        throw new ProvisionException('Error creating an instance of '.$class->getName().': '.$e->getCause()->getMessage(), $e->getCause());
+      } catch (Throwable $e) {
+        throw new ProvisionException('Error creating an instance of '.$class->getName().': '.$e->getMessage(), $e);
       }
     } else {
       $instance= $class->newInstance();
     }
+
     return $this->injectInto($instance);
   }
 
@@ -99,59 +147,26 @@ class Injector extends \lang\Object {
   public function injectInto(Generic $instance) {
     $class= $instance->getClass();
 
-    // Fields
     foreach ($class->getFields() as $field) {
       if (!$field->hasAnnotation('inject')) continue;
-
-      // Determine injection type
-      $inject= $field->getAnnotation('inject');
-      if (isset($inject['type'])) {
-        $type= $inject['type'];
-      } else {
-        $type= $field->getType();
-      }
-
-      // Inject
-      $binding= $this->get($type, isset($inject['name']) ? $inject['name'] : null);
-      if (null === $binding) {
-        throw new ProvisionException('Unknown injection type "'.$type.'" at field "'.$field->getName().'"');
-      }
-
       try {
-        $field->set($instance, $binding);
+        $field->set($instance, $this->bound($field->getAnnotation('inject'), $field->getType()));
       } catch (Throwable $e) {
-        throw new ProvisionException('Error injecting '.$type.' '.$inject['name'].': '.$e->getMessage());
+        throw new ProvisionException('Error setting '.$class->getName().'::$'.$field->getName().': '.$e->getMessage());
       }
     }
 
-    // Methods
     foreach ($class->getMethods() as $method) {
-      if (!$method->hasAnnotation('inject')) continue;
-
-      // Determine injection type
-      $inject= $method->getAnnotation('inject');
-      if (isset($inject['type'])) {
-        $type= $inject['type'];
-      } else if ($restriction= $method->getParameter(0)->getTypeRestriction()) {
-        $type= $restriction->getName();
-      } else {
-        $type= $method->getParameter(0)->getType()->getName();
-      }
-
-      // Inject
-      $binding= $this->get($type, isset($inject['name']) ? $inject['name'] : null);
-      if (null === $binding) {
-        throw new ProvisionException('Unknown injection type "'.$type.'" at method "'.$method->getName().'"');
-      }
-
+      if (null === ($args= $this->args($method, null))) continue;
       try {
-        $method->invoke($instance, array($binding));
+        $method->invoke($instance, $args);
       } catch (\lang\reflect\TargetInvocationException $e) {
-        throw new ProvisionException('Error injecting '.$type.' '.$inject['name'].': '.$e->getCause()->getMessage());
+        throw new ProvisionException('Error invoking '.$class->getName().'::'.$method->getName().': '.$e->getCause()->getMessage(), $e->getCause());
       } catch (Throwable $e) {
-        throw new ProvisionException('Error injecting '.$type.' '.$inject['name'].': '.$e->getMessage());
+        throw new ProvisionException('Error invoking '.$class->getName().'::'.$method->getName().': '.$e->getMessage(), $e);
       }
     }
+
     return $instance;
   }
 }

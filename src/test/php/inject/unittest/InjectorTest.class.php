@@ -4,9 +4,11 @@ use inject\Injector;
 use inject\InstanceProvider;
 use lang\XPClass;
 use lang\ClassLoader;
+use unittest\TestCase;
+use util\Currency;
 use inject\unittest\fixture\FileSystem;
 
-class InjectorTest extends \unittest\TestCase {
+class InjectorTest extends TestCase {
 
   /** @return var[][] */
   protected function bindings() {
@@ -103,16 +105,30 @@ class InjectorTest extends \unittest\TestCase {
     $inject->bind('unittest.TestCase', $this); 
     $inject->bind('inject.unittest.fixture.Storage', $this->newStorage([
       'injected' => null,
-      '#[@inject] __construct' => function(\unittest\TestCase $param) { $this->injected= $param; }
+      '#[@inject] __construct' => function(TestCase $param) { $this->injected= $param; }
     ]));
     $this->assertEquals($this, $inject->get('inject.unittest.fixture.Storage')->injected);
+  }
+
+  #[@test]
+  public function constructor_with_inject_parameter_annotations() {
+    $inject= new Injector();
+    $inject->bind('unittest.TestCase', $this);
+    $inject->bind('util.Currency', Currency::$EUR, 'EUR');
+    $inject->bind('inject.unittest.fixture.Storage', $this->newStorage([
+      'injected' => null,
+      '#[@$test: inject, @$cur: inject(name= "EUR")] __construct' => function(TestCase $test, Currency $cur) {
+        $this->injected= [$test, $cur];
+      }
+    ]));
+    $this->assertEquals([$this, Currency::$EUR], $inject->get('inject.unittest.fixture.Storage')->injected);
   }
 
   #[@test, @expect(class= 'inject.ProvisionException', withMessage= '/Unknown injection type/')]
   public function constructor_injecting_unbound() {
     $inject= new Injector();
     $inject->bind('inject.unittest.fixture.Storage', $this->newStorage([
-      '#[@inject] __construct' => function(\unittest\TestCase $param) { /* Empty */ }
+      '#[@inject] __construct' => function(TestCase $param) { /* Empty */ }
     ]));
     $inject->get('inject.unittest.fixture.Storage');
   }
@@ -156,6 +172,15 @@ class InjectorTest extends \unittest\TestCase {
   }
 
   #[@test]
+  public function not_annotated_method_not_called() {
+    $inject= new Injector();
+    $inject->bind('inject.unittest.fixture.Storage', $this->newStorage([
+      'something' => function($param) { throw new \lang\IllegalStateException('Should not be called'); }
+    ]));
+    $inject->get('inject.unittest.fixture.Storage');
+  }
+
+  #[@test]
   public function method_with_inject_annotation_and_type() {
     $inject= new Injector();
     $inject->bind('unittest.TestCase', $this); 
@@ -172,16 +197,30 @@ class InjectorTest extends \unittest\TestCase {
     $inject->bind('unittest.TestCase', $this); 
     $inject->bind('inject.unittest.fixture.Storage', $this->newStorage([
       'injected' => null,
-      '#[@inject] inject' => function(\unittest\TestCase $param) { $this->injected= $param; }
+      '#[@inject] inject' => function(TestCase $param) { $this->injected= $param; }
     ]));
     $this->assertEquals($this, $inject->get('inject.unittest.fixture.Storage')->injected);
+  }
+
+  #[@test]
+  public function method_with_inject_parameter_annotations() {
+    $inject= new Injector();
+    $inject->bind('unittest.TestCase', $this);
+    $inject->bind('util.Currency', Currency::$EUR, 'EUR');
+    $inject->bind('inject.unittest.fixture.Storage', $this->newStorage([
+      'injected' => null,
+      '#[@$test: inject, @$cur: inject(name= "EUR")] inject' => function(TestCase $test, Currency $cur) {
+        $this->injected= [$test, $cur];
+      }
+    ]));
+    $this->assertEquals([$this, Currency::$EUR], $inject->get('inject.unittest.fixture.Storage')->injected);
   }
 
   #[@test, @expect(class= 'inject.ProvisionException', withMessage= '/Unknown injection type/')]
   public function method_injecting_unbound() {
     $inject= new Injector();
     $inject->bind('inject.unittest.fixture.Storage', $this->newStorage([
-      '#[@inject] inject' => function(\unittest\TestCase $param) { /* Empty */ }
+      '#[@inject] inject' => function(TestCase $param) { /* Empty */ }
     ]));
     $inject->get('inject.unittest.fixture.Storage');
   }
@@ -191,7 +230,7 @@ class InjectorTest extends \unittest\TestCase {
     $inject= new Injector();
     $inject->bind('unittest.TestCase', $this); 
     $inject->bind('inject.unittest.fixture.Storage', $this->newStorage([
-      '#[@inject] inject' => function(\unittest\TestCase $param) { throw new \lang\IllegalArgumentException('Test'); }
+      '#[@inject] inject' => function(TestCase $param) { throw new \lang\IllegalArgumentException('Test'); }
     ]));
     $inject->get('inject.unittest.fixture.Storage');
   }
