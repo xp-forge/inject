@@ -20,18 +20,18 @@ class XPInjector extends Injector {
    */
   public function __construct() {
     if (class_exists('rdbms\DBConnection')) {   // TODO: Check for module? Inject via module RFC? Class path search?
-      $this->addBinding('rdbms.DBConnection', newinstance('inject.Provider', array(), '{
+      $this->bind('rdbms.DBConnection', newinstance('inject.Provider', array(), '{
         public function get($name= NULL) {
           return \rdbms\ConnectionManager::getInstance()->getByHost($name, 0);
         }
       }'));
     }
-    $this->addBinding('util.log.LogCategory', newinstance('inject.Provider', array(), '{
+    $this->bind('util.log.LogCategory', newinstance('inject.Provider', array(), '{
       public function get($name= NULL) {
         return \util\log\Logger::getInstance()->getCategory($name);
       }
     }'));
-    $this->addBinding('util.Properties', newinstance('inject.Provider', array(), '{
+    $this->bind('util.Properties', newinstance('inject.Provider', array(), '{
       public function get($name= NULL) {
         $p= \util\PropertyManager::getInstance()->getProperties($name);
 
