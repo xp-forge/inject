@@ -77,54 +77,53 @@ class Injector extends \lang\Object {
    * Retrieve args for a given routine
    *
    * @param  lang.reflect.Routine $routine
-   * @param  var $default Value to return if no injection was performed
+   * @param  var[] $default The default arguments
+   * @param  bool $target
    * @return var
    * @throws inject.ProvisionException
    */
-  protected function args($routine, $default) {
-    if ($routine->hasAnnotation('inject')) {
-      if ($routine->numParameters() < 1) {
-        return $default;
+  protected function args($routine, $default, $target) {
+    $inject= $routine->hasAnnotation('inject');
+
+    $args= [];
+    foreach ($routine->getParameters() as $i => $param) {
+      if ($inject && 0 === $i) {
+        $target= true;
+        $args[]= $this->bound($routine->getAnnotation('inject'), $param->getTypeRestriction() ?: $param->getType());
+      } else if ($param->hasAnnotation('inject')) {
+        $target= true;
+        $args[]= $this->bound($param->getAnnotation('inject'), $param->getTypeRestriction() ?: $param->getType());
+      } else if (array_key_exists($i, $default)) {
+        $args[]= $default[$i];
+      } else if ($target && !$param->isOptional()) {
+        throw new ProvisionException(sprintf(
+          'Value required for %s\'s %s() parameter %s',
+          $routine->getDeclaringClass()->getName(),
+          $routine->getName(),
+          $param->getName()
+        ));
       } else {
-        $param= $routine->getParameter(0);
-        return [$this->bound($routine->getAnnotation('inject'), $param->getTypeRestriction() ?: $param->getType())];
+        break;
       }
-    } else {
-      $args= [];
-      $target= false;
-      foreach ($routine->getParameters() as $param) {
-        if ($param->hasAnnotation('inject')) {
-          $target= true;
-          $args[]= $this->bound($param->getAnnotation('inject'), $param->getTypeRestriction() ?: $param->getType());
-        } else if (!$target) {
-          return $default;
-        } else if ($param->isOptional()) {
-          break;
-        } else {
-          throw new ProvisionException(sprintf(
-            'Value required for %s\'s %s() parameter %s',
-            $routine->getDeclaringClass()->getName(),
-            $routine->getName(),
-            $param->getName()
-          ));
-        }
-      }
-      return $target ? $args : $default;
     }
+    return $target ? $args : null;
   }
 
   /**
-   * Creates a new instance of a given class
+   * Creates a new instance of a given class. If the constructor uses
+   * injection, the arguments are compiled from the relevant annotations.
+   * Otherwise, optional constructor arguments may be passed.
    *
-   * @param   lang.XPClass class
+   * @param   lang.XPClass $class
+   * @param   var[] $args
    * @return  lang.Generic
    * @throws  inject.ProvisionException
    */
-  public function newInstance(XPClass $class) {
+  public function newInstance(XPClass $class, $args= []) {
     if ($class->hasConstructor()) {
       $constructor= $class->getConstructor();
       try {
-        $instance= $constructor->newInstance($this->args($constructor, []));
+        $instance= $constructor->newInstance($this->args($constructor, $args, true));
       } catch (\lang\reflect\TargetInvocationException $e) {
         throw new ProvisionException('Error creating an instance of '.$class->getName().': '.$e->getCause()->getMessage(), $e->getCause());
       } catch (Throwable $e) {
@@ -157,7 +156,7 @@ class Injector extends \lang\Object {
     }
 
     foreach ($class->getMethods() as $method) {
-      if (null === ($args= $this->args($method, null))) continue;
+      if (null === ($args= $this->args($method, [], false))) continue;
       try {
         $method->invoke($instance, $args);
       } catch (\lang\reflect\TargetInvocationException $e) {

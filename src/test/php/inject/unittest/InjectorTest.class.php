@@ -234,4 +234,47 @@ class InjectorTest extends TestCase {
     ]));
     $inject->get('inject.unittest.fixture.Storage');
   }
+
+  #[@test]
+  public function newInstance_performs_injection() {
+    $inject= new Injector();
+    $inject->bind('unittest.TestCase', $this);
+    $storage= $this->newStorage([
+      'injected' => null,
+      '#[@inject] __construct' => function(TestCase $param) { $this->injected= $param; }
+    ]);
+    $this->assertEquals($this, $inject->newInstance($storage)->injected);
+  }
+
+  #[@test]
+  public function newInstance_also_accepts_arguments() {
+    $inject= new Injector();
+    $storage= $this->newStorage([
+      'injected' => null,
+      '__construct' => function(TestCase $param) { $this->injected= $param; }
+    ]);
+    $this->assertEquals($this, $inject->newInstance($storage, [$this])->injected);
+  }
+
+  #[@test]
+  public function newInstance_performs_partial_injection_with_required_parameter() {
+    $inject= new Injector();
+    $inject->bind('unittest.TestCase', $this);
+    $storage= $this->newStorage([
+      'injected' => null,
+      '#[@inject] __construct' => function(TestCase $param, $verify) { $this->injected= [$param, $verify]; }
+    ]);
+    $this->assertEquals([$this, true], $inject->newInstance($storage, [null, true])->injected);
+  }
+
+  #[@test]
+  public function newInstance_performs_partial_injection_with_optional_parameter() {
+    $inject= new Injector();
+    $inject->bind('unittest.TestCase', $this);
+    $storage= $this->newStorage([
+      'injected' => null,
+      '#[@inject] __construct' => function(TestCase $param, $verify= true) { $this->injected= [$param, $verify]; }
+    ]);
+    $this->assertEquals([$this, true], $inject->newInstance($storage)->injected);
+  }
 }
