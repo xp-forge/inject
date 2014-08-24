@@ -16,9 +16,10 @@ class InstanceProvider extends \lang\Object implements Provider {
   /**
    * Gets an instance of a service
    *
+   * @param   string $name= null
    * @return  var
    */
-  public function get() {
+  public function get($name= null) {
     return $this->instance;
   }
 }

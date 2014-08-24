@@ -1,7 +1,5 @@
 <?php namespace inject;
 
-
-
 /**
  * Non-generic, BC retainining injector with providers bound for:
  * <ul>
@@ -21,18 +19,18 @@ class XPInjector extends Injector {
   public function __construct() {
     if (class_exists('rdbms\DBConnection')) {   // TODO: Check for module? Inject via module RFC? Class path search?
       $this->bind('rdbms.DBConnection', newinstance('inject.Provider', array(), '{
-        public function get($name= NULL) {
+        public function get($name= null) {
           return \rdbms\ConnectionManager::getInstance()->getByHost($name, 0);
         }
       }'));
     }
     $this->bind('util.log.LogCategory', newinstance('inject.Provider', array(), '{
-      public function get($name= NULL) {
+      public function get($name= null) {
         return \util\log\Logger::getInstance()->getCategory($name);
       }
     }'));
     $this->bind('util.Properties', newinstance('inject.Provider', array(), '{
-      public function get($name= NULL) {
+      public function get($name= null) {
         $p= \util\PropertyManager::getInstance()->getProperties($name);
 
         // If a PropertyAccess is retrieved which is not a util.Properties,
