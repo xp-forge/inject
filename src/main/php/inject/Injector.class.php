@@ -139,8 +139,8 @@ class Injector extends \lang\Object {
   /**
    * Inject members of an instance
    *
-   * @param   lang.Generic instance
-   * @return  lang.Generic instance
+   * @param   lang.Generic $instance
+   * @return  lang.Generic
    * @throws  inject.ProvisionException
    */
   public function injectInto(Generic $instance) {
