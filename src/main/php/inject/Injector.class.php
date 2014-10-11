@@ -10,7 +10,24 @@ use lang\Generic;
  * @test    xp://inject.unittest.InjectorTest
  */
 class Injector extends \lang\Object {
+  protected static $PROVIDER;
   protected $bindings= [];
+
+  static function __static() {
+    self::$PROVIDER= Type::forName('inject.Provider<?>');
+  }
+
+  /**
+   * Creates a new injector optionally given initial bindings
+   *
+   * @param  inject.Bindings... $initial
+   */
+  public function __construct() {
+    foreach (func_get_args() as $bindings) {
+      $bindings->bind($this);
+    }
+    $this->bind($this->getClass(), $this);
+  }
 
   /**
    * Add a binding
@@ -22,14 +39,10 @@ class Injector extends \lang\Object {
    */
   public function bind($type, $impl, $name= null) {
     $key= $type instanceof Type ? $type->literal() : Type::forName($type)->literal();
-    if ($impl instanceof Provider) {
-      $this->bindings[$key.$name]= $impl;
-    } else {
-      $this->bindings[$key.$name]= new InstanceProvider($impl);
-    }
+    $this->bindings[$key.$name]= $impl;
     return $this;
   }
-  
+
   /**
    * Get a binding
    *
@@ -38,16 +51,21 @@ class Injector extends \lang\Object {
    * @return  var or NULL if none exists
    */
   public function get($type, $name= null) {
-    $key= $type instanceof Type ? $type->literal() : Type::forName($type)->literal();
-    if (isset($this->bindings[$combined= $key.$name])) {
-      $bound= $this->bindings[$combined]->get();
-    } else if (isset($this->bindings[$key])) {
-      $bound= $this->bindings[$key]->get($name);
+    $t= $type instanceof Type ? $type : Type::forName($type);
+
+    if (self::$PROVIDER->isAssignableFrom($t)) {
+      if (isset($this->bindings[$combined= $t->genericArguments()[0]->literal().$name])) {
+        $bound= $this->bindings[$combined];
+        return $bound instanceof XPClass ? new TypeProvider($bound, $this) : new InstanceProvider($bound);
+      } else {
+        return null;
+      }
+    } else if (isset($this->bindings[$combined= $t->literal().$name])) {
+      $bound= $this->bindings[$combined];
+      return $bound instanceof XPClass ? $this->newInstance($bound) : $bound;
     } else {
       return null;
     }
-
-    return $bound instanceof XPClass ? $this->newInstance($bound) : $bound;
   }
 
   /**
@@ -139,8 +157,8 @@ class Injector extends \lang\Object {
   /**
    * Inject members of an instance
    *
-   * @param   lang.Generic instance
-   * @return  lang.Generic instance
+   * @param   lang.Generic $instance
+   * @return  lang.Generic
    * @throws  inject.ProvisionException
    */
   public function injectInto(Generic $instance) {

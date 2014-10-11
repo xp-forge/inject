@@ -14,7 +14,6 @@ Values can be bound to the injector by using its `bind()` method. It accepts the
 
 * **Binding an class**: The typical usecase, where we bind an interface to its concrete implementation.
 * **Binding an instance**: By binding a type to an existing instance, we can create a "singleton" model.
-* **Binding a Provider**: This allows implementing lazy-loading semantics. The provider's `get()` method will be invoked when a binding is looked up either by an injection or manually via `get()`.
 
 Instance creation
 -----------------
@@ -24,8 +23,8 @@ Keep in mind: *"injector.get() is the new 'new'"*. To create objects and perform
 $instance= $injector->get(XPClass::forName('scriptlet.Session'));
 ```
 
+Manual calls are usually not necessary though, instead you'll use the injection:
 
-Manual calls are usually not necesary though, instead you'll use the injection:
 Injection
 ---------
 Injection is performed by looking at a type's constructor, its fields and methods and checking for the `@inject` annotation.
@@ -49,3 +48,15 @@ class ReportImpl extends Object implements Report {
   public $writer;
 }
 ```
+
+Providers
+---------
+Providers allow implementing lazy-loading semantics. Every type bound to the injector can also be retrieved by a provider. Invoking its get() method will instantiate it.
+
+```php
+$provider= $injector->get('inject.Provider<com.example.writers.ReportWriter>');
+
+// ...later on
+$instance= $provider->get();
+```
+

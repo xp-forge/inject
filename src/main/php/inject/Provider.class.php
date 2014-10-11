@@ -1,15 +1,13 @@
 <?php namespace inject;
 
 /**
- * A provider can be used to perform lazy initialization inside the
- * injector's `get()` method.
+ * A provider can be used to perform lazy initialization.
  *
  * ```php
- * $injector->bind($intf, newinstance('inject.Provider<var>', [], [
- *   'get' => function($name= null) { ... }
- * ]));
+ * $injector->bind($intf, XPClass::forName($impl));
  *
- * $instance= $injector->get($intf);   // invokes above get() method
+ * $provider= $injector->get($intf);
+ * $instance= $provider->get();       // Instantiation happens here
  * ```
  *
  * @see   xp://inject.Injector
@@ -18,11 +16,10 @@
 interface Provider {
   
   /**
-   * Gets an (optionally named) instance of "T"
+   * Gets an instance of "T"
    *
-   * @param   string $name
    * @return  T
    */
   #[@generic(return= 'T')]
-  public function get($name= null);
+  public function get();
 }

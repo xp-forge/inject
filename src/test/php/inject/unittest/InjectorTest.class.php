@@ -12,14 +12,12 @@ class InjectorTest extends TestCase {
   /** @return var[][] */
   protected function bindings() {
     $instance= new FileSystem();
-    $provider= new InstanceProvider($instance);
+    $name= 'inject.unittest.fixture.Storage';
     return [
-      ['inject.unittest.fixture.Storage', XPClass::forName('inject.unittest.fixture.FileSystem')],
-      ['inject.unittest.fixture.Storage', $instance],
-      ['inject.unittest.fixture.Storage', $provider],
-      [XPClass::forName('inject.unittest.fixture.Storage'), XPClass::forName('inject.unittest.fixture.FileSystem')],
-      [XPClass::forName('inject.unittest.fixture.Storage'), $instance],
-      [XPClass::forName('inject.unittest.fixture.Storage'), $provider]
+      [$name, XPClass::forName('inject.unittest.fixture.FileSystem')],
+      [$name, $instance],
+      [XPClass::forName($name), XPClass::forName('inject.unittest.fixture.FileSystem')],
+      [XPClass::forName($name), $instance]
     ];
   }
 
@@ -38,6 +36,12 @@ class InjectorTest extends TestCase {
   public function bind_returns_injector_instance($type, $impl) {
     $inject= new Injector();
     $this->assertEquals($inject, $inject->bind($type, $impl));
+  }
+
+  #[@test]
+  public function binds_self_per_default() {
+    $inject= new Injector();
+    $this->assertEquals($inject, $inject->get('inject.Injector'));
   }
 
   #[@test]
