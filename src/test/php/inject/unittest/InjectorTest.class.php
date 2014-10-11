@@ -55,6 +55,12 @@ class InjectorTest extends TestCase {
   }
 
   #[@test]
+  public function binds_self_per_default() {
+    $inject= new Injector();
+    $this->assertEquals($inject, $inject->get('inject.Injector'));
+  }
+
+  #[@test]
   public function get_unbound_type_returns_null() {
     $this->assertNull((new Injector())->get('inject.unittest.fixture.Storage'));
   }
