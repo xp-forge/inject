@@ -85,6 +85,12 @@ class InjectorTest extends TestCase {
   }
 
   #[@test, @expect('lang.IllegalArgumentException')]
+  public function cannot_bind_string_to_int() {
+    $inject= new Injector();
+    $inject->bind('string', 0x82523c0, 'API Key');
+  }
+
+  #[@test, @expect('lang.IllegalArgumentException')]
   public function cannot_bind_non_class_type_unnamed() {
     $inject= new Injector();
     $inject->bind('string', '82523c0');
