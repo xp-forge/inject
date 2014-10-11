@@ -54,8 +54,12 @@ class Injector extends \lang\Object {
     $t= $type instanceof Type ? $type : Type::forName($type);
 
     if (self::$PROVIDER->isAssignableFrom($t)) {
-      if (null === ($bound= $this->get($t->genericArguments()[0], $name))) return null;
-      return new InstanceProvider($bound);
+      if (isset($this->bindings[$combined= $t->genericArguments()[0]->literal().$name])) {
+        $bound= $this->bindings[$combined];
+        return $bound instanceof XPClass ? new TypeProvider($bound, $this) : new InstanceProvider($bound);
+      } else {
+        return null;
+      }
     } else if (isset($this->bindings[$combined= $t->literal().$name])) {
       $bound= $this->bindings[$combined];
       return $bound instanceof XPClass ? $this->newInstance($bound) : $bound;
