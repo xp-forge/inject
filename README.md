@@ -34,7 +34,13 @@ Instance creation
 Keep in mind: *"injector.get() is the new 'new'"*. To create objects and perform injection, use the Injector's get() method instead of using the `new` keyword or factories.
 
 ```php
-$instance= $injector->get(XPClass::forName('scriptlet.Session'));
+$injector->bind('com.example.Report', 'com.example.HtmlReport');
+
+// Explicit binding: Lookup finds binding to HtmlReport, creates instance.
+$instance= $injector->get('com.example.Report');
+
+// Implicit binding: No previous binding, TextReport instantiable, thus created.
+$instance= $injector->get('com.example.TextReport');
 ```
 
 Manual calls are usually not necessary though, instead you'll use the injection:
