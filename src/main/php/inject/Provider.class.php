@@ -6,7 +6,7 @@
  *
  * ```php
  * $injector->bind($intf, newinstance('inject.Provider<var>', [], [
- *   'get' => function($name= null) { ... }
+ *   'get' => function() { ... }
  * ]));
  *
  * $instance= $injector->get($intf);   // invokes above get() method
@@ -18,11 +18,10 @@
 interface Provider {
   
   /**
-   * Gets an (optionally named) instance of "T"
+   * Gets an instance of "T"
    *
-   * @param   string $name
    * @return  T
    */
   #[@generic(return= 'T')]
-  public function get($name= null);
+  public function get();
 }

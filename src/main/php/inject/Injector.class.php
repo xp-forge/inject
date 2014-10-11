@@ -10,7 +10,12 @@ use lang\Generic;
  * @test    xp://inject.unittest.InjectorTest
  */
 class Injector extends \lang\Object {
+  protected static $PROVIDER;
   protected $bindings= [];
+
+  static function __static() {
+    self::$PROVIDER= Type::forName('inject.Provider<?>');
+  }
 
   /**
    * Creates a new injector optionally given initial bindings
@@ -45,14 +50,17 @@ class Injector extends \lang\Object {
    * @return  var or NULL if none exists
    */
   public function get($type, $name= null) {
-    $key= $type instanceof Type ? $type->literal() : Type::forName($type)->literal();
-    if (isset($this->bindings[$combined= $key.$name])) {
+    $t= $type instanceof Type ? $type : Type::forName($type);
+
+    if (self::$PROVIDER->isAssignableFrom($t)) {
+      if (null === ($bound= $this->get($t->genericArguments()[0], $name))) return null;
+      return new InstanceProvider($bound);
+    } else if (isset($this->bindings[$combined= $t->literal().$name])) {
       $bound= $this->bindings[$combined];
+      return $bound instanceof XPClass ? $this->newInstance($bound) : $bound;
     } else {
       return null;
     }
-
-    return $bound instanceof XPClass ? $this->newInstance($bound) : $bound;
   }
 
   /**

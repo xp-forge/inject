@@ -7,7 +7,7 @@ class InstanceProvider extends \lang\Object implements Provider {
   /**
    * Creates a new instance with an instance
    *
-   * @param   var instance
+   * @param   var $instance
    */
   public function __construct($instance= null) {
     $this->instance= $instance;
@@ -16,10 +16,9 @@ class InstanceProvider extends \lang\Object implements Provider {
   /**
    * Gets an instance of a service
    *
-   * @param   string $name= null
    * @return  var
    */
-  public function get($name= null) {
+  public function get() {
     return $this->instance;
   }
 }

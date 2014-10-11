@@ -93,6 +93,13 @@ class InjectorTest extends TestCase {
     $this->assertNull($inject->get($type));
   }
 
+  #[@test, @values('bindings')]
+  public function get_supports_providers($type, $impl) {
+    $inject= new Injector();
+    $inject->bind($type, $impl);
+    $this->assertInstanceOf('inject.unittest.fixture.FileSystem', $inject->get("inject.Provider<$type>")->get());
+  }
+
   #[@test]
   public function constructor_with_inject_annotation_and_type() {
     $inject= new Injector();
