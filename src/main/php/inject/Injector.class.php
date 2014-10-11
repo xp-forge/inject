@@ -45,6 +45,7 @@ class Injector extends \lang\Object {
    *
    * @param  lang.XPClass $t
    * @param  lang.XPClass $impl
+   * @throws lang.IllegalArgumentException
    */
   protected function asBinding($t, $impl) {
     if ($impl instanceof XPClass) {
@@ -72,11 +73,11 @@ class Injector extends \lang\Object {
   /**
    * Add a binding
    *
-   * @param   var $type either a lang.Type instance or a type name
-   * @param   var $impl
-   * @param   string $name
-   * @return  self
-   * @throws  lang.IllegalArgumentException
+   * @param  var $type either a lang.Type instance or a type name
+   * @param  var $impl
+   * @param  string $name
+   * @return self
+   * @throws lang.IllegalArgumentException
    */
   public function bind($type, $impl, $name= null) {
     $t= $type instanceof Type ? $type : Type::forName($type);
@@ -125,9 +126,9 @@ class Injector extends \lang\Object {
   /**
    * Get a binding
    *
-   * @param   var $type either a lang.Type instance or a type name
-   * @param   string $name
-   * @return  var or NULL if none exists
+   * @param  var $type either a lang.Type instance or a type name
+   * @param  string $name
+   * @return var or NULL if none exists
    */
   public function get($type, $name= null) {
     $t= $type instanceof Type ? $type : Type::forName($type);
@@ -223,7 +224,7 @@ class Injector extends \lang\Object {
         $instance= $constructor->newInstance($this->args($constructor, $args, true));
       } catch (\lang\reflect\TargetInvocationException $e) {
         throw new ProvisionException('Error creating an instance of '.$class->getName().': '.$e->getCause()->getMessage(), $e->getCause());
-      } catch (Throwable $e) {
+      } catch (\lang\Throwable $e) {
         throw new ProvisionException('Error creating an instance of '.$class->getName().': '.$e->getMessage(), $e);
       }
     } else {
@@ -247,7 +248,7 @@ class Injector extends \lang\Object {
       if (!$field->hasAnnotation('inject')) continue;
       try {
         $field->set($instance, $this->bound($field->getAnnotation('inject'), $field->getType()));
-      } catch (Throwable $e) {
+      } catch (\lang\Throwable $e) {
         throw new ProvisionException('Error setting '.$class->getName().'::$'.$field->getName().': '.$e->getMessage());
       }
     }
@@ -258,7 +259,7 @@ class Injector extends \lang\Object {
         $method->invoke($instance, $args);
       } catch (\lang\reflect\TargetInvocationException $e) {
         throw new ProvisionException('Error invoking '.$class->getName().'::'.$method->getName().': '.$e->getCause()->getMessage(), $e->getCause());
-      } catch (Throwable $e) {
+      } catch (\lang\Throwable $e) {
         throw new ProvisionException('Error invoking '.$class->getName().'::'.$method->getName().': '.$e->getMessage(), $e);
       }
     }

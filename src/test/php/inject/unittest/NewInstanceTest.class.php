@@ -212,4 +212,36 @@ class NewInstanceTest extends TestCase {
     ]);
     $this->assertEquals([$this, true], $inject->newInstance($storage)->injected);
   }
+
+  #[@test, @expect(class= 'inject.ProvisionException', withMessage= '/Error creating an instance of .+/')]
+  public function newInstance_catches_iae_when_creating_class_instances() {
+    $inject= new Injector();
+    $storage= $this->newStorage('{
+      #[@inject]
+      private function __construct() { }
+    }');
+    $inject->newInstance($storage);
+  }
+
+  #[@test, @expect(class= 'inject.ProvisionException', withMessage= '/Error setting .+::\$fixture/')]
+  public function newInstance_catches_iae_when_setting_private_fields() {
+    $inject= new Injector();
+    $inject->bind('unittest.TestCase', $this);
+    $storage= $this->newStorage('{
+      #[@inject(type= "unittest.TestCase")]
+      private $fixture;
+    }');
+    $inject->newInstance($storage);
+  }
+
+  #[@test, @expect(class= 'inject.ProvisionException', withMessage= '/Error invoking .+::fixture/')]
+  public function newInstance_catches_iae_when_invoking_private_methods() {
+    $inject= new Injector();
+    $inject->bind('unittest.TestCase', $this);
+    $storage= $this->newStorage('{
+      #[@inject]
+      private function fixture(\unittest\TestCase $param) { }
+    }');
+    $inject->newInstance($storage);
+  }
 }
