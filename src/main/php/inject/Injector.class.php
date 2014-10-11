@@ -49,6 +49,36 @@ class Injector extends \lang\Object {
   }
 
   /**
+   * Returns a bound value as a instance
+   *
+   * @param  var $bound
+   * @return var
+   */
+  protected function asInstance($bound) {
+    if ($bound instanceof XPClass) {
+      return $this->newInstance($bound);
+    } else {
+      return $bound;
+    }
+  }
+
+  /**
+   * Returns a bound value as a provider
+   *
+   * @param  var $bound
+   * @return inject.Provider<?>
+   */
+  protected function asProvider($bound) {
+    if (self::$PROVIDER->isInstance($bound) || $bound instanceof Provider) {
+      return $bound;
+    } else if ($bound instanceof XPClass) {
+      return new TypeProvider($bound, $this);
+    } else {
+      return new InstanceProvider($bound);
+    }
+  }
+
+  /**
    * Get a binding
    *
    * @param   var $type either a lang.Type instance or a type name
@@ -60,14 +90,12 @@ class Injector extends \lang\Object {
 
     if (self::$PROVIDER->isAssignableFrom($t)) {
       if (isset($this->bindings[$combined= $t->genericArguments()[0]->literal().$name])) {
-        $bound= $this->bindings[$combined];
-        return $bound instanceof XPClass ? new TypeProvider($bound, $this) : new InstanceProvider($bound);
+        return $this->asProvider($this->bindings[$combined]);
       } else {
         return null;
       }
     } else if (isset($this->bindings[$combined= $t->literal().$name])) {
-      $bound= $this->bindings[$combined];
-      return $bound instanceof XPClass ? $this->newInstance($bound) : $bound;
+      return $this->asInstance($this->bindings[$combined]);
     } else if ($t instanceof XPClass && !($t->isInterface() || $t->getModifiers() & MODIFIER_ABSTRACT)) {
       return $this->newInstance($t);
     } else {
