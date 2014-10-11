@@ -13,6 +13,15 @@ class Injector extends \lang\Object {
   protected $bindings= [];
 
   /**
+   * Creates a new injector optionally given initial bindings
+   *
+   * @param  inject.Bindings $initial
+   */
+  public function __construct(Bindings $initial= null) {
+    $initial && $initial->bind($this);
+  }
+
+  /**
    * Add a binding
    *
    * @param   var $type either a lang.Type instance or a type name
