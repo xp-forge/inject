@@ -15,8 +15,10 @@ class InjectorTest extends TestCase {
     $name= 'inject.unittest.fixture.Storage';
     return [
       [$name, XPClass::forName('inject.unittest.fixture.FileSystem')],
+      [$name, 'inject.unittest.fixture.FileSystem'],
       [$name, $instance],
       [XPClass::forName($name), XPClass::forName('inject.unittest.fixture.FileSystem')],
+      [XPClass::forName($name), 'inject.unittest.fixture.FileSystem'],
       [XPClass::forName($name), $instance]
     ];
   }
@@ -59,7 +61,7 @@ class InjectorTest extends TestCase {
   }
 
   #[@test]
-  public function get_unbound_type_returns_null() {
+  public function no_implicit_binding_for_interfaces() {
     $this->assertNull((new Injector())->get('inject.unittest.fixture.Storage'));
   }
 

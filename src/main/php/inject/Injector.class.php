@@ -38,8 +38,13 @@ class Injector extends \lang\Object {
    * @return  self
    */
   public function bind($type, $impl, $name= null) {
-    $key= $type instanceof Type ? $type->literal() : Type::forName($type)->literal();
-    $this->bindings[$key.$name]= $impl;
+    $t= $type instanceof Type ? $type : Type::forName($type);
+
+    if ($t instanceof XPClass && is_string($impl)) {
+      $this->bindings[$t->literal().$name]= XPClass::forName($impl);
+    } else {
+      $this->bindings[$t->literal().$name]= $impl;
+    }
     return $this;
   }
 
