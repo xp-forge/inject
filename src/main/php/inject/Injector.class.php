@@ -86,16 +86,15 @@ class Injector extends \lang\Object {
     if (self::$PROVIDER->isAssignableFrom($t)) {
       if (isset($this->bindings[$combined= $t->genericArguments()[0]->literal().$name])) {
         return $this->bindings[$combined]->provider($this);
-      } else {
-        return null;
       }
-    } else if (isset($this->bindings[$combined= $t->literal().$name])) {
-      return $this->bindings[$combined]->resolve($this);
-    } else if ($t instanceof XPClass && !($t->isInterface() || $t->getModifiers() & MODIFIER_ABSTRACT)) {
-      return $this->newInstance($t);
     } else {
-      return null;
+      if (isset($this->bindings[$combined= $t->literal().$name])) {
+        return $this->bindings[$combined]->resolve($this);
+      } else if ($t instanceof XPClass && !($t->isInterface() || $t->getModifiers() & MODIFIER_ABSTRACT)) {
+        return $this->newInstance($t);
+      }
     }
+    return null;
   }
 
   /**
