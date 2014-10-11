@@ -3,6 +3,7 @@
 use lang\Type;
 use lang\XPClass;
 use lang\Generic;
+use lang\IllegalArgumentException;
 
 /**
  * Injector
@@ -36,15 +37,19 @@ class Injector extends \lang\Object {
    * @param   var $impl
    * @param   string $name
    * @return  self
+   * @throws  lang.IllegalArgumentException
    */
   public function bind($type, $impl, $name= null) {
     $t= $type instanceof Type ? $type : Type::forName($type);
 
-    if ($t instanceof XPClass && is_string($impl)) {
-      $this->bindings[$t->literal().$name]= XPClass::forName($impl);
+    if ($t instanceof XPClass) {
+      $this->bindings[$t->literal().$name]= is_string($impl) ? XPClass::forName($impl) : $impl;
+    } else if (null === $name) {
+      throw new IllegalArgumentException('Cannot bind non-class type '.$t.' without a name');
     } else {
       $this->bindings[$t->literal().$name]= $impl;
     }
+
     return $this;
   }
 

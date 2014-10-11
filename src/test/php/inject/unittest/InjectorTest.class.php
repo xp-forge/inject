@@ -84,6 +84,12 @@ class InjectorTest extends TestCase {
     $this->assertEquals(4, $inject->get('int', 'Timeout'));
   }
 
+  #[@test, @expect('lang.IllegalArgumentException')]
+  public function cannot_bind_non_class_type_unnamed() {
+    $inject= new Injector();
+    $inject->bind('string', '82523c0');
+  }
+
   #[@test, @values('bindings')]
   public function get_named_implementation_bound_to_interface($type, $impl) {
     $inject= new Injector();
