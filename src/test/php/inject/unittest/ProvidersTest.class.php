@@ -41,7 +41,10 @@ class ProvidersTest extends TestCase {
     $inject= new Injector();
     $provider= new TypeProvider(XPClass::forName('inject.unittest.fixture.FileSystem'), $inject);
     $inject->bind('inject.unittest.fixture.Storage', $provider);
-    $this->assertEquals($provider, $inject->get('inject.unittest.fixture.Storage'));
+    $this->assertInstanceOf(
+      'inject.unittest.fixture.FileSystem',
+      $inject->get('inject.unittest.fixture.Storage')
+    );
   }
 
   #[@test]
