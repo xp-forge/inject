@@ -1,17 +1,18 @@
 <?php namespace inject;
 
 /**
- * Base class for bindings
+ * Base class for bindings. Extend from this class and overwrite its
+ * `configure()` method.
  *
  * @test    xp://inject.unittest.BindingsTest
  */
 abstract class Bindings extends \lang\Object {
 
   /**
-   * Executes bindings on given injector
+   * Configures bindings on given injector
    *
    * @param  inject.Injector $injector
    */
-  public abstract function bind($injector);
+  public abstract function configure($injector);
 
 }

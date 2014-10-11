@@ -27,7 +27,7 @@ class Injector extends \lang\Object {
    */
   public function __construct() {
     foreach (func_get_args() as $bindings) {
-      $bindings->bind($this);
+      $bindings->configure($this);
     }
     $this->bind($this->getClass(), $this);
   }

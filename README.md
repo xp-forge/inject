@@ -14,6 +14,7 @@ Values can be bound to the injector by using its `bind()` method. It accepts the
 
 * **Binding an class**: The typical usecase, where we bind an interface to its concrete implementation.
 * **Binding an instance**: By binding a type to an existing instance, we can create a "singleton" model.
+* **Binding a provider**: If we need more complicated code to create an instance, we can bind to a provider.
 
 ```php
 // Manually
