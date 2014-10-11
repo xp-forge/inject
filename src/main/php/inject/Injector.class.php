@@ -4,6 +4,7 @@ use lang\Type;
 use lang\XPClass;
 use lang\Generic;
 use lang\IllegalArgumentException;
+use lang\Throwable;
 
 /**
  * Injector
@@ -224,7 +225,7 @@ class Injector extends \lang\Object {
         $instance= $constructor->newInstance($this->args($constructor, $args, true));
       } catch (\lang\reflect\TargetInvocationException $e) {
         throw new ProvisionException('Error creating an instance of '.$class->getName().': '.$e->getCause()->getMessage(), $e->getCause());
-      } catch (\lang\Throwable $e) {
+      } catch (Throwable $e) {
         throw new ProvisionException('Error creating an instance of '.$class->getName().': '.$e->getMessage(), $e);
       }
     } else {
@@ -248,7 +249,7 @@ class Injector extends \lang\Object {
       if (!$field->hasAnnotation('inject')) continue;
       try {
         $field->set($instance, $this->bound($field->getAnnotation('inject'), $field->getType()));
-      } catch (\lang\Throwable $e) {
+      } catch (Throwable $e) {
         throw new ProvisionException('Error setting '.$class->getName().'::$'.$field->getName().': '.$e->getMessage());
       }
     }
@@ -259,7 +260,7 @@ class Injector extends \lang\Object {
         $method->invoke($instance, $args);
       } catch (\lang\reflect\TargetInvocationException $e) {
         throw new ProvisionException('Error invoking '.$class->getName().'::'.$method->getName().': '.$e->getCause()->getMessage(), $e->getCause());
-      } catch (\lang\Throwable $e) {
+      } catch (Throwable $e) {
         throw new ProvisionException('Error invoking '.$class->getName().'::'.$method->getName().': '.$e->getMessage(), $e);
       }
     }
