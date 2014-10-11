@@ -14,14 +14,4 @@ abstract class Bindings extends \lang\Object {
    */
   public abstract function bind($injector);
 
-  /**
-   * Executes bindings and returns injector
-   *
-   * @return inject.Injector
-   */
-  public function injector() {
-    $injector= new Injector();
-    $this->bind($injector);
-    return $injector;
-  }
 }

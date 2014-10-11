@@ -44,39 +44,6 @@ class InjectorTest extends TestCase {
     new Injector();
   }
 
-  #[@test]
-  public function can_optionally_be_given_binding() {
-    $inject= new Injector(newinstance('inject.Bindings', [], [
-      'bind' => function($inject) {
-        $inject->bind('inject.unittest.fixture.Storage', new FileSystem());
-      }
-    ]));
-    $this->assertInstanceOf(
-      'inject.unittest.fixture.FileSystem',
-      $inject->get('inject.unittest.fixture.Storage')
-    );
-  }
-
-  #[@test]
-  public function can_optionally_be_given_bindings() {
-    $inject= new Injector(
-      newinstance('inject.Bindings', [], [
-        'bind' => function($inject) { $inject->bind('inject.unittest.fixture.Storage', new FileSystem()); }
-      ]),
-      newinstance('inject.Bindings', [], [
-        'bind' => function($inject) { $inject->bind('util.Currency', Currency::$EUR, 'EUR'); }
-      ])
-    );
-    $this->assertInstanceOf(
-      'inject.unittest.fixture.FileSystem',
-      $inject->get('inject.unittest.fixture.Storage')
-    );
-    $this->assertEquals(
-      Currency::$EUR,
-      $inject->get('util.Currency', 'EUR')
-    );
-  }
-
   #[@test, @values('bindings')]
   public function bind_interface_to_implementation($type, $impl) {
     $inject= new Injector();
