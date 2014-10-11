@@ -26,10 +26,10 @@ class Injector extends \lang\Object {
    * @param  inject.Bindings... $initial
    */
   public function __construct() {
-    foreach (func_get_args() as $bindings) {
-      $bindings->configure($this);
-    }
     $this->bind($this->getClass(), $this);
+    foreach (func_get_args() as $bindings) {
+      $this->add($bindings);
+    }
   }
 
   /**
@@ -48,6 +48,17 @@ class Injector extends \lang\Object {
     } else {
       return new ClassBinding($t, XPClass::forName((string)$impl));
     }
+  }
+
+  /**
+   * Add bindings
+   *
+   * @param  inject.Bindings $bindings
+   * @return self
+   */
+  public function add(Bindings $bindings) {
+    $bindings->configure($this);
+    return $this;
   }
 
   /**
