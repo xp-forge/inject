@@ -23,7 +23,7 @@ $injector->bind('com.example.Report', 'com.example.HtmlReport');
 
 // Reusable via Bindings instances
 class ApplicationDefaults extends Bindings {
-  public function bind($injector) {
+  public function configure($injector) {
     $injector->bind('com.example.Report', 'com.example.HtmlReport');
   }
 }
