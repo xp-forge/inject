@@ -13,14 +13,12 @@ class InjectorTest extends TestCase {
   /** @return var[][] */
   protected function bindings() {
     $instance= new FileSystem();
-    $provider= new InstanceProvider($instance);
+    $name= 'inject.unittest.fixture.Storage';
     return [
-      ['inject.unittest.fixture.Storage', XPClass::forName('inject.unittest.fixture.FileSystem')],
-      ['inject.unittest.fixture.Storage', $instance],
-      ['inject.unittest.fixture.Storage', $provider],
-      [XPClass::forName('inject.unittest.fixture.Storage'), XPClass::forName('inject.unittest.fixture.FileSystem')],
-      [XPClass::forName('inject.unittest.fixture.Storage'), $instance],
-      [XPClass::forName('inject.unittest.fixture.Storage'), $provider]
+      [$name, XPClass::forName('inject.unittest.fixture.FileSystem')],
+      [$name, $instance],
+      [XPClass::forName($name), XPClass::forName('inject.unittest.fixture.FileSystem')],
+      [XPClass::forName($name), $instance]
     ];
   }
 
@@ -86,6 +84,13 @@ class InjectorTest extends TestCase {
     $inject= new Injector();
     $inject->bind($type, $impl, 'test');
     $this->assertNull($inject->get($type, 'another-name-than-the-one-bound'));
+  }
+
+  #[@test, @values('bindings')]
+  public function get_type_bound_by_name_returns_null_when_fetched_without_name($type, $impl) {
+    $inject= new Injector();
+    $inject->bind($type, $impl, 'test');
+    $this->assertNull($inject->get($type));
   }
 
   #[@test]

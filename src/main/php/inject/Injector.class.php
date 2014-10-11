@@ -33,11 +33,7 @@ class Injector extends \lang\Object {
    */
   public function bind($type, $impl, $name= null) {
     $key= $type instanceof Type ? $type->literal() : Type::forName($type)->literal();
-    if ($impl instanceof Provider) {
-      $this->bindings[$key.$name]= $impl;
-    } else {
-      $this->bindings[$key.$name]= new InstanceProvider($impl);
-    }
+    $this->bindings[$key.$name]= $impl;
     return $this;
   }
   
@@ -51,9 +47,7 @@ class Injector extends \lang\Object {
   public function get($type, $name= null) {
     $key= $type instanceof Type ? $type->literal() : Type::forName($type)->literal();
     if (isset($this->bindings[$combined= $key.$name])) {
-      $bound= $this->bindings[$combined]->get();
-    } else if (isset($this->bindings[$key])) {
-      $bound= $this->bindings[$key]->get($name);
+      $bound= $this->bindings[$combined];
     } else {
       return null;
     }
