@@ -65,6 +65,11 @@ class InjectorTest extends TestCase {
     $this->assertNull((new Injector())->get('inject.unittest.fixture.Storage'));
   }
 
+  #[@test]
+  public function no_implicit_binding_for_abstract_classes() {
+    $this->assertNull((new Injector())->get('inject.unittest.fixture.AbstractStorage'));
+  }
+
   #[@test, @values('bindings')]
   public function get_named_implementation_bound_to_interface($type, $impl) {
     $inject= new Injector();
