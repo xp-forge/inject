@@ -63,6 +63,8 @@ class Injector extends \lang\Object {
     } else if (isset($this->bindings[$combined= $t->literal().$name])) {
       $bound= $this->bindings[$combined];
       return $bound instanceof XPClass ? $this->newInstance($bound) : $bound;
+    } else if ($t instanceof XPClass && !($t->isInterface() || $t->getModifiers() & MODIFIER_ABSTRACT)) {
+      return $this->newInstance($t);
     } else {
       return null;
     }

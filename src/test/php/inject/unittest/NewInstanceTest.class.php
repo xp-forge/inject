@@ -4,6 +4,7 @@ use inject\Injector;
 use unittest\TestCase;
 use util\Currency;
 use lang\ClassLoader;
+use lang\Runnable;
 
 class NewInstanceTest extends TestCase {
 
@@ -62,7 +63,7 @@ class NewInstanceTest extends TestCase {
   public function constructor_injecting_unbound() {
     $inject= new Injector();
     $inject->bind('inject.unittest.fixture.Storage', $this->newStorage([
-      '#[@inject] __construct' => function(TestCase $param) { /* Empty */ }
+      '#[@inject] __construct' => function(Runnable $param) { /* Empty */ }
     ]));
     $inject->get('inject.unittest.fixture.Storage');
   }
@@ -100,7 +101,7 @@ class NewInstanceTest extends TestCase {
   public function field_injecting_unbound() {
     $inject= new Injector();
     $inject->bind('inject.unittest.fixture.Storage', $this->newStorage([
-      '#[@inject, @type("unittest.TestCase")] injected' => null,
+      '#[@inject, @type("lang.Runnable")] injected' => null,
     ]));
     $inject->get('inject.unittest.fixture.Storage');
   }
@@ -154,7 +155,7 @@ class NewInstanceTest extends TestCase {
   public function method_injecting_unbound() {
     $inject= new Injector();
     $inject->bind('inject.unittest.fixture.Storage', $this->newStorage([
-      '#[@inject] inject' => function(TestCase $param) { /* Empty */ }
+      '#[@inject] inject' => function(Runnable $param) { /* Empty */ }
     ]));
     $inject->get('inject.unittest.fixture.Storage');
   }

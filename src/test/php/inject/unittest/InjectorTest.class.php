@@ -44,16 +44,23 @@ class InjectorTest extends TestCase {
     $this->assertEquals($inject, $inject->get('inject.Injector'));
   }
 
-  #[@test]
-  public function get_unbound_type_returns_null() {
-    $this->assertNull((new Injector())->get('inject.unittest.fixture.Storage'));
-  }
-
   #[@test, @values('bindings')]
   public function get_implementation_bound_to_interface($type, $impl) {
     $inject= new Injector();
     $inject->bind($type, $impl);
     $this->assertInstanceOf('inject.unittest.fixture.FileSystem', $inject->get($type));
+  }
+
+  #[@test]
+  public function creates_implicit_binding_when_no_explicit_binding_exists_and_type_is_concrete() {
+    $inject= new Injector();
+    $impl= 'inject.unittest.fixture.FileSystem';
+    $this->assertInstanceOf($impl, $inject->get($impl));
+  }
+
+  #[@test]
+  public function get_unbound_type_returns_null() {
+    $this->assertNull((new Injector())->get('inject.unittest.fixture.Storage'));
   }
 
   #[@test, @values('bindings')]
