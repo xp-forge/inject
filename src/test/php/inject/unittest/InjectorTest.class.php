@@ -90,6 +90,36 @@ class InjectorTest extends TestCase {
     $inject->bind('string', '82523c0');
   }
 
+  #[@test, @expect('lang.IllegalArgumentException')]
+  public function cannot_bind_non_concrete_implementation() {
+    $inject= new Injector();
+    $inject->bind('inject.unittest.fixture.Storage', 'inject.unittest.fixture.AbstractStorage');
+  }
+
+  #[@test, @expect('lang.IllegalArgumentException')]
+  public function cannot_bind_uncompatible_instance() {
+    $inject= new Injector();
+    $inject->bind('inject.unittest.fixture.Storage', $this);
+  }
+
+  #[@test, @expect('lang.IllegalArgumentException')]
+  public function cannot_bind_uncompatible_class() {
+    $inject= new Injector();
+    $inject->bind('inject.unittest.fixture.Storage', XPClass::forName('unittest.TestCase'));
+  }
+
+  #[@test, @expect('lang.IllegalArgumentException')]
+  public function cannot_bind_uncompatible_class_name() {
+    $inject= new Injector();
+    $inject->bind('inject.unittest.fixture.Storage', 'unittest.TestCase');
+  }
+
+  #[@test, @expect('lang.ClassNotFoundException')]
+  public function cannot_bind_non_existant_class() {
+    $inject= new Injector();
+    $inject->bind('inject.unittest.fixture.Storage', '@non.existant.class@');
+  }
+
   #[@test, @values('bindings')]
   public function get_named_implementation_bound_to_interface($type, $impl) {
     $inject= new Injector();

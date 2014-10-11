@@ -31,6 +31,45 @@ class Injector extends \lang\Object {
   }
 
   /**
+   * Tests whether a class is a concrete type
+   *
+   * @param  lang.XPClass $class
+   * @return bool
+   */
+  protected function isConcrete($class) {
+    return !($class->isInterface() || $class->getModifiers() & MODIFIER_ABSTRACT);
+  }
+
+  /**
+   * Returns a binding
+   *
+   * @param  lang.XPClass $t
+   * @param  lang.XPClass $impl
+   */
+  protected function asBinding($t, $impl) {
+    if ($impl instanceof XPClass) {
+      $class= $impl;
+    } else if (self::$PROVIDER->isInstance($impl) || $impl instanceof Provider) {
+      return $impl;
+    } else if ($impl instanceof Generic) {
+      if ($t->isInstance($impl)) return $impl;
+      throw new IllegalArgumentException($impl->getClassName().' is not an instance of '.$t);
+    } else {
+      $class= XPClass::forName((string)$impl);
+    }
+
+    if ($t->isAssignableFrom($class)) {
+      if ($this->isConcrete($class)) {
+        return $class;
+      } else {
+        throw new IllegalArgumentException('Cannot bind to non-concrete type '.$t);
+      }
+    } else {
+      throw new IllegalArgumentException($class.' is not an instance of '.$t);
+    }
+  }
+
+  /**
    * Add a binding
    *
    * @param   var $type either a lang.Type instance or a type name
@@ -43,7 +82,7 @@ class Injector extends \lang\Object {
     $t= $type instanceof Type ? $type : Type::forName($type);
 
     if ($t instanceof XPClass) {
-      $this->bindings[$t->literal().$name]= is_string($impl) ? XPClass::forName($impl) : $impl;
+      $this->bindings[$t->literal().$name]= $this->asBinding($t, $impl);
     } else if (null === $name) {
       throw new IllegalArgumentException('Cannot bind non-class type '.$t.' without a name');
     } else {
@@ -101,7 +140,7 @@ class Injector extends \lang\Object {
       }
     } else if (isset($this->bindings[$combined= $t->literal().$name])) {
       return $this->asInstance($this->bindings[$combined]);
-    } else if ($t instanceof XPClass && !($t->isInterface() || $t->getModifiers() & MODIFIER_ABSTRACT)) {
+    } else if ($t instanceof XPClass && $this->isConcrete($t)) {
       return $this->newInstance($t);
     } else {
       return null;
