@@ -47,28 +47,16 @@ class Injector extends \lang\Object {
    *
    * @param  lang.XPClass $t
    * @param  lang.XPClass $impl
-   * @throws lang.IllegalArgumentException
    */
   protected function asBinding($t, $impl) {
     if ($impl instanceof XPClass) {
-      $class= $impl;
+      return new ClassBinding($t, $impl);
     } else if (self::$PROVIDER->isInstance($impl) || $impl instanceof Provider) {
-      return $impl;
+      return new ProviderBinding($t, $impl);
     } else if ($impl instanceof Generic) {
-      if ($t->isInstance($impl)) return $impl;
-      throw new IllegalArgumentException($impl->getClassName().' is not an instance of '.$t);
+      return new InstanceBinding($t, $impl);
     } else {
-      $class= XPClass::forName((string)$impl);
-    }
-
-    if ($t->isAssignableFrom($class)) {
-      if ($this->isConcrete($class)) {
-        return $class;
-      } else {
-        throw new IllegalArgumentException('Cannot bind to non-concrete type '.$t);
-      }
-    } else {
-      throw new IllegalArgumentException($class.' is not an instance of '.$t);
+      return new ClassBinding($t, XPClass::forName((string)$impl));
     }
   }
 
@@ -89,40 +77,10 @@ class Injector extends \lang\Object {
     } else if (null === $name) {
       throw new IllegalArgumentException('Cannot bind non-class type '.$t.' without a name');
     } else {
-      $this->bindings[$t->literal().$name]= $impl;
+      $this->bindings[$t->literal().$name]= new InstanceBinding($t, $impl);
     }
 
     return $this;
-  }
-
-  /**
-   * Returns a bound value as a instance
-   *
-   * @param  var $bound
-   * @return var
-   */
-  protected function asInstance($bound) {
-    if ($bound instanceof XPClass) {
-      return $this->newInstance($bound);
-    } else {
-      return $bound;
-    }
-  }
-
-  /**
-   * Returns a bound value as a provider
-   *
-   * @param  var $bound
-   * @return inject.Provider<?>
-   */
-  protected function asProvider($bound) {
-    if (self::$PROVIDER->isInstance($bound) || $bound instanceof Provider) {
-      return $bound;
-    } else if ($bound instanceof XPClass) {
-      return new TypeProvider($bound, $this);
-    } else {
-      return new InstanceProvider($bound);
-    }
   }
 
   /**
@@ -137,12 +95,12 @@ class Injector extends \lang\Object {
 
     if (self::$PROVIDER->isAssignableFrom($t)) {
       if (isset($this->bindings[$combined= $t->genericArguments()[0]->literal().$name])) {
-        return $this->asProvider($this->bindings[$combined]);
+        return $this->bindings[$combined]->provider($this);
       } else {
         return null;
       }
     } else if (isset($this->bindings[$combined= $t->literal().$name])) {
-      return $this->asInstance($this->bindings[$combined]);
+      return $this->bindings[$combined]->resolve($this);
     } else if ($t instanceof XPClass && $this->isConcrete($t)) {
       return $this->newInstance($t);
     } else {
