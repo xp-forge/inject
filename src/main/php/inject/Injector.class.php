@@ -173,9 +173,9 @@ class Injector extends \lang\Object {
       try {
         $instance= $constructor->newInstance($this->args($constructor, $args, true));
       } catch (TargetInvocationException $e) {
-        throw new ProvisionException('Error creating an instance of '.$class->getName().': '.$e->getCause()->getMessage(), $e->getCause());
+        throw new ProvisionException('Error creating an instance of '.$class->getName(), $e->getCause());
       } catch (Throwable $e) {
-        throw new ProvisionException('Error creating an instance of '.$class->getName().': '.$e->getMessage(), $e);
+        throw new ProvisionException('Error creating an instance of '.$class->getName(), $e);
       }
     } else {
       $instance= $class->newInstance();
@@ -199,7 +199,7 @@ class Injector extends \lang\Object {
       try {
         $field->set($instance, $this->bound($field->getAnnotation('inject'), $field->getType()));
       } catch (Throwable $e) {
-        throw new ProvisionException('Error setting '.$class->getName().'::$'.$field->getName().': '.$e->getMessage());
+        throw new ProvisionException('Error setting '.$class->getName().'::$'.$field->getName());
       }
     }
 
@@ -208,9 +208,9 @@ class Injector extends \lang\Object {
       try {
         $method->invoke($instance, $args);
       } catch (TargetInvocationException $e) {
-        throw new ProvisionException('Error invoking '.$class->getName().'::'.$method->getName().': '.$e->getCause()->getMessage(), $e->getCause());
+        throw new ProvisionException('Error invoking '.$class->getName().'::'.$method->getName(), $e->getCause());
       } catch (Throwable $e) {
-        throw new ProvisionException('Error invoking '.$class->getName().'::'.$method->getName().': '.$e->getMessage(), $e);
+        throw new ProvisionException('Error invoking '.$class->getName().'::'.$method->getName(), $e);
       }
     }
 

@@ -59,7 +59,7 @@ class NewInstanceTest extends TestCase {
     $this->assertEquals([$this, Currency::$EUR], $inject->get('inject.unittest.fixture.Storage')->injected);
   }
 
-  #[@test, @expect(class= 'inject.ProvisionException', withMessage= '/Unknown injection type/')]
+  #[@test, @expect(class= 'inject.ProvisionException', withMessage= '/Error creating an instance/')]
   public function constructor_injecting_unbound() {
     $inject= new Injector();
     $inject->bind('inject.unittest.fixture.Storage', $this->newStorage([
@@ -68,7 +68,7 @@ class NewInstanceTest extends TestCase {
     $inject->get('inject.unittest.fixture.Storage');
   }
 
-  #[@test, @expect(class= 'inject.ProvisionException', withMessage= '/Test/')]
+  #[@test, @expect(class= 'inject.ProvisionException', withMessage= '/Error creating an instance/')]
   public function constructor_throwing_an_exception_raises_ProvisionException() {
     $inject= new Injector();
     $inject->bind('inject.unittest.fixture.Storage', $this->newStorage([
@@ -97,7 +97,7 @@ class NewInstanceTest extends TestCase {
     $this->assertEquals($this, $inject->get('inject.unittest.fixture.Storage')->injected);
   }
 
-  #[@test, @expect(class= 'inject.ProvisionException', withMessage= '/Unknown injection type/')]
+  #[@test, @expect(class= 'inject.ProvisionException', withMessage= '/Error setting/')]
   public function field_injecting_unbound() {
     $inject= new Injector();
     $inject->bind('inject.unittest.fixture.Storage', $this->newStorage([
@@ -160,7 +160,7 @@ class NewInstanceTest extends TestCase {
     $inject->get('inject.unittest.fixture.Storage');
   }
 
-  #[@test, @expect(class= 'inject.ProvisionException', withMessage= '/Test/')]
+  #[@test, @expect(class= 'inject.ProvisionException', withMessage= '/Error invoking/')]
   public function method_throwing_an_exception_raises_ProvisionException() {
     $inject= new Injector();
     $inject->bind('unittest.TestCase', $this); 
