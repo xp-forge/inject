@@ -3,8 +3,9 @@
 use lang\Type;
 use lang\XPClass;
 use lang\Generic;
-use lang\IllegalArgumentException;
 use lang\Throwable;
+use lang\IllegalArgumentException;
+use lang\reflect\TargetInvocationException;
 
 /**
  * Injector
@@ -223,7 +224,7 @@ class Injector extends \lang\Object {
       $constructor= $class->getConstructor();
       try {
         $instance= $constructor->newInstance($this->args($constructor, $args, true));
-      } catch (\lang\reflect\TargetInvocationException $e) {
+      } catch (TargetInvocationException $e) {
         throw new ProvisionException('Error creating an instance of '.$class->getName().': '.$e->getCause()->getMessage(), $e->getCause());
       } catch (Throwable $e) {
         throw new ProvisionException('Error creating an instance of '.$class->getName().': '.$e->getMessage(), $e);
@@ -258,7 +259,7 @@ class Injector extends \lang\Object {
       if (null === ($args= $this->args($method, [], false))) continue;
       try {
         $method->invoke($instance, $args);
-      } catch (\lang\reflect\TargetInvocationException $e) {
+      } catch (TargetInvocationException $e) {
         throw new ProvisionException('Error invoking '.$class->getName().'::'.$method->getName().': '.$e->getCause()->getMessage(), $e->getCause());
       } catch (Throwable $e) {
         throw new ProvisionException('Error invoking '.$class->getName().'::'.$method->getName().': '.$e->getMessage(), $e);
