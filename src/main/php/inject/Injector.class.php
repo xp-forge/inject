@@ -36,7 +36,7 @@ class Injector extends \lang\Object {
    * Returns a binding
    *
    * @param  lang.XPClass $t
-   * @param  lang.XPClass $impl
+   * @param  var $impl
    */
   protected function asBinding($t, $impl) {
     if ($impl instanceof XPClass) {
