@@ -70,6 +70,20 @@ class InjectorTest extends TestCase {
     $this->assertNull((new Injector())->get('inject.unittest.fixture.AbstractStorage'));
   }
 
+  #[@test]
+  public function bind_string_named() {
+    $inject= new Injector();
+    $inject->bind('string', '82523c0', 'API Key');
+    $this->assertEquals('82523c0', $inject->get('string', 'API Key'));
+  }
+
+  #[@test]
+  public function bind_int_named() {
+    $inject= new Injector();
+    $inject->bind('int', 4, 'Timeout');
+    $this->assertEquals(4, $inject->get('int', 'Timeout'));
+  }
+
   #[@test, @values('bindings')]
   public function get_named_implementation_bound_to_interface($type, $impl) {
     $inject= new Injector();
