@@ -1,6 +1,6 @@
 <?php namespace inject;
 
-#[@generic(implements= ['lang.XPClass'])]
+#[@generic(implements= ['var'])]
 class TypeProvider extends \lang\Object implements Provider {
   protected $type;
   protected $injector;
