@@ -33,16 +33,6 @@ class Injector extends \lang\Object {
   }
 
   /**
-   * Tests whether a class is a concrete type
-   *
-   * @param  lang.XPClass $class
-   * @return bool
-   */
-  protected function isConcrete($class) {
-    return !($class->isInterface() || $class->getModifiers() & MODIFIER_ABSTRACT);
-  }
-
-  /**
    * Returns a binding
    *
    * @param  lang.XPClass $t
@@ -101,7 +91,7 @@ class Injector extends \lang\Object {
       }
     } else if (isset($this->bindings[$combined= $t->literal().$name])) {
       return $this->bindings[$combined]->resolve($this);
-    } else if ($t instanceof XPClass && $this->isConcrete($t)) {
+    } else if ($t instanceof XPClass && !($t->isInterface() || $t->getModifiers() & MODIFIER_ABSTRACT)) {
       return $this->newInstance($t);
     } else {
       return null;
