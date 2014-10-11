@@ -29,7 +29,7 @@ class MethodInvocation extends \lang\Object {
   /** @return var[] */
   public function arguments() { return $this->arguments; }
 
-  /** @return void */
+  /** @return var */
   public function proceed() {
     return $this->routine->invoke($this->instance, $this->arguments);
  }
