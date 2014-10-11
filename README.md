@@ -32,7 +32,7 @@ $injector= new Injector(new ApplicationDefaults());
 
 Instance creation
 -----------------
-Keep in mind: *"injector.get() is the new 'new'"*. To create objects and perform injection, use the Injector's get() method instead of using the `new` keyword or factories.
+Keep in mind: ***"injector.get() is the new 'new'"***. To create objects and perform injection, use the Injector's get() method instead of using the `new` keyword or factories.
 
 ```php
 $injector->bind('com.example.Report', 'com.example.HtmlReport');
