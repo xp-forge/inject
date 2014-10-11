@@ -15,6 +15,20 @@ Values can be bound to the injector by using its `bind()` method. It accepts the
 * **Binding an class**: The typical usecase, where we bind an interface to its concrete implementation.
 * **Binding an instance**: By binding a type to an existing instance, we can create a "singleton" model.
 
+```php
+// Manually
+$injector= new Injector();
+$injector->bind('com.example.Report', 'com.example.HtmlReport');
+
+// Reusable via Bindings instances
+class ApplicationDefaults extends Bindings {
+  public function bind($injector) {
+    $injector->bind('com.example.Report', 'com.example.HtmlReport');
+  }
+}
+$injector= new Injector(new ApplicationDefaults());
+```
+
 Instance creation
 -----------------
 Keep in mind: *"injector.get() is the new 'new'"*. To create objects and perform injection, use the Injector's get() method instead of using the `new` keyword or factories.
