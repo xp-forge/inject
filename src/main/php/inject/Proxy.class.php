@@ -43,11 +43,15 @@ class Proxy extends \lang\Object {
     }
 
     return 'function '.$routine->getName().'('.substr($signature, 2).') {
-      return self::$__intercept->invoke(new \inject\MethodInvocation(
+      $invocation= new \inject\MethodInvocation(
         $this,
         \''.$routine->getName().'\',
         ['.substr($args, 2).']
-      ));
+      );
+      self::$__intercept->invoke($invocation);
+      if ($invocation->proceed) {
+        return parent::'.$routine->getName().'('.substr($args, 2).');
+      }
     }';
   }
 

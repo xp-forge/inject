@@ -17,6 +17,7 @@ class InterceptionTest extends TestCase {
       newinstance('inject.MethodInterception', [], [
         'invoke' => function($invocation) use($log) {
           $log[]= $invocation;
+          return $invocation->proceed();
         }
       ])
     ));

@@ -6,6 +6,7 @@ class MethodInvocation extends \lang\Object {
   protected $instance;
   protected $method;
   protected $arguments;
+  public $proceed;
 
   /**
    * Creates a new method invocation
@@ -18,6 +19,7 @@ class MethodInvocation extends \lang\Object {
     $this->instance= $instance;
     $this->method= $method;
     $this->arguments= $arguments;
+    $this->proceed= false;
   }
 
   /** @return lang.Generic */
@@ -29,14 +31,8 @@ class MethodInvocation extends \lang\Object {
   /** @return var[] */
   public function arguments() { return $this->arguments; }
 
-  /**
-   * Proceed with the call
-   *
-   * @return var
-   */
-  public function proceed() {
-    return call_user_func_array([$this->instance, $this->method], $this->arguments);
-  }
+  /** @return void */
+  public function proceed() { $this->proceed= true; }
 
   /**
    * Returns whether a given value is equal to this method invocation
