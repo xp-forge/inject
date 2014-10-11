@@ -4,38 +4,38 @@ use util\Objects;
 
 class MethodInvocation extends \lang\Object {
   protected $instance;
-  protected $method;
+  protected $routine;
   protected $arguments;
-  public $proceed;
 
   /**
-   * Creates a new method invocation
+   * Creates a new routine invocation
    *
    * @param  lang.Generic $instance
-   * @param  string $method
+   * @param  lang.reflect.Routine $routine
    * @param  var[] $arguments
    */
-  public function __construct($instance, $method, $arguments) {
+  public function __construct($instance, $routine, $arguments) {
     $this->instance= $instance;
-    $this->method= $method;
+    $this->routine= $routine;
     $this->arguments= $arguments;
-    $this->proceed= false;
   }
 
   /** @return lang.Generic */
   public function instance() { return $this->instance; }
 
   /** @return string */
-  public function method() { return $this->method; }
+  public function routine() { return $this->routine; }
 
   /** @return var[] */
   public function arguments() { return $this->arguments; }
 
   /** @return void */
-  public function proceed() { $this->proceed= true; }
+  public function proceed() {
+    return $this->routine->invoke($this->instance, $this->arguments);
+ }
 
   /**
-   * Returns whether a given value is equal to this method invocation
+   * Returns whether a given value is equal to this routine invocation
    *
    * @param  var $cmp
    * @return bool
@@ -44,7 +44,7 @@ class MethodInvocation extends \lang\Object {
     return (
       $cmp instanceof self &&
       $this->instance === $cmp->instance &&
-      $this->method === $cmp->method &&
+      $this->routine->equals($cmp->routine) &&
       Objects::equal($this->arguments, $cmp->arguments)
     );
   }

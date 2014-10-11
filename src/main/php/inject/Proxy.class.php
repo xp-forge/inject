@@ -11,13 +11,16 @@ class Proxy extends \lang\Object {
    * @param  lang.XPClass $type
    */
   public function __construct($type) {
-    $decl= '{ public static $__intercept; ';
+    $decl= '{ public static $__intercept, $__routines; ';
+    $routines= [];
     foreach ($type->getDeclaredMethods() as $method) {
       $decl.= $this->declarationOf($method);
+      $routines[$method->getName()]= $method;
     }
     $decl.= '}';
 
     $this->class= ClassLoader::defineClass($type->getName().'Proxy'.(self::$uniq++), $type, [], $decl);
+    $this->class->getField('__routines')->set(null, $routines);
   }
 
   /**
@@ -45,13 +48,10 @@ class Proxy extends \lang\Object {
     return 'function '.$routine->getName().'('.substr($signature, 2).') {
       $invocation= new \inject\MethodInvocation(
         $this,
-        \''.$routine->getName().'\',
+        self::$__routines[\''.$routine->getName().'\'],
         ['.substr($args, 2).']
       );
-      self::$__intercept->invoke($invocation);
-      if ($invocation->proceed) {
-        return parent::'.$routine->getName().'('.substr($args, 2).');
-      }
+      return self::$__intercept->invoke($invocation);
     }';
   }
 
