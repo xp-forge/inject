@@ -23,7 +23,7 @@ class InterceptionTest extends TestCase {
     ));
 
     $instance= $inject->get('inject.unittest.fixture.Storage');
-    $instance->store('Hello');
+    $this->assertEquals('Stored "Hello"', $instance->store('Hello'));
     $this->assertEquals([new MethodInvocation($instance, 'store', ['Hello'])], $log->elements());
   }
 }
