@@ -7,6 +7,6 @@ class InstanceProvider extends \lang\Object implements Provider {
   /** @param var */
   public function __construct($instance= null) { $this->instance= $instance; }
 
-  /** @retun var */
+  /** @return var */
   public function get() { return $this->instance; }
 }

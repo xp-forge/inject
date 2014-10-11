@@ -16,6 +16,6 @@ class TypeProvider extends \lang\Object implements Provider {
     $this->injector= $injector;
   }
 
-  /** @retun var */
+  /** @return var */
   public function get() { return $this->injector->newInstance($this->type); }
 }
