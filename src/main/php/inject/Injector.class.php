@@ -42,7 +42,7 @@ class Injector extends \lang\Object {
     $this->bindings[$key.$name]= $impl;
     return $this;
   }
-  
+
   /**
    * Get a binding
    *
