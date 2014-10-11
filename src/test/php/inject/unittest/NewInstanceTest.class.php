@@ -17,8 +17,8 @@ class NewInstanceTest extends TestCase {
   protected function newStorage($definition) {
     return ClassLoader::defineClass(
       'inject.unittest.fixture.'.$this->name,
-      'lang.Object',
-      ['inject.unittest.fixture.Storage'],
+      'inject.unittest.fixture.FileSystem',
+      [],
       $definition
     );
   }

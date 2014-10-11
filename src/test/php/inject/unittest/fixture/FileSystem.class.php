@@ -2,4 +2,7 @@
 
 class FileSystem extends \lang\Object implements Storage {
 
+  public function store($data) {
+    // Implementation missing
+  }
 }

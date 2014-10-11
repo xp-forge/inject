@@ -2,4 +2,5 @@
 
 interface Storage {
 
+  public function store($data);
 }
