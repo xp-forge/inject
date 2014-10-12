@@ -1,11 +1,11 @@
-<?php namespace inject;
+<?php namespace inject\aop;
 
 interface MethodInterception {
 
   /**
    * Intercept a method invocation
    *
-   * @param  inject.MethodInvocation $invocation
+   * @param  inject.aop.MethodInvocation $invocation
    */
   public function invoke($invocation);
 }

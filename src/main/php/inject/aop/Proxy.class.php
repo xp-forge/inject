@@ -1,4 +1,4 @@
-<?php namespace inject;
+<?php namespace inject\aop;
 
 use lang\XPClass;
 use lang\ClassLoader;
@@ -11,7 +11,7 @@ class Proxy extends \lang\Object {
    * Creates a new proxy for a given type
    *
    * @param  lang.XPClass $type
-   * @param  inject.MethodInterception $interception
+   * @param  inject.aop.MethodInterception $interception
    */
   public function __construct(XPClass $type, MethodInterception $interception) {
     $decl= '{ public static $__intercept, $__routines; ';
@@ -37,7 +37,7 @@ class Proxy extends \lang\Object {
   protected function proxyMethod($i, $routine) {
     $decl= new MethodDeclaration($routine);
     return $decl->withBody('
-      return self::$__intercept->invoke(new \inject\MethodInvocation(
+      return self::$__intercept->invoke(new \inject\aop\MethodInvocation(
         $this,
         self::$__routines['.$i.'],
         ['.$decl->arguments().']

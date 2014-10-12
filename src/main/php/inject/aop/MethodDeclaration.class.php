@@ -1,4 +1,4 @@
-<?php namespace inject;
+<?php namespace inject\aop;
 
 use lang\reflect\Routine;
 
