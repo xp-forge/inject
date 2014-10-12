@@ -6,7 +6,6 @@ use lang\XPClass;
 class ProxyProvider extends \lang\Object implements Provider {
   protected $proxy;
   protected $injector;
-  protected $interception;
 
   /**
    * Creates a new type provider
@@ -16,13 +15,15 @@ class ProxyProvider extends \lang\Object implements Provider {
    * @param  inject.MethodInterception $interception
    */
   public function __construct($type, Injector $injector, MethodInterception $interception) {
-    $this->proxy= new Proxy($type instanceof XPClass ? $type : XPClass::forName($type));
+    $this->proxy= new Proxy(
+      $type instanceof XPClass ? $type : XPClass::forName($type),
+      $interception
+    );
     $this->injector= $injector;
-    $this->interception= $interception;
   }
 
   /** @return var */
   public function get() {
-    return $this->injector->newInstance($this->proxy->withInterception($this->interception));
+    return $this->injector->newInstance($this->proxy->type());
   }
 }
