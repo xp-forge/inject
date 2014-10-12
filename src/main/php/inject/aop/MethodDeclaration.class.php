@@ -2,6 +2,11 @@
 
 use lang\reflect\Routine;
 
+/**
+ * Method declaration
+ *
+ * @test  xp://inject.unittest.aop.MethodDeclarationTest
+ */
 class MethodDeclaration extends \lang\Object {
 
   /**
@@ -11,13 +16,14 @@ class MethodDeclaration extends \lang\Object {
    */
   public function __construct(Routine $routine) {
     $arguments= $signature= '';
-    foreach ($routine->getParameters() as $i => $param) {
-      $arguments.= ', $__a'.$i;
+    foreach ($routine->getParameters() as $param) {
+      $name= $param->getName();
+      $arguments.= ', $'.$name;
 
       if ($restrict= $param->getTypeRestriction()) {
-        $signature.= ', '.$restrict.' $__a'.$i;
+        $signature.= ', '.strtr($restrict, '.', '\\').' $'.$name;
       } else {
-        $signature.= ', $__a'.$i;
+        $signature.= ', $'.$name;
       }
 
       if ($param->isOptional()) {
@@ -26,8 +32,8 @@ class MethodDeclaration extends \lang\Object {
     }
 
     $this->name= $routine->getName();
-    $this->signature= substr($signature, 2);
-    $this->arguments= substr($arguments, 2);
+    $this->signature= $signature ? substr($signature, 2) : '';
+    $this->arguments= $arguments ? substr($arguments, 2) : '';
   }
 
   /** @return string */
@@ -46,7 +52,7 @@ class MethodDeclaration extends \lang\Object {
    * @return string
    */
   public function withBody($body) { 
-    return 'function '.$this->name.'('.$this->signature.') {'.$body.'}';
+    return 'function '.$this->name.'('.$this->signature.') { '.$body.' }';
   }
 
   /**
