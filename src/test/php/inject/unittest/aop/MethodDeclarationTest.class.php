@@ -12,7 +12,7 @@ class MethodDeclarationTest extends TestCase {
   protected function fixture1($arg) { }
 
   /** @return void */
-  protected function fixture($a, self $b, array $c, $d= true) { }
+  protected function fixture($a, self $b, array $c, callable $d, $e= true) { }
 
   /**
    * Returns a method declaration instance for a given fixture in this class
@@ -47,7 +47,7 @@ class MethodDeclarationTest extends TestCase {
   #[@test]
   public function signature() {
     $this->assertEquals(
-      '$a, inject\unittest\aop\MethodDeclarationTest $b, array $c, $d= true',
+      '$a, inject\unittest\aop\MethodDeclarationTest $b, array $c, callable $d, $e= true',
       $this->declaration('fixture')->signature()
     );
   }
@@ -64,7 +64,7 @@ class MethodDeclarationTest extends TestCase {
 
   #[@test]
   public function arguments() {
-    $this->assertEquals('$a, $b, $c, $d', $this->declaration('fixture')->arguments());
+    $this->assertEquals('$a, $b, $c, $d, $e', $this->declaration('fixture')->arguments());
   }
 
   #[@test]
