@@ -8,6 +8,9 @@ use lang\reflect\Routine;
  * @test  xp://inject.unittest.aop.MethodDeclarationTest
  */
 class MethodDeclaration extends \lang\Object {
+  protected $name;
+  protected $signature;
+  protected $arguments;
 
   /**
    * Creates a new instance from a given routine

@@ -1,7 +1,14 @@
 <?php namespace inject\aop;
 
+use lang\Generic;
+use lang\reflect\Routine;
 use util\Objects;
 
+/**
+ * Method invocation
+ *
+ * @test  xp://inject.unittest.aop.MethodInvocationTest
+ */
 class MethodInvocation extends \lang\Object {
   protected $instance;
   protected $routine;
@@ -14,10 +21,11 @@ class MethodInvocation extends \lang\Object {
    * @param  lang.reflect.Routine $routine
    * @param  var[] $arguments
    */
-  public function __construct($instance, $routine, $arguments) {
+  public function __construct(Generic $instance, Routine $routine, array $arguments) {
     $this->instance= $instance;
     $this->routine= $routine;
     $this->arguments= $arguments;
+    $this->routine->setAccessible(true);
   }
 
   /** @return lang.Generic */
@@ -32,7 +40,7 @@ class MethodInvocation extends \lang\Object {
   /** @return var */
   public function proceed() {
     return $this->routine->invoke($this->instance, $this->arguments);
- }
+  }
 
   /**
    * Returns whether a given value is equal to this routine invocation
