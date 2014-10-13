@@ -31,7 +31,7 @@ class ClassBinding extends \lang\Object implements Binding {
    * @param  inject.Provider<?>
    */
   public function provider($injector) {
-    return new TypeProvider($this->class, $injector);
+    return (new TypeProvider($this->class))->boundTo($injector);
   }
 
   /**

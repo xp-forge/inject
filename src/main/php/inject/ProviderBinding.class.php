@@ -25,7 +25,7 @@ class ProviderBinding extends \lang\Object implements Binding {
    * @param  inject.Provider<?>
    */
   public function provider($injector) {
-    return $this->provider;
+    return $this->provider->boundTo($injector);
   }
 
   /**
@@ -35,6 +35,6 @@ class ProviderBinding extends \lang\Object implements Binding {
    * @param  var
    */
   public function resolve($injector) {
-    return $this->provider->get();
+    return $this->provider->boundTo($injector)->get();
   }
 }

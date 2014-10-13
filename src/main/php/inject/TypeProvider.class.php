@@ -1,19 +1,17 @@
 <?php namespace inject;
 
 #[@generic(implements= ['var'])]
-class TypeProvider extends \lang\Object implements Provider {
+class TypeProvider extends Provider {
   protected $type;
-  protected $injector;
 
   /**
    * Creates a new type provider
    *
    * @param  lang.XPClass $type
-   * @param  inject.Injector $injector
    */
-  public function __construct($type, $injector) {
+  public function __construct($type) {
+    parent::__construct();
     $this->type= $type;
-    $this->injector= $injector;
   }
 
   /** @return var */

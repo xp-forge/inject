@@ -4,9 +4,8 @@ use lang\XPClass;
 use inject\Injector;
 
 #[@generic(implements= ['var'])]
-class ProxyProvider extends \lang\Object implements \inject\Provider {
+class ProxyProvider extends \inject\Provider {
   protected $type;
-  protected $injector;
   protected $match;
   protected $interception;
   protected $proxy= null;
@@ -15,13 +14,12 @@ class ProxyProvider extends \lang\Object implements \inject\Provider {
    * Creates a new type provider
    *
    * @param  var $type Either an XPClass instance or a string
-   * @param  inject.Injector $injector
    * @param  inject.aop.Methods $match
    * @param  inject.aop.MethodInterception $interception
    */
-  public function __construct($type, Injector $injector, Methods $match, MethodInterception $interception) {
+  public function __construct($type, Methods $match, MethodInterception $interception) {
+    parent::__construct();
     $this->type= $type instanceof XPClass ? $type : XPClass::forName($type);
-    $this->injector= $injector;
     $this->match= $match;
     $this->interception= $interception;
   }
