@@ -15,9 +15,9 @@ class ProxyProvider extends \inject\Provider {
    *
    * @param  var $type Either an XPClass instance or a string
    * @param  inject.aop.Methods $match
-   * @param  inject.aop.MethodInterception $interception
+   * @param  inject.aop.Interception $interception
    */
-  public function __construct($type, Methods $match, MethodInterception $interception) {
+  public function __construct($type, Methods $match, Interception $interception) {
     parent::__construct();
     $this->type= $type instanceof XPClass ? $type : XPClass::forName($type);
     $this->match= $match;

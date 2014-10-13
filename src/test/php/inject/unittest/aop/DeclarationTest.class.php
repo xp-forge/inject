@@ -1,9 +1,9 @@
 <?php namespace inject\unittest\aop;
 
-use inject\aop\MethodDeclaration;
+use inject\aop\Declaration;
 use unittest\TestCase;
 
-class MethodDeclarationTest extends TestCase {
+class DeclarationTest extends TestCase {
 
   /** @return void */
   protected function fixture0() { }
@@ -18,10 +18,10 @@ class MethodDeclarationTest extends TestCase {
    * Returns a method declaration instance for a given fixture in this class
    *
    * @param  string $name
-   * @return inject.aop.MethodDeclaration
+   * @return inject.aop.Declaration
    */
   protected function declaration($name) {
-    return new MethodDeclaration($this->getClass()->getMethod($name));
+    return new Declaration($this->getClass()->getMethod($name));
   }
 
   #[@test]
@@ -47,7 +47,7 @@ class MethodDeclarationTest extends TestCase {
   #[@test]
   public function signature() {
     $this->assertEquals(
-      '$a, inject\unittest\aop\MethodDeclarationTest $b, array $c, callable $d, $e= true',
+      '$a, inject\unittest\aop\DeclarationTest $b, array $c, callable $d, $e= true',
       $this->declaration('fixture')->signature()
     );
   }
@@ -78,7 +78,7 @@ class MethodDeclarationTest extends TestCase {
   #[@test]
   public function string_representation() {
     $this->assertEquals(
-      'inject.aop.MethodDeclaration<function fixture1($arg)>',
+      'inject.aop.Declaration<function fixture1($arg)>',
       $this->declaration('fixture1')->toString()
     );
   }

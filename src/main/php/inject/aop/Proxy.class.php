@@ -12,9 +12,9 @@ class Proxy extends \lang\Object {
    *
    * @param  lang.XPClass $type
    * @param  inject.aop.Methods $methods
-   * @param  inject.aop.MethodInterception $interception
+   * @param  inject.aop.Interception $interception
    */
-  public function __construct(XPClass $type, Methods $methods, MethodInterception $interception) {
+  public function __construct(XPClass $type, Methods $methods, Interception $interception) {
     $decl= '{ public static $__interception, $__routines; ';
     $routines=  [];
     foreach ($type->getDeclaredMethods() as $i => $method) {
@@ -38,9 +38,9 @@ class Proxy extends \lang\Object {
    * @return string
    */
   protected function proxyMethod($i, $routine) {
-    $decl= new MethodDeclaration($routine);
+    $decl= new Declaration($routine);
     return $decl->withBody('
-      return self::$__interception->invoke(new \inject\aop\MethodInvocation(
+      return self::$__interception->invoke(new \inject\aop\Invocation(
         $this,
         self::$__routines['.$i.'],
         ['.$decl->arguments().']

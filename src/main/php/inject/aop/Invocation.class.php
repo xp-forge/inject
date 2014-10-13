@@ -7,9 +7,9 @@ use util\Objects;
 /**
  * Method invocation
  *
- * @test  xp://inject.unittest.aop.MethodInvocationTest
+ * @test  xp://inject.unittest.aop.InvocationTest
  */
-class MethodInvocation extends \lang\Object {
+class Invocation extends \lang\Object {
   protected $instance;
   protected $routine;
   protected $arguments;

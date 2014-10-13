@@ -5,9 +5,9 @@ use lang\reflect\Routine;
 /**
  * Method declaration
  *
- * @test  xp://inject.unittest.aop.MethodDeclarationTest
+ * @test  xp://inject.unittest.aop.DeclarationTest
  */
-class MethodDeclaration extends \lang\Object {
+class Declaration extends \lang\Object {
   protected $name;
   protected $signature;
   protected $arguments;

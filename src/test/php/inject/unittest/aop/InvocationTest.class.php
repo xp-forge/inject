@@ -1,9 +1,9 @@
 <?php namespace inject\unittest\aop;
 
-use inject\aop\MethodInvocation;
+use inject\aop\Invocation;
 use unittest\TestCase;
 
-class MethodInvocationTest extends TestCase {
+class InvocationTest extends TestCase {
 
   /**
    * Fixture method
@@ -22,10 +22,10 @@ class MethodInvocationTest extends TestCase {
    *
    * @param  string $name
    * @param  var $args
-   * @return lang.reflect.Method
+   * @return inject.aop.Invocation
    */
   protected function invocation($name, $args) {
-    return new MethodInvocation($this, $this->getClass()->getMethod($name), $args);
+    return new Invocation($this, $this->getClass()->getMethod($name), $args);
   }
 
   #[@test]
