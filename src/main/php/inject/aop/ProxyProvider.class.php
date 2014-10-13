@@ -13,11 +13,13 @@ class ProxyProvider extends \lang\Object implements \inject\Provider {
    *
    * @param  var $type Either an XPClass instance or a string
    * @param  inject.Injector $injector
+   * @param  inject.aop.Methods $match
    * @param  inject.aop.MethodInterception $interception
    */
-  public function __construct($type, Injector $injector, MethodInterception $interception) {
+  public function __construct($type, Injector $injector, Methods $match, MethodInterception $interception) {
     $this->proxy= new Proxy(
       $type instanceof XPClass ? $type : XPClass::forName($type),
+      $match,
       $interception
     );
     $this->injector= $injector;

@@ -11,20 +11,23 @@ class Proxy extends \lang\Object {
    * Creates a new proxy for a given type
    *
    * @param  lang.XPClass $type
+   * @param  inject.aop.Methods $methods
    * @param  inject.aop.MethodInterception $interception
    */
-  public function __construct(XPClass $type, MethodInterception $interception) {
-    $decl= '{ public static $__intercept, $__routines; ';
-    $routines= [];
+  public function __construct(XPClass $type, Methods $methods, MethodInterception $interception) {
+    $decl= '{ public static $__interception, $__routines; ';
+    $routines=  [];
     foreach ($type->getDeclaredMethods() as $i => $method) {
-      $decl.= $this->proxyMethod($i, $method);
-      $routines[$i]= $method;
+      if ($methods->match($method)) {
+        $decl.= $this->proxyMethod($i, $method);
+        $routines[$i]= $method;
+      }
     }
     $decl.= '}';
 
     $this->type= ClassLoader::defineClass($type->getName().'Proxy'.(self::$uniq++), $type, [], $decl);
     $this->type->getField('__routines')->set(null, $routines);
-    $this->type->getField('__intercept')->set(null, $interception);
+    $this->type->getField('__interception')->set(null, $interception);
   }
 
   /**
@@ -37,7 +40,7 @@ class Proxy extends \lang\Object {
   protected function proxyMethod($i, $routine) {
     $decl= new MethodDeclaration($routine);
     return $decl->withBody('
-      return self::$__intercept->invoke(new \inject\aop\MethodInvocation(
+      return self::$__interception->invoke(new \inject\aop\MethodInvocation(
         $this,
         self::$__routines['.$i.'],
         ['.$decl->arguments().']
