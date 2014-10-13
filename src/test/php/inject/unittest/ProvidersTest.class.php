@@ -31,7 +31,7 @@ class ProvidersTest extends TestCase {
   #[@test]
   public function type_provider_bound_to_type_provider() {
     $inject= new Injector();
-    $provider= new TypeProvider(XPClass::forName('inject.unittest.fixture.FileSystem'), $inject);
+    $provider= new TypeProvider(XPClass::forName('inject.unittest.fixture.FileSystem'));
     $inject->bind('inject.unittest.fixture.Storage', $provider);
     $this->assertEquals($provider, $inject->get('inject.Provider<inject.unittest.fixture.Storage>'));
   }
@@ -39,7 +39,7 @@ class ProvidersTest extends TestCase {
   #[@test]
   public function type_bound_to_type_provider() {
     $inject= new Injector();
-    $provider= new TypeProvider(XPClass::forName('inject.unittest.fixture.FileSystem'), $inject);
+    $provider= new TypeProvider(XPClass::forName('inject.unittest.fixture.FileSystem'));
     $inject->bind('inject.unittest.fixture.Storage', $provider);
     $this->assertInstanceOf(
       'inject.unittest.fixture.FileSystem',
