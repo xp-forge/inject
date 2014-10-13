@@ -5,8 +5,11 @@ use inject\Injector;
 
 #[@generic(implements= ['var'])]
 class ProxyProvider extends \lang\Object implements \inject\Provider {
-  protected $proxy;
+  protected $type;
   protected $injector;
+  protected $match;
+  protected $interception;
+  protected $proxy= null;
 
   /**
    * Creates a new type provider
@@ -17,16 +20,17 @@ class ProxyProvider extends \lang\Object implements \inject\Provider {
    * @param  inject.aop.MethodInterception $interception
    */
   public function __construct($type, Injector $injector, Methods $match, MethodInterception $interception) {
-    $this->proxy= new Proxy(
-      $type instanceof XPClass ? $type : XPClass::forName($type),
-      $match,
-      $interception
-    );
+    $this->type= $type instanceof XPClass ? $type : XPClass::forName($type);
     $this->injector= $injector;
+    $this->match= $match;
+    $this->interception= $interception;
   }
 
   /** @return var */
   public function get() {
+    if (null === $this->proxy) {
+      $this->proxy= new Proxy($this->type, $this->match, $this->interception);
+    }
     return $this->injector->newInstance($this->proxy->type());
   }
 }

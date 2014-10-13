@@ -19,13 +19,13 @@ class InterceptionTest extends TestCase {
       newinstance('inject.aop.MethodInterception', [], [
         'invoke' => function($invocation) use($log) {
           $log[]= $invocation;
-          return $invocation->proceed();
+          return 'Wrapped('.$invocation->proceed().')';
         }
       ])
     ));
 
     $instance= $inject->get('inject.unittest.fixture.Storage');
-    $this->assertEquals('Stored "Hello"', $instance->store('Hello'));
+    $this->assertEquals('Wrapped(Stored "Hello")', $instance->store('Hello'));
     $this->assertEquals(
       [new MethodInvocation($instance, $instance->getClass()->getParentclass()->getMethod('store'), ['Hello'])],
       $log->elements()
