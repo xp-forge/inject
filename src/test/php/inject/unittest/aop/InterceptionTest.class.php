@@ -14,7 +14,7 @@ class InterceptionTest extends TestCase {
     $inject= new Injector();
     $inject->bind('inject.unittest.fixture.Storage', new ProxyProvider(
       'inject.unittest.fixture.FileSystem',
-      Methods::$ALL,
+      Methods::all(),
       newinstance('inject.aop.Interception', [], [
         'invoke' => function($invocation) use($log) {
           $log[]= $invocation;
