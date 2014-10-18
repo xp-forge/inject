@@ -118,4 +118,9 @@ class MethodsTest extends \unittest\TestCase {
   public function acessible_private() {
     $this->assertMethods(['c'], Methods::accessible(MODIFIER_PRIVATE));
   }
+
+  #[@test]
+  public function acessible_private_or_protected() {
+    $this->assertMethods(['b', 'c'], Methods::accessible(MODIFIER_PRIVATE | MODIFIER_PROTECTED));
+  }
 }

@@ -79,7 +79,7 @@ class Methods extends \lang\Object {
    */
   public static function accessible($modifiers) {
     return new self(function($routine) use($modifiers) {
-      return $modifiers === ($routine->getModifiers() & $modifiers);
+      return ($routine->getModifiers() & $modifiers) > 0;
     });
   }
 
