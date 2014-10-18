@@ -72,6 +72,18 @@ class Methods extends \lang\Object {
   }
 
   /**
+   * Returns all methods accessible by given modifiers
+   *
+   * @param  int $modifiers
+   * @return self
+   */
+  public static function accessible($modifiers) {
+    return new self(function($routine) use($modifiers) {
+      return $modifiers === ($routine->getModifiers() & $modifiers);
+    });
+  }
+
+  /**
    * Returns all methods where all given conditions match
    *
    * @param  self[] $conditions

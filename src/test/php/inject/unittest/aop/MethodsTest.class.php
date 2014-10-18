@@ -103,4 +103,19 @@ class MethodsTest extends \unittest\TestCase {
   public function all_via_named() {
     $this->assertMethods(['a', 'b', 'c', 'd', 'ab'], Methods::named('*'));
   }
+
+  #[@test]
+  public function acessible_public() {
+    $this->assertMethods(['a', 'd', 'ab'], Methods::accessible(MODIFIER_PUBLIC));
+  }
+
+  #[@test]
+  public function acessible_protected() {
+    $this->assertMethods(['b'], Methods::accessible(MODIFIER_PROTECTED));
+  }
+
+  #[@test]
+  public function acessible_private() {
+    $this->assertMethods(['c'], Methods::accessible(MODIFIER_PRIVATE));
+  }
 }
