@@ -23,6 +23,8 @@ class MethodsTest extends \unittest\TestCase {
 
       /** @return int */
       public function d() { }
+
+      public function ab() { }
     }');
   }
 
@@ -43,7 +45,7 @@ class MethodsTest extends \unittest\TestCase {
 
   #[@test]
   public function all_methods() {
-    $this->assertMethods(['a', 'b', 'c', 'd'], Methods::all());
+    $this->assertMethods(['a', 'b', 'c', 'd', 'ab'], Methods::all());
   }
 
   #[@test]
@@ -85,5 +87,20 @@ class MethodsTest extends \unittest\TestCase {
       Methods::returning('int'),
       Methods::annotatedWith('expect')
     ]));
+  }
+
+  #[@test]
+  public function named_a() {
+    $this->assertMethods(['a'], Methods::named('a'));
+  }
+
+  #[@test]
+  public function named_beginning_with_a() {
+    $this->assertMethods(['a', 'ab'], Methods::named('a*'));
+  }
+
+  #[@test]
+  public function all_via_named() {
+    $this->assertMethods(['a', 'b', 'c', 'd', 'ab'], Methods::named('*'));
   }
 }
