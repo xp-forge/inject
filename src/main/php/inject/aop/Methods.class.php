@@ -43,8 +43,8 @@ class Methods extends \lang\Object {
   public static function returning($type) {
     $t= $type instanceof Type ? $type : Type::forName($type);
     return new self(function($routine) use($t) {
-      $returns= $routine->getReturnType();
-      return $t->equals($returns) || $t->isAssignableFrom($returns);
+      $r= $routine->getReturnType();
+      return Type::$VOID->equals($r) ? $t->equals($r) : $t->isAssignableFrom($r);
     });
   }
 

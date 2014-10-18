@@ -64,6 +64,11 @@ class MethodsTest extends \unittest\TestCase {
   }
 
   #[@test]
+  public function returning_var() {
+    $this->assertMethods(['b', 'c', 'd', 'ab'], Methods::returning('var'));
+  }
+
+  #[@test]
   public function returning_int() {
     $this->assertMethods(['b', 'd'], Methods::returning('int'));
   }
