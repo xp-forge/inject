@@ -1,7 +1,0 @@
-{
-  "name"    : "xp-forge/inject",
-  "version" : "0.6.1-dev",
-  "require" : {
-    "xp-framework/core" : "~6.0"
-  }
-}
