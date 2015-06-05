@@ -19,6 +19,9 @@ Values can be bound to the injector by using its `bind()` method. It accepts the
 * **Binding a provider**: If we need more complicated code to create an instance, we can bind to a provider.
 
 ```php
+use inject\Injector;
+use inject\Bindings;
+
 // Manually
 $injector= new Injector();
 $injector->bind('com.example.Report', 'com.example.HtmlReport');
@@ -37,6 +40,8 @@ Instance creation
 Keep in mind: ***"injector.get() is the new 'new'"***. To create objects and perform injection, use the Injector's get() method instead of using the `new` keyword or factories.
 
 ```php
+use inject\Injector;
+
 $injector->bind('com.example.Report', 'com.example.HtmlReport');
 
 // Explicit binding: Lookup finds binding to HtmlReport, creates instance.
@@ -50,27 +55,23 @@ Manual calls are usually not necessary though, instead you'll use the injection:
 
 Injection
 ---------
-Injection is performed by looking at a type's constructor, its fields and methods and checking for the `@inject` annotation.
+Injection is performed by looking at a type's constructor. If it's annotated with an `@inject` annotation, bound values will be passed according to the given type hint.
 
 ```php
-// Constructor injection
-class ReportImpl extends Object implements Report {
+// Single parameter
+class ReportImpl extends \lang\Object implements Report {
   #[@inject]
   public function __construct(ReportWriter $writer) { ... }
 }
 
-// Method injection
-class ReportImpl extends Object implements Report {
-  #[@inject]
-  public function setWriter(ReportWriter $writer) { ... }
-}
-
-// Field injection
-class ReportImpl extends Object implements Report {
-  #[@inject, @type = 'com.example.writers.ReportWriter']
-  public $writer;
+// Multiple parameters
+class ReportImpl extends \lang\Object implements Report {
+  #[@$writer: inject, @$format: inject]
+  public function __construct(ReportWriter $writer, Format $format) { ... }
 }
 ```
+
+Method and field injection is not automatically supported when using `get()`.
 
 Providers
 ---------
