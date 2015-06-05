@@ -3,6 +3,10 @@ Dependency injection for the XP Framework change log
 
 ## ?.?.? / ????-??-??
 
+* Removed field and method injection via `get()`, now only supports
+  constructor injection. If you need injection for fields, you may
+  use `$injector->injectInto($instance)` after getting an instance.
+  (@thekid)
 * Removed `inject.XPInjector`. Its name is misleading, its implementation
   dependant on whether certain other modules are loaded or not. It should
   be called `LegacyInjector` or somethong. I'll leave this to another place

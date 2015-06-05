@@ -181,17 +181,15 @@ class Injector extends \lang\Object {
     if ($class->hasConstructor()) {
       $constructor= $class->getConstructor();
       try {
-        $instance= $constructor->newInstance($this->args($constructor, $args, true));
+        return $constructor->newInstance($this->args($constructor, $args, true));
       } catch (TargetInvocationException $e) {
         throw new ProvisionException('Error creating an instance of '.$class->getName(), $e->getCause());
       } catch (Throwable $e) {
         throw new ProvisionException('Error creating an instance of '.$class->getName(), $e);
       }
     } else {
-      $instance= $class->newInstance();
+      return $class->newInstance();
     }
-
-    return $this->injectInto($instance);
   }
 
   /**
