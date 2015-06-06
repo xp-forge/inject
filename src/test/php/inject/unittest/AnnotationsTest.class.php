@@ -4,6 +4,7 @@ use inject\Injector;
 use unittest\TestCase;
 use util\Currency;
 use lang\ClassLoader;
+use inject\unittest\fixture\FileSystem;
 
 abstract class AnnotationsTest extends TestCase {
   protected $inject;
@@ -14,7 +15,9 @@ abstract class AnnotationsTest extends TestCase {
   public function setUp() {
     $this->inject= new Injector();
     $this->inject->bind('unittest.TestCase', $this);
+    $this->inject->bind('inject.unittest.fixture.Storage', new FileSystem());
     $this->inject->bind('util.Currency', Currency::$EUR, 'EUR');
+    $this->inject->bind('string', 'Test', 'name');
   }
 
   /**
@@ -23,11 +26,11 @@ abstract class AnnotationsTest extends TestCase {
    * @param  [:var] $definition
    * @return inject.unittest.fixture.Storage
    */
-  protected function newStorage($definition) {
+  protected function newInstance($definition) {
     return ClassLoader::defineClass(
       'inject.unittest.fixture.'.$this->name,
-      'lang.Object',
-      ['inject.unittest.fixture.Storage'],
+      'inject.unittest.fixture.Value',
+      [],
       $definition
     );
   }

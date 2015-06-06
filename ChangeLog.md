@@ -3,6 +3,17 @@ Dependency injection for the XP Framework change log
 
 ## ?.?.? / ????-??-??
 
+* Improved error messages when injecting fields and parameters
+  (@thekid)
+* Changed `@inject` annotation behavior:
+  . If a method annotation is present, injection is performed for all
+    parameters using their types. Previously, this annotation was only
+    taken into consideration for the first parameter.
+  . Parameter annotations are only necessary when supplying types or
+    names for a single parameter.
+  . Injection is also performed for optional bound parameters instead
+    of silently ignoring them.
+  (@thekid)
 * Removed field and method injection via `get()`, now only supports
   constructor injection. If you need injection for fields, you may
   use `$injector->injectInto($instance)` after getting an instance.

@@ -112,21 +112,56 @@ class Injector extends \lang\Object {
    * Retrieve bound value for injection
    *
    * @param  var $inject The annotation
-   * @param  lang.Type $type
+   * @param  lang.reflect.Field $field
    * @return var
    * @throws inject.ProvisionException
    */
-  protected function bound($inject, $type) {
+  private function field($inject, $field) {
     $binding= $this->get(
-      isset($inject['type']) ? $inject['type'] : $type,
+      isset($inject['type']) ? $inject['type'] : $field->getType(),
       isset($inject['name']) ? $inject['name'] : null
     );
+
     if (null === $binding) {
       throw new ProvisionException(sprintf(
-        'Unknown injection type %s%s',
+        'Unknown injection type %s%s for %s\'s field %s',
         $type,
-        isset($inject['name']) ? 'named "'.$inject['name'].'"' : ''
+        isset($inject['name']) ? ' named "'.$inject['name'].'"' : '',
+        $field->getDeclaringClass()->getName(),
+        $field->getName()
       ));
+    }
+    return $binding;
+  }
+
+  /**
+   * Retrieve bound value for injection
+   *
+   * @param  var $inject The annotation
+   * @param  lang.reflect.Routine $routine
+   * @param  lang.reflect.Parameter $param
+   * @return var
+   * @throws inject.ProvisionException
+   */
+  private function param($inject, $routine, $param) {
+    $binding= $this->get(
+      isset($inject['type']) ? $inject['type'] : ($param->getTypeRestriction() ?: $param->getType()),
+      isset($inject['name']) ? $inject['name'] : null
+    );
+
+    if (null === $binding) {
+      if ($param->isOptional()) {
+        return $param->getDefaultValue();
+      } else {
+        throw new ProvisionException(sprintf(
+          'Unknown injection type %s%s for %s\'s %s() parameter %s',
+          $type,
+          isset($inject['name']) ? ' named "'.$inject['name'].'"' : '',
+          $routine->getDeclaringClass()->getName(),
+          $routine->getName(),
+          $param->getName()
+        ));
+      }
     }
     return $binding;
   }
@@ -135,33 +170,31 @@ class Injector extends \lang\Object {
    * Retrieve args for a given routine
    *
    * @param  lang.reflect.Routine $routine
-   * @param  var[] $default The default arguments
+   * @param  [:var] $named Named arguments
    * @param  bool $target
    * @return var
    * @throws inject.ProvisionException
    */
-  protected function args($routine, $default, $target) {
+  protected function args($routine, $named, $target) {
     $inject= $routine->hasAnnotation('inject');
-
     $args= [];
     foreach ($routine->getParameters() as $i => $param) {
-      if ($inject && 0 === $i) {
-        $target= true;
-        $args[]= $this->bound($routine->getAnnotation('inject'), $param->getTypeRestriction() ?: $param->getType());
+      $name= $param->getName();
+      if (isset($named[$name])) {
+        $args[]= $named[$name];
       } else if ($param->hasAnnotation('inject')) {
         $target= true;
-        $args[]= $this->bound($param->getAnnotation('inject'), $param->getTypeRestriction() ?: $param->getType());
-      } else if (array_key_exists($i, $default)) {
-        $args[]= $default[$i];
+        $args[]= $this->param($param->getAnnotation('inject'), $routine, $param);
+      } else if ($inject) {
+        $target= true;
+        $args[]= $this->param(0 === $i ? $routine->getAnnotation('inject') : [], $routine, $param);
       } else if ($target && !$param->isOptional()) {
         throw new ProvisionException(sprintf(
           'Value required for %s\'s %s() parameter %s',
           $routine->getDeclaringClass()->getName(),
           $routine->getName(),
-          $param->getName()
+          $name
         ));
-      } else {
-        break;
       }
     }
     return $target ? $args : null;
@@ -173,15 +206,15 @@ class Injector extends \lang\Object {
    * Otherwise, optional constructor arguments may be passed.
    *
    * @param   lang.XPClass $class
-   * @param   var[] $args
+   * @param   [:var] $named Named arguments
    * @return  lang.Generic
    * @throws  inject.ProvisionException
    */
-  public function newInstance(XPClass $class, $args= []) {
+  public function newInstance(XPClass $class, $named= []) {
     if ($class->hasConstructor()) {
       $constructor= $class->getConstructor();
       try {
-        return $constructor->newInstance($this->args($constructor, $args, true));
+        return $constructor->newInstance($this->args($constructor, $named, true));
       } catch (TargetInvocationException $e) {
         throw new ProvisionException('Error creating an instance of '.$class->getName(), $e->getCause());
       } catch (Throwable $e) {
@@ -205,7 +238,7 @@ class Injector extends \lang\Object {
     foreach ($class->getFields() as $field) {
       if (!$field->hasAnnotation('inject')) continue;
       try {
-        $field->set($instance, $this->bound($field->getAnnotation('inject'), $field->getType()));
+        $field->set($instance, $this->field($field->getAnnotation('inject'), $field));
       } catch (Throwable $e) {
         throw new ProvisionException('Error setting '.$class->getName().'::$'.$field->getName());
       }

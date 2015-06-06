@@ -3,6 +3,8 @@
 use inject\Injector;
 use inject\InstanceProvider;
 use lang\XPClass;
+use lang\IllegalArgumentException;
+use lang\ClassNotFoundException;
 use unittest\TestCase;
 use util\Currency;
 use inject\unittest\fixture\FileSystem;
@@ -84,43 +86,43 @@ class InjectorTest extends TestCase {
     $this->assertEquals(4, $inject->get('int', 'Timeout'));
   }
 
-  #[@test, @expect('lang.IllegalArgumentException')]
+  #[@test, @expect(IllegalArgumentException::class)]
   public function cannot_bind_string_to_int() {
     $inject= new Injector();
     $inject->bind('string', 0x82523c0, 'API Key');
   }
 
-  #[@test, @expect('lang.IllegalArgumentException')]
+  #[@test, @expect(IllegalArgumentException::class)]
   public function cannot_bind_non_class_type_unnamed() {
     $inject= new Injector();
     $inject->bind('string', '82523c0');
   }
 
-  #[@test, @expect('lang.IllegalArgumentException')]
+  #[@test, @expect(IllegalArgumentException::class)]
   public function cannot_bind_non_concrete_implementation() {
     $inject= new Injector();
     $inject->bind('inject.unittest.fixture.Storage', 'inject.unittest.fixture.AbstractStorage');
   }
 
-  #[@test, @expect('lang.IllegalArgumentException')]
+  #[@test, @expect(IllegalArgumentException::class)]
   public function cannot_bind_uncompatible_instance() {
     $inject= new Injector();
     $inject->bind('inject.unittest.fixture.Storage', $this);
   }
 
-  #[@test, @expect('lang.IllegalArgumentException')]
+  #[@test, @expect(IllegalArgumentException::class)]
   public function cannot_bind_uncompatible_class() {
     $inject= new Injector();
     $inject->bind('inject.unittest.fixture.Storage', XPClass::forName('unittest.TestCase'));
   }
 
-  #[@test, @expect('lang.IllegalArgumentException')]
+  #[@test, @expect(IllegalArgumentException::class)]
   public function cannot_bind_uncompatible_class_name() {
     $inject= new Injector();
     $inject->bind('inject.unittest.fixture.Storage', 'unittest.TestCase');
   }
 
-  #[@test, @expect('lang.ClassNotFoundException')]
+  #[@test, @expect(ClassNotFoundException::class)]
   public function cannot_bind_non_existant_class() {
     $inject= new Injector();
     $inject->bind('inject.unittest.fixture.Storage', '@non.existant.class@');

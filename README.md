@@ -14,8 +14,8 @@ Binding
 -------
 Values can be bound to the injector by using its `bind()` method. It accepts the type to bind to, an optional name and three different scenarios:
 
-* **Binding an class**: The typical usecase, where we bind an interface to its concrete implementation.
-* **Binding an instance**: By binding a type to an existing instance, we can create a "singleton" model.
+* **Binding a class**: The typical usecase, where we bind an interface to its concrete implementation.
+* **Binding an instance**: By binding a type to an existing instance, we can create a *singleton* model.
 * **Binding a provider**: If we need more complicated code to create an instance, we can bind to a provider.
 
 ```php
@@ -25,13 +25,19 @@ use inject\Bindings;
 // Manually
 $injector= new Injector();
 $injector->bind('com.example.Report', 'com.example.HtmlReport');
+$injector->bind('com.example.Storage', new InFileSystem('.'));
+$injector->bind('string', 'Report title', 'title');
 
 // Reusable via Bindings instances
 class ApplicationDefaults extends Bindings {
+
   public function configure($injector) {
     $injector->bind('com.example.Report', 'com.example.HtmlReport');
+    $injector->bind('com.example.Storage', new InFileSystem('.'));
+    $injector->bind('string', 'Report title', 'title');
   }
 }
+
 $injector= new Injector(new ApplicationDefaults());
 ```
 
@@ -60,18 +66,30 @@ Injection is performed by looking at a type's constructor. If it's annotated wit
 ```php
 // Single parameter
 class ReportImpl extends \lang\Object implements Report {
+
   #[@inject]
   public function __construct(ReportWriter $writer) { ... }
 }
 
 // Multiple parameters
 class ReportImpl extends \lang\Object implements Report {
-  #[@$writer: inject, @$format: inject]
+
+  #[@inject]
   public function __construct(ReportWriter $writer, Format $format) { ... }
 }
 ```
 
-Method and field injection is not automatically supported when using `get()`.
+You can supply name and type by using parameter annotations:
+
+```php
+class ReportImpl extends \lang\Object implements Report {
+
+  #[@inject, @$title: inject(type= 'string', name= 'title')]
+  public function __construct(ReportWriter $writer, Format $format, $title) { ... }
+}
+```
+
+Method and field injection are not supported.
 
 Providers
 ---------

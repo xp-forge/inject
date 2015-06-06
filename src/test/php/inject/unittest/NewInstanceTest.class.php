@@ -41,7 +41,7 @@ class NewInstanceTest extends TestCase {
       'injected' => null,
       '__construct' => function(TestCase $param) { $this->injected= $param; }
     ]);
-    $this->assertEquals($this, $inject->newInstance($storage, [$this])->injected);
+    $this->assertEquals($this, $inject->newInstance($storage, ['param' => $this])->injected);
   }
 
   #[@test]
@@ -52,7 +52,7 @@ class NewInstanceTest extends TestCase {
       'injected' => null,
       '#[@inject] __construct' => function(TestCase $param, $verify) { $this->injected= [$param, $verify]; }
     ]);
-    $this->assertEquals([$this, true], $inject->newInstance($storage, [null, true])->injected);
+    $this->assertEquals([$this, true], $inject->newInstance($storage, ['verify' => true])->injected);
   }
 
   #[@test]
