@@ -57,7 +57,7 @@ $instance= $injector->get('com.example.Report');
 $instance= $injector->get('com.example.TextReport');
 ```
 
-Manual calls are usually not necessary though, instead you'll use the injection:
+Manual calls are usually not necessary though, instead you'll use injection:
 
 Injection
 ---------
@@ -87,6 +87,19 @@ class ReportImpl extends \lang\Object implements Report {
   #[@inject, @$title: inject(type= 'string', name= 'title')]
   public function __construct(ReportWriter $writer, Format $format, $title) { ... }
 }
+```
+
+When a required parameter is encountered and there is no bound value for this parameter, an `inject.ProvisionException` is raised.
+
+```php
+class ReportWriter extends \lang\Object implements Writer {
+
+  #[@inject]
+  public function __construct(Storage $storage) { ... }
+}
+
+$injector= new Injector();
+$report= $injector->get('com.example.ReportWriter');  // *** Storage not bound
 ```
 
 Method and field injection are not supported.
