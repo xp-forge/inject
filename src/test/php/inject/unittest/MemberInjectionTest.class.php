@@ -21,7 +21,7 @@ class MemberInjectionTest extends \unittest\TestCase {
 
   #[@test]
   public function injecting_fields() {
-    $fixture= $this->inject->injectInto(newinstance('lang.Object', [], [
+    $fixture= $this->inject->into(newinstance('lang.Object', [], [
       '#[@inject(type= "inject.unittest.fixture.Storage")] storage' => null
     ]));
 
@@ -30,7 +30,7 @@ class MemberInjectionTest extends \unittest\TestCase {
 
   #[@test]
   public function injecting_methods() {
-    $fixture= $this->inject->injectInto(newinstance('lang.Object', [], [
+    $fixture= $this->inject->into(newinstance('lang.Object', [], [
       'storage' => null,
       '#[@inject] useStorage' => function(Storage $storage) { $this->storage= $storage; }
     ]));
@@ -40,7 +40,7 @@ class MemberInjectionTest extends \unittest\TestCase {
 
   #[@test]
   public function injecting_methods_via_param_annotation() {
-    $fixture= $this->inject->injectInto(newinstance('lang.Object', [], [
+    $fixture= $this->inject->into(newinstance('lang.Object', [], [
       'storage' => null,
       '#[@$storage: inject] useStorage' => function(Storage $storage) { $this->storage= $storage; }
     ]));
@@ -50,7 +50,7 @@ class MemberInjectionTest extends \unittest\TestCase {
 
   #[@test]
   public function injecting_method_with_type() {
-    $fixture= $this->inject->injectInto(newinstance('lang.Object', [], [
+    $fixture= $this->inject->into(newinstance('lang.Object', [], [
       'storage' => null,
       '#[@inject(type= "inject.unittest.fixture.Storage")] useStorage' => function($storage) { $this->storage= $storage; }
     ]));

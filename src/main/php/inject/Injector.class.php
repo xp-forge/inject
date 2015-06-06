@@ -64,7 +64,7 @@ class Injector extends \lang\Object {
   /**
    * Add a binding
    *
-   * @param  var $type either a lang.Type instance or a type name
+   * @param  string|lang.Type $type
    * @param  var $impl
    * @param  string $name
    * @return self
@@ -232,7 +232,7 @@ class Injector extends \lang\Object {
    * @return  lang.Generic
    * @throws  inject.ProvisionException
    */
-  public function injectInto(Generic $instance) {
+  public function into(Generic $instance) {
     $class= $instance->getClass();
 
     foreach ($class->getFields() as $field) {
