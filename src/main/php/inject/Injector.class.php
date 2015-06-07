@@ -40,13 +40,13 @@ class Injector extends \lang\Object {
    */
   protected function asBinding($t, $impl) {
     if ($impl instanceof XPClass) {
-      return new ClassBinding($t, $impl);
+      return new ClassBinding($impl, $t);
     } else if (self::$PROVIDER->isInstance($impl) || $impl instanceof Provider) {
-      return new ProviderBinding($t, $impl);
+      return new ProviderBinding($impl);
     } else if ($impl instanceof Generic) {
-      return new InstanceBinding($t, $impl);
+      return new InstanceBinding($impl, $t);
     } else {
-      return new ClassBinding($t, XPClass::forName((string)$impl));
+      return new ClassBinding(XPClass::forName((string)$impl), $t);
     }
   }
 
@@ -73,21 +73,22 @@ class Injector extends \lang\Object {
   public function bind($type, $impl, $name= null) {
     $t= $type instanceof Type ? $type : Type::forName($type);
 
-    if ($t instanceof XPClass) {
-      $this->bindings[$t->literal().$name]= $this->asBinding($t, $impl);
+    if ($impl instanceof Named) {
+      $this->bindings[$t->literal()]= $impl;
+    } else if ($t instanceof XPClass) {
+      $this->bindings[$t->literal()][$name]= $this->asBinding($t, $impl);
     } else if (null === $name) {
       throw new IllegalArgumentException('Cannot bind non-class type '.$t.' without a name');
     } else {
-      $this->bindings[$t->literal().$name]= new InstanceBinding($t, $impl);
+      $this->bindings[$t->literal()][$name]= new InstanceBinding($impl, $t);
     }
-
     return $this;
   }
 
   /**
    * Get a binding
    *
-   * @param  var $type either a lang.Type instance or a type name
+   * @param  string|lang.Type $type
    * @param  string $name
    * @return var or NULL if none exists
    */
@@ -95,16 +96,19 @@ class Injector extends \lang\Object {
     $t= $type instanceof Type ? $type : Type::forName($type);
 
     if (self::$PROVIDER->isAssignableFrom($t)) {
-      if (isset($this->bindings[$combined= $t->genericArguments()[0]->literal().$name])) {
-        return $this->bindings[$combined]->provider($this);
+      $literal= $t->genericArguments()[0]->literal();
+      if (isset($this->bindings[$literal][$name])) {
+        return $this->bindings[$literal][$name]->provider($this);
       }
     } else {
-      if (isset($this->bindings[$combined= $t->literal().$name])) {
-        return $this->bindings[$combined]->resolve($this);
-      } else if ($t instanceof XPClass && !($t->isInterface() || $t->getModifiers() & MODIFIER_ABSTRACT)) {
+      $literal= $t->literal();
+      if (isset($this->bindings[$literal][$name])) {
+        return $this->bindings[$literal][$name]->resolve($this);
+      } else if (null === $name && $t instanceof XPClass && !($t->isInterface() || $t->getModifiers() & MODIFIER_ABSTRACT)) {
         return $this->newInstance($t);
       }
     }
+
     return null;
   }
 

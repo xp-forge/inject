@@ -3,18 +3,15 @@
 use lang\IllegalArgumentException;
 
 class ProviderBinding extends \lang\Object implements Binding {
-  protected $type;
   protected $provider;
 
   /**
    * Creates a new provider binding
    *
-   * @param  lang.XPClass $type
    * @param  inject.Provider $provider
    * @throws lang.IllegalArgumentException
    */
-  public function __construct($type, $provider) {
-    $this->type= $type;
+  public function __construct($provider) {
     $this->provider= $provider;
   }
 
