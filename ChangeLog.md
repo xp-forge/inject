@@ -3,6 +3,8 @@ Dependency injection for the XP Framework change log
 
 ## ?.?.? / ????-??-??
 
+## 0.5.0 / 2015-06-07
+
 * Added `inject.ConfiguredBindings` which reads bindings from a .ini
   file. See pull request #6
   (@thekid)
