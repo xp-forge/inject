@@ -4,7 +4,7 @@ Dependency injection for the XP Framework change log
 ## ?.?.? / ????-??-??
 
 * Added class `inject.Named`. Extending from this class will allow to
-  create bindings on demand.
+  create bindings on demand. See pull request #5
   (@thekid)
 * Improved error messages when injecting fields and parameters
   (@thekid)
