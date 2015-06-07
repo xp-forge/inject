@@ -5,7 +5,8 @@ use lang\XPClass;
 use lang\Generic;
 use lang\Throwable;
 use lang\IllegalArgumentException;
-use lang\reflect\TargetInvocationException;
+use lang\mirrors\TypeMirror;
+use lang\mirrors\TargetInvocationException;
 
 /**
  * Injector
@@ -118,7 +119,7 @@ class Injector extends \lang\Object {
    */
   private function field($inject, $field) {
     $binding= $this->get(
-      isset($inject['type']) ? $inject['type'] : $field->getType(),
+      isset($inject['type']) ? $inject['type'] : $field->type(),
       isset($inject['name']) ? $inject['name'] : null
     );
 
@@ -127,8 +128,8 @@ class Injector extends \lang\Object {
         'Unknown injection type %s%s for %s\'s field %s',
         $type,
         isset($inject['name']) ? ' named "'.$inject['name'].'"' : '',
-        $field->getDeclaringClass()->getName(),
-        $field->getName()
+        $field->declaredIn()->name(),
+        $field->name()
       ));
     }
     return $binding;
@@ -145,21 +146,21 @@ class Injector extends \lang\Object {
    */
   private function param($inject, $routine, $param) {
     $binding= $this->get(
-      isset($inject['type']) ? $inject['type'] : ($param->getTypeRestriction() ?: $param->getType()),
+      isset($inject['type']) ? $inject['type'] : $param->type(),
       isset($inject['name']) ? $inject['name'] : null
     );
 
     if (null === $binding) {
       if ($param->isOptional()) {
-        return $param->getDefaultValue();
+        return $param->defaultValue();
       } else {
         throw new ProvisionException(sprintf(
           'Unknown injection type %s%s for %s\'s %s() parameter %s',
           $type,
           isset($inject['name']) ? ' named "'.$inject['name'].'"' : '',
-          $routine->getDeclaringClass()->getName(),
-          $routine->getName(),
-          $param->getName()
+          $routine->declaredIn()->name(),
+          $routine->name(),
+          $param->name()
         ));
       }
     }
@@ -169,30 +170,30 @@ class Injector extends \lang\Object {
   /**
    * Retrieve args for a given routine
    *
-   * @param  lang.reflect.Routine $routine
+   * @param  lang.mirrors.Routine $routine
    * @param  [:var] $named Named arguments
    * @param  bool $target
    * @return var
    * @throws inject.ProvisionException
    */
   protected function args($routine, $named, $target) {
-    $inject= $routine->hasAnnotation('inject');
+    $inject= $routine->annotations()->present('inject');
     $args= [];
-    foreach ($routine->getParameters() as $i => $param) {
-      $name= $param->getName();
+    foreach ($routine->parameters() as $i => $param) {
+      $name= $param->name();
       if (isset($named[$name])) {
         $args[]= $named[$name];
-      } else if ($param->hasAnnotation('inject')) {
+      } else if ($param->annotations()->present('inject')) {
         $target= true;
-        $args[]= $this->param($param->getAnnotation('inject'), $routine, $param);
+        $args[]= $this->param($param->annotations()->named('inject')->value(), $routine, $param);
       } else if ($inject) {
         $target= true;
-        $args[]= $this->param(0 === $i ? $routine->getAnnotation('inject') : [], $routine, $param);
+        $args[]= $this->param(0 === $i ? $routine->annotations()->named('inject')->value() : [], $routine, $param);
       } else if ($target && !$param->isOptional()) {
         throw new ProvisionException(sprintf(
           'Value required for %s\'s %s() parameter %s',
           $routine->getDeclaringClass()->getName(),
-          $routine->getName(),
+          $routine->name(),
           $name
         ));
       }
@@ -211,17 +212,15 @@ class Injector extends \lang\Object {
    * @throws  inject.ProvisionException
    */
   public function newInstance(XPClass $class, $named= []) {
-    if ($class->hasConstructor()) {
-      $constructor= $class->getConstructor();
-      try {
-        return $constructor->newInstance($this->args($constructor, $named, true));
-      } catch (TargetInvocationException $e) {
-        throw new ProvisionException('Error creating an instance of '.$class->getName(), $e->getCause());
-      } catch (Throwable $e) {
-        throw new ProvisionException('Error creating an instance of '.$class->getName(), $e);
-      }
-    } else {
-      return $class->newInstance();
+    $mirror= new TypeMirror($class);
+    $constructor= $mirror->constructor();
+
+    try {
+      return $constructor->newInstance(...$this->args($constructor, $named, true));
+    } catch (TargetInvocationException $e) {
+      throw new ProvisionException('Error creating an instance of '.$mirror->name(), $e->getCause());
+    } catch (Throwable $e) {
+      throw new ProvisionException('Error creating an instance of '.$mirror->name(), $e);
     }
   }
 
@@ -233,25 +232,25 @@ class Injector extends \lang\Object {
    * @throws  inject.ProvisionException
    */
   public function into(Generic $instance) {
-    $class= $instance->getClass();
+    $mirror= new TypeMirror($instance->getClass());
 
-    foreach ($class->getFields() as $field) {
-      if (!$field->hasAnnotation('inject')) continue;
+    foreach ($mirror->fields() as $field) {
+      if (!$field->annotations()->present('inject')) continue;
       try {
-        $field->set($instance, $this->field($field->getAnnotation('inject'), $field));
+        $field->modify($instance, $this->field($field->annotations()->named('inject')->value(), $field));
       } catch (Throwable $e) {
-        throw new ProvisionException('Error setting '.$class->getName().'::$'.$field->getName());
+        throw new ProvisionException('Error setting '.$mirror->name().'::$'.$field->name());
       }
     }
 
-    foreach ($class->getMethods() as $method) {
+    foreach ($mirror->methods() as $method) {
       if (null === ($args= $this->args($method, [], false))) continue;
       try {
         $method->invoke($instance, $args);
       } catch (TargetInvocationException $e) {
-        throw new ProvisionException('Error invoking '.$class->getName().'::'.$method->getName(), $e->getCause());
+        throw new ProvisionException('Error invoking '.$mirror->name().'::'.$method->name(), $e->getCause());
       } catch (Throwable $e) {
-        throw new ProvisionException('Error invoking '.$class->getName().'::'.$method->getName(), $e);
+        throw new ProvisionException('Error invoking '.$mirror->name().'::'.$method->name(), $e);
       }
     }
 
