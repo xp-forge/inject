@@ -3,7 +3,7 @@
 class Value extends \lang\Object {
   private $backing;
 
-  /** @param var $initial */
+  /** @param string $initial */
   public function __construct($initial) { $this->backing= $initial; }
 
   /**
