@@ -3,6 +3,7 @@
 use util\PropertyAccess;
 use util\Properties;
 use lang\XPClass;
+use lang\Type;
 
 /**
  * Bindings from a properties file
@@ -16,6 +17,12 @@ use lang\XPClass;
  */
 class ConfiguredBindings extends Bindings {
   private $properties;
+  private static $PRIMITIVES= [
+    'string' => true,
+    'int'    => true,
+    'double' => true,
+    'bool'   => true
+  ];
 
   /** @param util.PropertyAccess|string */
   public function __construct($arg) {
@@ -45,10 +52,10 @@ class ConfiguredBindings extends Bindings {
         $arguments[]= false;
       } else if (0 === strncasecmp($arg, 'null', 4)) {
         $arguments[]= null;
-      } else if (strstr($arg, '.')) {
-        $arguments[]= (double)$arg;
+      } else if (is_numeric($arg)) {
+        $arguments[]= strstr($arg, '.') ? (double)$arg : (int)$arg;
       } else {
-        $arguments[]= (int)$arg;
+        $arguments[]= $arg;
       }
     }
     return $arguments;
@@ -94,14 +101,20 @@ class ConfiguredBindings extends Bindings {
   public function configure($injector) {
     $namespace= $this->properties->getFirstSection();
     do {
-      foreach ($this->properties->readSection($namespace) as $name => $implementation) {
-        $type= $this->resolveType($namespace, $name);
-        if (is_array($implementation)) {
-          foreach ($implementation as $name => $impl) {
-            $injector->bind($type, $this->bindingTo($namespace, $impl), $name);
+      foreach ($this->properties->readSection($namespace) as $type => $implementation) {
+        if (isset(self::$PRIMITIVES[$type])) {
+          foreach ($implementation as $name => $value) {
+            $injector->bind($type, $this->argumentsIn($value)[0], $name);
           }
         } else {
-          $injector->bind($type, $this->bindingTo($namespace, $implementation));
+          $resolved= $this->resolveType($namespace, $type);
+          if (is_array($implementation)) {
+            foreach ($implementation as $name => $impl) {
+              $injector->bind($resolved, $this->bindingTo($namespace, $impl), $name);
+            }
+          } else {
+            $injector->bind($resolved, $this->bindingTo($namespace, $implementation));
+          }
         }
       }
     } while ($namespace= $this->properties->getNextSection());

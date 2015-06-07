@@ -34,6 +34,18 @@ class ConfiguredBindingsTest extends \unittest\TestCase {
     $this->assertEquals(new FileSystem('/usr'), $inject->get('inject.unittest.fixture.Storage'));
   }
 
+  #[@test, @values([
+  #  ['string[test]="Test"', 'string', 'Test'],
+  #  ['int[test]=6100', 'int', 6100],
+  #  ['double[test]=1.5', 'double', 1.5],
+  #  ['bool[test]=true', 'bool', true],
+  #  ['bool[test]=false', 'bool', false]
+  #])]
+  public function bind_primitive($line, $type, $expected) {
+    $inject= new Injector(new ConfiguredBindings(Properties::fromString($line)));
+    $this->assertEquals($expected, $inject->get($type, 'test'));
+  }
+
   #[@test]
   public function bind_named_class() {
     $inject= new Injector(new ConfiguredBindings(Properties::fromString('
