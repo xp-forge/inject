@@ -19,6 +19,17 @@ class NamedTest extends \unittest\TestCase {
   }
 
   #[@test]
+  public function providing_without_name() {
+    $inject= new Injector();
+    $inject->bind('inject.unittest.fixture.Value', newinstance('inject.Named', [], [
+      'provides' => function($name) { return true; },
+      'binding'  => function($name) { return new InstanceBinding(new Value($name)); }
+    ]));
+
+    $this->assertEquals(new Value(null), $inject->get('inject.unittest.fixture.Value'));
+  }
+
+  #[@test]
   public function get_returns_null_if_provides_returns_false() {
     $inject= new Injector();
     $inject->bind('inject.unittest.fixture.Value', newinstance('inject.Named', [], [

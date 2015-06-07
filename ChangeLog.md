@@ -3,6 +3,9 @@ Dependency injection for the XP Framework change log
 
 ## ?.?.? / ????-??-??
 
+* Added class `inject.Named`. Extending from this class will allow to
+  create bindings on demand.
+  (@thekid)
 * Improved error messages when injecting fields and parameters
   (@thekid)
 * Changed `@inject` annotation behavior:
@@ -20,7 +23,7 @@ Dependency injection for the XP Framework change log
   (@thekid)
 * Removed `inject.XPInjector`. Its name is misleading, its implementation
   dependant on whether certain other modules are loaded or not. It should
-  be called `LegacyInjector` or somethong. I'll leave this to another place
+  be called `LegacyInjector` or something. If necessary, use `inject.Named`. 
   (@thekid)
 
 ## 0.4.0 / 2015-01-10
