@@ -3,24 +3,22 @@
 use lang\IllegalArgumentException;
 
 class ClassBinding extends \lang\Object implements Binding {
-  protected $type;
   protected $class;
 
   /**
    * Creates a new instance binding
    *
-   * @param  lang.XPClass $type
    * @param  lang.XPClass $class
+   * @param  lang.XPClass $type
    * @throws lang.IllegalArgumentException
    */
-  public function __construct($type, $class) {
+  public function __construct($class, $type) {
     if (!$type->isAssignableFrom($class)) {
       throw new IllegalArgumentException($class.' is not an instance of '.$type);
     } else if ($class->isInterface() || $class->getModifiers() & MODIFIER_ABSTRACT) {
       throw new IllegalArgumentException('Cannot bind to non-concrete type '.$type);
     }
 
-    $this->type= $type;
     $this->class= $class;
   }
 
