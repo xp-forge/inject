@@ -39,4 +39,15 @@ class NamedTest extends \unittest\TestCase {
 
     $this->assertNull($inject->get('inject.unittest.fixture.Value', 'default'));
   }
+
+  #[@test]
+  public function using_a_provider() {
+    $inject= new Injector();
+    $inject->bind('inject.unittest.fixture.Value', newinstance('inject.Named', [], [
+      'provides' => function($name) { return true; },
+      'binding'  => function($name) { return new InstanceBinding(new Value($name)); }
+    ]));
+
+    $this->assertEquals(new Value('default'), $inject->get('inject.Provider<inject.unittest.fixture.Value>', 'default')->get());
+  }
 }

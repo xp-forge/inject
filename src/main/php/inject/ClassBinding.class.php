@@ -12,8 +12,8 @@ class ClassBinding extends \lang\Object implements Binding {
    * @param  lang.XPClass $type
    * @throws lang.IllegalArgumentException
    */
-  public function __construct($class, $type) {
-    if (!$type->isAssignableFrom($class)) {
+  public function __construct($class, $type= null) {
+    if ($type && !$type->isAssignableFrom($class)) {
       throw new IllegalArgumentException($class.' is not an instance of '.$type);
     } else if ($class->isInterface() || $class->getModifiers() & MODIFIER_ABSTRACT) {
       throw new IllegalArgumentException('Cannot bind to non-concrete type '.$type);
