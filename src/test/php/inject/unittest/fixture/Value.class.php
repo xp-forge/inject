@@ -1,9 +1,11 @@
 <?php namespace inject\unittest\fixture;
 
+use util\Objects;
+
 class Value extends \lang\Object {
   private $backing;
 
-  /** @param string $initial */
+  /** @param var $initial */
   public function __construct($initial) { $this->backing= $initial; }
 
   /**
@@ -13,6 +15,6 @@ class Value extends \lang\Object {
    * @return bool
    */
   public function equals($cmp) {
-    return $cmp instanceof self && $this->backing === $cmp->backing;
+    return $cmp instanceof self && Objects::equal($this->backing, $cmp->backing);
   }
 }
