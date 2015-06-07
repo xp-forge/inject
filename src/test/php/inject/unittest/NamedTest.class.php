@@ -5,7 +5,7 @@ use inject\InstanceBinding;
 use inject\unittest\fixture\Value;
 use lang\Type;
 
-class NamedInstancesTest extends \unittest\TestCase {
+class NamedTest extends \unittest\TestCase {
 
   #[@test]
   public function providing_named_values() {

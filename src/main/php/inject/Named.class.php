@@ -3,7 +3,7 @@
 /**
  * Base class for named lookups
  *
- * @test  xp://inject.unittest.NamedInstancesTest
+ * @test  xp://inject.unittest.NamedTest
  */
 abstract class Named extends \lang\Object implements \ArrayAccess {
 
