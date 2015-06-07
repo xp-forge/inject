@@ -12,11 +12,12 @@ The inject package contains the XP framework's dependency injection API. Its ent
 
 Binding
 -------
-Values can be bound to the injector by using its `bind()` method. It accepts the type to bind to, an optional name and three different scenarios:
+Values can be bound to the injector by using its `bind()` method. It accepts the type to bind to, an optional name and these different scenarios:
 
 * **Binding a class**: The typical usecase, where we bind an interface to its concrete implementation.
 * **Binding an instance**: By binding a type to an existing instance, we can create a *singleton* model.
 * **Binding a provider**: If we need more complicated code to create an instance, we can bind to a provider.
+* **Binding a named lookup**: If we want control over the binding lookups for a type, we can bind to a `Named` instance.
 
 ```php
 use inject\Injector;
@@ -113,5 +114,22 @@ $provider= $injector->get('inject.Provider<com.example.writers.ReportWriter>');
 
 // ...later on
 $instance= $provider->get();
+```
+
+Named lookups
+-------------
+If we need control over the lookup, we can bind instances of `Named`:
+
+```php
+use inject\Injector;
+use inject\InstanceBinding;
+
+$inject= new Injector();
+$inject->bind('com.example.Value', newinstance('inject.Named', [], [
+  'provides' => function($name) { return true; },
+  'binding'  => function($name) { return new InstanceBinding(new Value($name)); }
+]));
+
+$value= $inject->get('com.example.Value', 'default');  // new Value("default")
 ```
 
