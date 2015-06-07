@@ -88,7 +88,7 @@ class Injector extends \lang\Object {
   /**
    * Get a binding
    *
-   * @param  var $type either a lang.Type instance or a type name
+   * @param  string|lang.Type $type
    * @param  string $name
    * @return var or NULL if none exists
    */
