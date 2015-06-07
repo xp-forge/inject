@@ -3,6 +3,9 @@ Dependency injection for the XP Framework change log
 
 ## ?.?.? / ????-??-??
 
+* Added `inject.ConfiguredBindings` which reads bindings from a .ini
+  file. See pull request #6
+  (@thekid)
 * Added class `inject.Named`. Extending from this class will allow to
   create bindings on demand. See pull request #5
   (@thekid)
