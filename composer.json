@@ -6,7 +6,8 @@
   "description" : "Dependency injection for the XP Framework",
   "keywords": ["module", "xp"],
   "require" : {
-    "xp-framework/core": "~6.0",
+    "xp-framework/core": "~6.3",
+    "xp-forge/mirrors": "~0.7",
     "php" : ">=5.4.0"
   },
   "autoload" : {
