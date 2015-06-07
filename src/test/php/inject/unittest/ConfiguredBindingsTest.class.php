@@ -9,6 +9,16 @@ use inject\unittest\fixture\FileSystem;
 class ConfiguredBindingsTest extends \unittest\TestCase {
 
   #[@test]
+  public function can_create_with_properties() {
+    new ConfiguredBindings(new Properties('test.ini'));
+  }
+
+  #[@test]
+  public function can_create_with_filename() {
+    new ConfiguredBindings('test.ini');
+  }
+
+  #[@test]
   public function bind_class() {
     $inject= new Injector(new ConfiguredBindings(Properties::fromString('
       inject.unittest.fixture.Storage=inject.unittest.fixture.FileSystem

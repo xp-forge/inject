@@ -1,6 +1,7 @@
 <?php namespace inject;
 
 use util\PropertyAccess;
+use util\Properties;
 use lang\XPClass;
 
 /**
@@ -16,8 +17,14 @@ use lang\XPClass;
 class ConfiguredBindings extends Bindings {
   private $properties;
 
-  /** @param util.PropertyAccess */
-  public function __construct(PropertyAccess $properties) { $this->properties= $properties; }
+  /** @param util.PropertyAccess|string */
+  public function __construct($arg) {
+    if ($arg instanceof PropertyAccess) {
+      $this->properties= $arg;
+    } else {
+      $this->properties= new Properties($arg);
+    }
+  }
 
   /**
    * Parse arguments from a string. Supports strings, booleans, null, and numbers.
