@@ -4,7 +4,7 @@ Inject
 [![Build Status on TravisCI](https://secure.travis-ci.org/xp-forge/inject.svg)](http://travis-ci.org/xp-forge/inject)
 [![XP Framework Mdodule](https://raw.githubusercontent.com/xp-framework/web/master/static/xp-framework-badge.png)](https://github.com/xp-framework/core)
 [![BSD Licence](https://raw.githubusercontent.com/xp-framework/web/master/static/licence-bsd.png)](https://github.com/xp-framework/core/blob/master/LICENCE.md)
-[![Required PHP 5.4+](https://raw.githubusercontent.com/xp-framework/web/master/static/php-5_4plus.png)](http://php.net/)
+[![Required PHP 5.5+](https://raw.githubusercontent.com/xp-framework/web/master/static/php-5_5plus.png)](http://php.net/)
 [![Supports PHP 7.0+](https://raw.githubusercontent.com/xp-framework/web/master/static/php-7_0plus.png)](http://php.net/)
 [![Supports HHVM 3.4+](https://raw.githubusercontent.com/xp-framework/web/master/static/hhvm-3_4plus.png)](http://hhvm.com/)
 [![Latest Stable Version](https://poser.pugx.org/xp-forge/inject/version.png)](https://packagist.org/packages/xp-forge/inject)
@@ -23,19 +23,23 @@ Values can be bound to the injector by using its `bind()` method. It accepts the
 ```php
 use inject\Injector;
 use inject\Bindings;
+use com\example\Report;
+use com\example\HtmlReport;
+use com\example\Storage;
+use com\example\InFileSystem;
 
 // Manually
 $injector= new Injector();
-$injector->bind('com.example.Report', 'com.example.HtmlReport');
-$injector->bind('com.example.Storage', new InFileSystem('.'));
+$injector->bind(Report::class, HtmlReport::class);
+$injector->bind(Storage::class, new InFileSystem('.'));
 $injector->bind('string', 'Report title', 'title');
 
 // Reusable via Bindings instances
 class ApplicationDefaults extends Bindings {
 
   public function configure($injector) {
-    $injector->bind('com.example.Report', 'com.example.HtmlReport');
-    $injector->bind('com.example.Storage', new InFileSystem('.'));
+    $injector->bind(Report::class, HtmlReport::class);
+    $injector->bind(Storage::class, new InFileSystem('.'));
     $injector->bind('string', 'Report title', 'title');
   }
 }
@@ -50,13 +54,13 @@ Keep in mind: ***"injector.get() is the new 'new'"***. To create objects and per
 ```php
 use inject\Injector;
 
-$injector->bind('com.example.Report', 'com.example.HtmlReport');
+$injector->bind(Report::class, HtmlReport::class);
 
 // Explicit binding: Lookup finds binding to HtmlReport, creates instance.
-$instance= $injector->get('com.example.Report');
+$instance= $injector->get(Report::class);
 
 // Implicit binding: No previous binding, TextReport instantiable, thus created.
-$instance= $injector->get('com.example.TextReport');
+$instance= $injector->get(TextReport::class);
 ```
 
 Manual calls are usually not necessary though, instead you'll use injection:
@@ -123,14 +127,16 @@ If we need control over the lookup, we can bind instances of `Named`:
 
 ```php
 use inject\Injector;
+use inject\Named;
 use inject\InstanceBinding;
+use com\example\Value;
 
 $inject= new Injector();
-$inject->bind('com.example.Value', newinstance('inject.Named', [], [
+$inject->bind(Value::class, newinstance(Named::class, [], [
   'provides' => function($name) { return true; },
   'binding'  => function($name) { return new InstanceBinding(new Value($name)); }
 ]));
 
-$value= $inject->get('com.example.Value', 'default');  // new Value("default")
+$value= $inject->get(Value::class, 'default');  // new Value("default")
 ```
 
