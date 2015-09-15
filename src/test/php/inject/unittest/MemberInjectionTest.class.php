@@ -16,7 +16,7 @@ class MemberInjectionTest extends \unittest\TestCase {
    */
   public function setUp() {
     $this->inject= new Injector();
-    $this->inject->bind('inject.unittest.fixture.Storage', new FileSystem());
+    $this->inject->bind(Storage::class, new FileSystem());
   }
 
   #[@test]
@@ -25,7 +25,7 @@ class MemberInjectionTest extends \unittest\TestCase {
       '#[@inject(type= "inject.unittest.fixture.Storage")] storage' => null
     ]));
 
-    $this->assertInstanceOf('inject.unittest.fixture.Storage', $fixture->storage);
+    $this->assertInstanceOf(Storage::class, $fixture->storage);
   }
 
   #[@test]
@@ -35,7 +35,7 @@ class MemberInjectionTest extends \unittest\TestCase {
       '#[@inject] useStorage' => function(Storage $storage) { $this->storage= $storage; }
     ]));
 
-    $this->assertInstanceOf('inject.unittest.fixture.Storage', $fixture->storage);
+    $this->assertInstanceOf(Storage::class, $fixture->storage);
   }
 
   #[@test]
@@ -45,7 +45,7 @@ class MemberInjectionTest extends \unittest\TestCase {
       '#[@$storage: inject] useStorage' => function(Storage $storage) { $this->storage= $storage; }
     ]));
 
-    $this->assertInstanceOf('inject.unittest.fixture.Storage', $fixture->storage);
+    $this->assertInstanceOf(Storage::class, $fixture->storage);
   }
 
   #[@test]
@@ -55,12 +55,12 @@ class MemberInjectionTest extends \unittest\TestCase {
       '#[@inject(type= "inject.unittest.fixture.Storage")] useStorage' => function($storage) { $this->storage= $storage; }
     ]));
 
-    $this->assertInstanceOf('inject.unittest.fixture.Storage', $fixture->storage);
+    $this->assertInstanceOf(Storage::class, $fixture->storage);
   }
 
   #[@test]
   public function get_does_not_inject_members() {
-    $class= ClassLoader::defineClass('NotInjected', 'lang.Object', ['inject.unittest.fixture.Storage'], [
+    $class= ClassLoader::defineClass('NotInjected', 'lang.Object', [Storage::class], [
       '#[@inject(type= "inject.unittest.fixture.Storage")] storage' => null,
       '#[@inject(type= "inject.unittest.fixture.Storage")] useStorage' => function($storage) {
         throw new IllegalStateException('Should not be reached');
