@@ -147,4 +147,11 @@ class InjectorTest extends TestCase {
     $inject->bind($type, $impl, 'test');
     $this->assertNull($inject->get($type, 'another-name-than-the-one-bound'));
   }
+
+  #[@test]
+  public function using_new() {
+    $inject= new Injector();
+    $inject->bind('inject.unittest.fixture.Storage', 'inject.unittest.fixture.FileSystem');
+    $this->assertInstanceOf('inject.unittest.fixture.FileSystem', $inject->new('inject.unittest.fixture.Storage'));
+  }
 }
