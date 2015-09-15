@@ -3,6 +3,10 @@ Dependency injection for the XP Framework change log
 
 ## ?.?.? / ????-??-??
 
+## 0.6.0 / 2015-09-15
+
+* Added PHP 7.0 support - @thekid
+
 ## 0.5.0 / 2015-06-07
 
 * Added `inject.ConfiguredBindings` which reads bindings from a .ini
