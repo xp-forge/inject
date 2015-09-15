@@ -92,7 +92,7 @@ class Injector extends \lang\Object {
    * @param  string $name
    * @return var or NULL if none exists
    */
-  public function get($type, $name= null) {
+  public function new($type, $name= null) {
     $t= $type instanceof Type ? $type : Type::forName($type);
 
     if (self::$PROVIDER->isAssignableFrom($t)) {
@@ -110,6 +110,17 @@ class Injector extends \lang\Object {
     }
 
     return null;
+  }
+
+  /**
+   * Get a binding
+   *
+   * @param  string|lang.Type $type
+   * @param  string $name
+   * @return var or NULL if none exists
+   */
+  public function get($type, $name= null) {
+    return $this->new($type, $name);
   }
 
   /**
