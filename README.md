@@ -105,7 +105,7 @@ class ReportWriter extends \lang\Object implements Writer {
 }
 
 $injector= new Injector();
-$report= $injector->get('com.example.ReportWriter');  // *** Storage not bound
+$report= $injector->get(ReportWriter::class);  // *** Storage not bound
 ```
 
 Method and field injection are not supported.
