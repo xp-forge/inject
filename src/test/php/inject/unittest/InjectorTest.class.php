@@ -8,19 +8,21 @@ use lang\ClassNotFoundException;
 use unittest\TestCase;
 use util\Currency;
 use inject\unittest\fixture\FileSystem;
+use inject\unittest\fixture\Storage;
+use inject\unittest\fixture\AbstractStorage;
 
 class InjectorTest extends TestCase {
 
   /** @return var[][] */
   protected function bindings() {
     $instance= new FileSystem();
-    $name= 'inject.unittest.fixture.Storage';
+    $name= Storage::class;
     return [
-      [$name, XPClass::forName('inject.unittest.fixture.FileSystem')],
-      [$name, 'inject.unittest.fixture.FileSystem'],
+      [$name, XPClass::forName(FileSystem::class)],
+      [$name, FileSystem::class],
       [$name, $instance],
-      [XPClass::forName($name), XPClass::forName('inject.unittest.fixture.FileSystem')],
-      [XPClass::forName($name), 'inject.unittest.fixture.FileSystem'],
+      [XPClass::forName($name), XPClass::forName(FileSystem::class)],
+      [XPClass::forName($name), FileSystem::class],
       [XPClass::forName($name), $instance]
     ];
   }
@@ -45,31 +47,31 @@ class InjectorTest extends TestCase {
   #[@test]
   public function binds_self_per_default() {
     $inject= new Injector();
-    $this->assertEquals($inject, $inject->get('inject.Injector'));
+    $this->assertEquals($inject, $inject->get(Injector::class));
   }
 
   #[@test, @values('bindings')]
   public function get_implementation_bound_to_interface($type, $impl) {
     $inject= new Injector();
     $inject->bind($type, $impl);
-    $this->assertInstanceOf('inject.unittest.fixture.FileSystem', $inject->get($type));
+    $this->assertInstanceOf(FileSystem::class, $inject->get($type));
   }
 
   #[@test]
   public function creates_implicit_binding_when_no_explicit_binding_exists_and_type_is_concrete() {
     $inject= new Injector();
-    $impl= 'inject.unittest.fixture.FileSystem';
+    $impl= FileSystem::class;
     $this->assertInstanceOf($impl, $inject->get($impl));
   }
 
   #[@test]
   public function no_implicit_binding_for_interfaces() {
-    $this->assertNull((new Injector())->get('inject.unittest.fixture.Storage'));
+    $this->assertNull((new Injector())->get(Storage::class));
   }
 
   #[@test]
   public function no_implicit_binding_for_abstract_classes() {
-    $this->assertNull((new Injector())->get('inject.unittest.fixture.AbstractStorage'));
+    $this->assertNull((new Injector())->get(AbstractStorage::class));
   }
 
   #[@test]
@@ -101,38 +103,38 @@ class InjectorTest extends TestCase {
   #[@test, @expect(IllegalArgumentException::class)]
   public function cannot_bind_non_concrete_implementation() {
     $inject= new Injector();
-    $inject->bind('inject.unittest.fixture.Storage', 'inject.unittest.fixture.AbstractStorage');
+    $inject->bind(Storage::class, AbstractStorage::class);
   }
 
   #[@test, @expect(IllegalArgumentException::class)]
   public function cannot_bind_uncompatible_instance() {
     $inject= new Injector();
-    $inject->bind('inject.unittest.fixture.Storage', $this);
+    $inject->bind(Storage::class, $this);
   }
 
   #[@test, @expect(IllegalArgumentException::class)]
   public function cannot_bind_uncompatible_class() {
     $inject= new Injector();
-    $inject->bind('inject.unittest.fixture.Storage', XPClass::forName('unittest.TestCase'));
+    $inject->bind(Storage::class, XPClass::forName(TestCase::class));
   }
 
   #[@test, @expect(IllegalArgumentException::class)]
   public function cannot_bind_uncompatible_class_name() {
     $inject= new Injector();
-    $inject->bind('inject.unittest.fixture.Storage', 'unittest.TestCase');
+    $inject->bind(Storage::class, TestCase::class);
   }
 
   #[@test, @expect(ClassNotFoundException::class)]
   public function cannot_bind_non_existant_class() {
     $inject= new Injector();
-    $inject->bind('inject.unittest.fixture.Storage', '@non.existant.class@');
+    $inject->bind(Storage::class, '@non.existant.class@');
   }
 
   #[@test, @values('bindings')]
   public function get_named_implementation_bound_to_interface($type, $impl) {
     $inject= new Injector();
     $inject->bind($type, $impl, 'test');
-    $this->assertInstanceOf('inject.unittest.fixture.FileSystem', $inject->get($type, 'test'));
+    $this->assertInstanceOf(FileSystem::class, $inject->get($type, 'test'));
   }
 
   #[@test, @values('bindings')]

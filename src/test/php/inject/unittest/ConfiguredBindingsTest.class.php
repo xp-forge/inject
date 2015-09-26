@@ -5,6 +5,7 @@ use inject\ConfiguredBindings;
 use util\Properties;
 use inject\unittest\fixture\Value;
 use inject\unittest\fixture\FileSystem;
+use inject\unittest\fixture\Storage;
 
 class ConfiguredBindingsTest extends \unittest\TestCase {
 
@@ -23,7 +24,7 @@ class ConfiguredBindingsTest extends \unittest\TestCase {
     $inject= new Injector(new ConfiguredBindings(Properties::fromString('
       inject.unittest.fixture.Storage=inject.unittest.fixture.FileSystem
     ')));
-    $this->assertEquals(new FileSystem(), $inject->get('inject.unittest.fixture.Storage'));
+    $this->assertEquals(new FileSystem(), $inject->get(Storage::class));
   }
 
   #[@test]
@@ -31,7 +32,7 @@ class ConfiguredBindingsTest extends \unittest\TestCase {
     $inject= new Injector(new ConfiguredBindings(Properties::fromString('
       inject.unittest.fixture.Storage=inject.unittest.fixture.FileSystem("/usr")
     ')));
-    $this->assertEquals(new FileSystem('/usr'), $inject->get('inject.unittest.fixture.Storage'));
+    $this->assertEquals(new FileSystem('/usr'), $inject->get(Storage::class));
   }
 
   #[@test, @values([
@@ -51,7 +52,7 @@ class ConfiguredBindingsTest extends \unittest\TestCase {
     $inject= new Injector(new ConfiguredBindings(Properties::fromString('
       inject.unittest.fixture.Storage[files]=inject.unittest.fixture.FileSystem
     ')));
-    $this->assertEquals(new FileSystem(), $inject->get('inject.unittest.fixture.Storage', 'files'));
+    $this->assertEquals(new FileSystem(), $inject->get(Storage::class, 'files'));
   }
 
   #[@test]
@@ -59,7 +60,7 @@ class ConfiguredBindingsTest extends \unittest\TestCase {
     $inject= new Injector(new ConfiguredBindings(Properties::fromString('
       inject.unittest.fixture.Storage[files]=inject.unittest.fixture.FileSystem("/usr")
     ')));
-    $this->assertEquals(new FileSystem('/usr'), $inject->get('inject.unittest.fixture.Storage', 'files'));
+    $this->assertEquals(new FileSystem('/usr'), $inject->get(Storage::class, 'files'));
   }
 
   #[@test]
@@ -70,7 +71,7 @@ class ConfiguredBindingsTest extends \unittest\TestCase {
     ')));
     $this->assertEquals(
       [new FileSystem('~/.xp'), new FileSystem('/etc/xp')],
-      [$inject->get('inject.unittest.fixture.Storage', 'user'), $inject->get('inject.unittest.fixture.Storage', 'system')]
+      [$inject->get(Storage::class, 'user'), $inject->get(Storage::class, 'system')]
     );
   }
 
@@ -105,6 +106,6 @@ class ConfiguredBindingsTest extends \unittest\TestCase {
       [inject.unittest.fixture]
       '.$line.'
     ')));
-    $this->assertEquals(new FileSystem(), $inject->get('inject.unittest.fixture.Storage'));
+    $this->assertEquals(new FileSystem(), $inject->get(Storage::class));
   }
 }

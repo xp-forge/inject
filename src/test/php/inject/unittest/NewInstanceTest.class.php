@@ -5,6 +5,7 @@ use unittest\TestCase;
 use util\Currency;
 use lang\ClassLoader;
 use lang\Runnable;
+use inject\unittest\fixture\Storage;
 
 class NewInstanceTest extends TestCase {
 
@@ -18,7 +19,7 @@ class NewInstanceTest extends TestCase {
     return ClassLoader::defineClass(
       'inject.unittest.fixture.'.$this->name,
       'lang.Object',
-      ['inject.unittest.fixture.Storage'],
+      [Storage::class],
       $definition
     );
   }
@@ -26,7 +27,7 @@ class NewInstanceTest extends TestCase {
   #[@test]
   public function newInstance_performs_injection() {
     $inject= new Injector();
-    $inject->bind('unittest.TestCase', $this);
+    $inject->bind(TestCase::class, $this);
     $storage= $this->newStorage([
       'injected' => null,
       '#[@inject] __construct' => function(TestCase $param) { $this->injected= $param; }
@@ -47,7 +48,7 @@ class NewInstanceTest extends TestCase {
   #[@test]
   public function newInstance_performs_partial_injection_with_required_parameter() {
     $inject= new Injector();
-    $inject->bind('unittest.TestCase', $this);
+    $inject->bind(TestCase::class, $this);
     $storage= $this->newStorage([
       'injected' => null,
       '#[@inject] __construct' => function(TestCase $param, $verify) { $this->injected= [$param, $verify]; }
@@ -58,7 +59,7 @@ class NewInstanceTest extends TestCase {
   #[@test]
   public function newInstance_performs_partial_injection_with_optional_parameter() {
     $inject= new Injector();
-    $inject->bind('unittest.TestCase', $this);
+    $inject->bind(TestCase::class, $this);
     $storage= $this->newStorage([
       'injected' => null,
       '#[@inject] __construct' => function(TestCase $param, $verify= true) { $this->injected= [$param, $verify]; }
