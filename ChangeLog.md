@@ -3,6 +3,11 @@ Dependency injection for the XP Framework change log
 
 ## ?.?.? / ????-??-??
 
+## 0.7.0 / 2015-09-27
+
+* **Heads up: Bumped minimum PHP version required to PHP 5.5**. See PR #8
+  (@thekid)
+
 ## 0.6.0 / 2015-09-15
 
 * Added PHP 7.0 support - @thekid
