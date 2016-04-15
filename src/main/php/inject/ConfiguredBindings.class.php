@@ -43,19 +43,39 @@ class ConfiguredBindings extends Bindings {
     if ('' === $input) return [];
 
     $arguments= [];
-    foreach (explode(',', $input) as $arg) {
-      if ('"' === $arg{0} || "'" === $arg{0}) {
-        $arguments[]= strtr(substr($arg, 1, -1), ['\\'.$arg{0} => $arg{0}]);
-      } else if (0 === strncasecmp($arg, 'true', 4)) {
-        $arguments[]= true;
-      } else if (0 === strncasecmp($arg, 'false', 5)) {
-        $arguments[]= false;
-      } else if (0 === strncasecmp($arg, 'null', 4)) {
-        $arguments[]= null;
-      } else if (is_numeric($arg)) {
-        $arguments[]= strstr($arg, '.') ? (double)$arg : (int)$arg;
+    for ($o= 0, $l= strlen($input); $o < $l; $o+= $p) {
+      if ('"' === $input{$o} || "'" === $input{$o}) {
+        $s= $o + 1;
+        $str= '';
+        do {
+          $p= strcspn($input, $input{$o}, $s);
+          if ('\\' === $input{$s + $p - 1}) {
+            $str.= substr($input, $s, $p - 1).$input{$o};
+            $s+= $p + 1;
+            continue;
+          } else {
+            $str.= substr($input, $s, $p);
+            $s+= $p + 1;
+            break;
+          }
+        } while ($s < $l);
+        $arguments[]= $str;
+        $p+= $s;
       } else {
-        $arguments[]= $arg;
+        $p= strcspn($input, ',', $o);
+        $arg= substr($input, $o, $p);
+
+        if (0 === strncasecmp($arg, 'true', 4)) {
+          $arguments[]= true;
+        } else if (0 === strncasecmp($arg, 'false', 5)) {
+          $arguments[]= false;
+        } else if (0 === strncasecmp($arg, 'null', 4)) {
+          $arguments[]= null;
+        } else if (is_numeric($arg)) {
+          $arguments[]= strstr($arg, '.') ? (double)$arg : (int)$arg;
+        } else {
+          $arguments[]= $arg;
+        }
       }
     }
     return $arguments;
