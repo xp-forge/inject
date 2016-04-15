@@ -3,6 +3,8 @@ Dependency injection for the XP Framework change log
 
 ## ?.?.? / ????-??-??
 
+## 1.0.1 / 2016-04-15
+
 * Fixed string arguments containing commas in ConfiguredBindings class:
   `peer.URL[api]=peer.URL("https://user:pass,word@example.com")`
   (@thekid)
