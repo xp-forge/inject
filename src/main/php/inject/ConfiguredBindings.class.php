@@ -34,6 +34,26 @@ class ConfiguredBindings extends Bindings {
   }
 
   /**
+   * Converts a given literal to a value
+   *
+   * @param  string $literal
+   * @return var
+   */
+  private function valueIn($literal) {
+    if (0 === strncasecmp($literal, 'true', 4)) {
+      return true;
+    } else if (0 === strncasecmp($literal, 'false', 5)) {
+      return false;
+    } else if (0 === strncasecmp($literal, 'null', 4)) {
+      return null;
+    } else if (is_numeric($literal)) {
+      return strstr($literal, '.') ? (double)$literal : (int)$literal;
+    } else {
+      return $literal;
+    }
+  }
+
+  /**
    * Parse arguments from a string. Supports strings, booleans, null, and numbers.
    *
    * @param  string $input
@@ -63,19 +83,7 @@ class ConfiguredBindings extends Bindings {
         $p+= $s;
       } else {
         $p= strcspn($input, ',', $o);
-        $arg= substr($input, $o, $p);
-
-        if (0 === strncasecmp($arg, 'true', 4)) {
-          $arguments[]= true;
-        } else if (0 === strncasecmp($arg, 'false', 5)) {
-          $arguments[]= false;
-        } else if (0 === strncasecmp($arg, 'null', 4)) {
-          $arguments[]= null;
-        } else if (is_numeric($arg)) {
-          $arguments[]= strstr($arg, '.') ? (double)$arg : (int)$arg;
-        } else {
-          $arguments[]= $arg;
-        }
+        $arguments[]= $this->valueIn(substr($input, $o, $p));
       }
     }
     return $arguments;
@@ -124,7 +132,7 @@ class ConfiguredBindings extends Bindings {
       foreach ($this->properties->readSection($namespace) as $type => $implementation) {
         if (isset(self::$PRIMITIVES[$type])) {
           foreach ($implementation as $name => $value) {
-            $injector->bind($type, $this->argumentsIn($value)[0], $name);
+            $injector->bind($type, $this->valueIn($value), $name);
           }
         } else {
           $resolved= $this->resolveType($namespace, $type);

@@ -83,6 +83,14 @@ class ConfiguredBindingsTest extends \unittest\TestCase {
     $this->assertEquals(new FileSystem('/path/with,commas/inside'), $inject->get(Storage::class));
   }
 
+  #[@test]
+  public function string_primitive_containing_comma() {
+    $inject= new Injector(new ConfiguredBindings(Properties::fromString('
+      string[path]="/path/with,commas/inside"
+    ')));
+    $this->assertEquals('/path/with,commas/inside', $inject->get('string', 'path'));
+  }
+
   #[@test, @values([
   #  ['null', null],
   #  ['true', true],

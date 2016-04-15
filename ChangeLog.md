@@ -3,6 +3,11 @@ Dependency injection for the XP Framework change log
 
 ## ?.?.? / ????-??-??
 
+## 1.0.2 / 2016-04-15
+
+* Fixed primitive bindings containing commas in ConfiguredBindings class.
+  (@thekid)
+
 ## 1.0.1 / 2016-04-15
 
 * Fixed string arguments containing commas in ConfiguredBindings class:
