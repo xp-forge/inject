@@ -70,18 +70,10 @@ Injection
 Injection is performed by looking at a type's constructor. If it's annotated with an `@inject` annotation, bound values will be passed according to the given type hint.
 
 ```php
-// Single parameter
 class ReportImpl implements Report {
 
   #[@inject]
   public function __construct(ReportWriter $writer) { ... }
-}
-
-// Multiple parameters
-class ReportImpl implements Report {
-
-  #[@inject]
-  public function __construct(ReportWriter $writer, Format $format) { ... }
 }
 ```
 
@@ -109,6 +101,24 @@ $report= $injector->get(ReportWriter::class);  // *** Storage not bound
 ```
 
 Method and field injection are not supported.
+
+Configuration
+-------------
+As seen above, bindings can be used instead of manually performing the wiring. You might want to configure some of your app's settings externally instead of harcoding them. Use the `inject.ConfiguredBindings` class for this:
+
+```php
+$injector= new Injector(
+  new ApplicationDefaults(),
+  new ConfiguredBindings(new Properties('etc/app.ini'))
+);
+```
+
+The syntax for these INI files is simple:
+
+```ini
+scriptlet.Session=com.example.session.FileSystem("/tmp")
+string[name]="Application"
+```
 
 Providers
 ---------
