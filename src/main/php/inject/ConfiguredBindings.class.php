@@ -14,7 +14,8 @@ use lang\Type;
  * scriptlet.Session=com.example.session.MemCache("tcp://localhost:11211")
  * ```
  *
- * @test    xp://inject.unittest.ConfiguredBindingsTest
+ * @see   https://github.com/xp-forge/inject/pull/10
+ * @test  xp://inject.unittest.ConfiguredBindingsTest
  */
 class ConfiguredBindings extends Bindings {
   private static $PRIMITIVES= [
@@ -28,8 +29,10 @@ class ConfiguredBindings extends Bindings {
   private $section= null;
 
   /**
-   * Creates new bindings from a given properties instance, reading the
-   * bindings only from a given section.
+   * Creates new bindings from a given properties instance. If an optional
+   * section identifier is given, bindings are created from both the global
+   * section *and* the given one - the latter overwriting bindings from the
+   * first (and inheriting ones it doesn't explicitely define).
    *
    * @param  util.PropertyAccess|string $properties
    * @param  string $section
