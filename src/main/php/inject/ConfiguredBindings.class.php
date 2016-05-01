@@ -9,9 +9,35 @@ use lang\Type;
 /**
  * Bindings from a properties file
  *
+ * ## Basic property file
+ * The bindings are written as key/value pairs. Constructor arguments
+ * are denoted inside braces.
+ *
  * ```ini
  * scriptlet.Session=com.example.session.FileSystem
  * scriptlet.Session=com.example.session.MemCache("tcp://localhost:11211")
+ * ```
+ *
+ * ## Imports
+ * One ore more `use` keys can be used to achieve imports.
+ *
+ * ```ini
+ * use[]=com.example.session
+ *
+ * scriptlet.Session=FileSystem
+ * ```
+ *
+ * ## Inheritance
+ * If created with the optional "section" argument, bindings are created
+ * from both the global section *and* the given one. The latter overwrites
+ * bindings from the first and inherits ones it doesn't explicitely define.
+ *
+ * ```ini
+ * string[name]="Sync"
+ * com.example.Monitoring=com.example.monitoring.Icinga
+ *
+ * [add]
+ * string[name]="Add users"
  * ```
  *
  * @see   https://github.com/xp-forge/inject/pull/10
@@ -29,13 +55,10 @@ class ConfiguredBindings extends Bindings {
   private $section= null;
 
   /**
-   * Creates new bindings from a given properties instance. If an optional
-   * section identifier is given, bindings are created from both the global
-   * section *and* the given one - the latter overwriting bindings from the
-   * first (and inheriting ones it doesn't explicitely define).
+   * Creates new bindings from a given properties instance.
    *
    * @param  util.PropertyAccess|string $properties
-   * @param  string $section
+   * @param  string $section Optional section
    */
   public function __construct($properties, $section= null) {
     if ($properties instanceof PropertyAccess) {
