@@ -26,7 +26,7 @@ class Injector extends \lang\Object {
    * @param  inject.Bindings... $initial
    */
   public function __construct() {
-    $this->bind($this->getClass(), $this);
+    $this->bind(typeof($this), $this);
     foreach (func_get_args() as $bindings) {
       $this->add($bindings);
     }
@@ -43,7 +43,7 @@ class Injector extends \lang\Object {
       return new ClassBinding($impl, $t);
     } else if (self::$PROVIDER->isInstance($impl) || $impl instanceof Provider) {
       return new ProviderBinding($impl);
-    } else if ($impl instanceof Generic) {
+    } else if (is_object($impl)) {
       return new InstanceBinding($impl, $t);
     } else {
       return new ClassBinding(XPClass::forName((string)$impl), $t);
@@ -232,12 +232,12 @@ class Injector extends \lang\Object {
   /**
    * Inject members of an instance
    *
-   * @param   lang.Generic $instance
-   * @return  lang.Generic
+   * @param   var $instance A value object
+   * @return  var
    * @throws  inject.ProvisionException
    */
-  public function into(Generic $instance) {
-    $class= $instance->getClass();
+  public function into($instance) {
+    $class= cast(typeof($instance), 'lang.XPClass');
 
     foreach ($class->getFields() as $field) {
       if (!$field->hasAnnotation('inject')) continue;
