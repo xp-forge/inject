@@ -117,11 +117,54 @@ class ConfiguredBindingsTest extends \unittest\TestCase {
   #  'inject.unittest.fixture.Storage=inject.unittest.fixture.FileSystem',
   #  'inject.unittest.fixture.Storage=inject.unittest.fixture.FileSystem()'
   #])]
-  public function uses_propertyfile_sections_as_namespace($line) {
+  public function namespace_import_via_use($line) {
     $inject= new Injector(new ConfiguredBindings(Properties::fromString('
-      [inject.unittest.fixture]
+      use[]=inject.unittest.fixture
       '.$line.'
     ')));
     $this->assertEquals(new FileSystem(), $inject->get(Storage::class));
+  }
+
+  #[@test]
+  public function use_section() {
+    $prop= Properties::fromString('
+      [one]
+      inject.unittest.fixture.Storage=inject.unittest.fixture.FileSystem()
+    ');
+    $inject= new Injector(new ConfiguredBindings($prop, 'one'));
+    $this->assertEquals(new FileSystem(), $inject->get(Storage::class));
+  }
+
+  #[@test]
+  public function use_different_section() {
+    $prop= Properties::fromString('
+      [one]
+      inject.unittest.fixture.Storage=inject.unittest.fixture.FileSystem()
+    ');
+    $inject= new Injector(new ConfiguredBindings($prop, 'two'));
+    $this->assertNull($inject->get(Storage::class));
+  }
+
+  #[@test]
+  public function inheriting_binding_from_defaults() {
+    $prop= Properties::fromString('
+      inject.unittest.fixture.Storage=inject.unittest.fixture.FileSystem()
+
+      [one]
+   ');
+    $inject= new Injector(new ConfiguredBindings($prop, 'one'));
+    $this->assertEquals(new FileSystem(), $inject->get(Storage::class));
+  }
+
+  #[@test]
+  public function overwriting_binding_from_defaults() {
+    $prop= Properties::fromString('
+      inject.unittest.fixture.Storage=inject.unittest.fixture.FileSystem()
+
+      [one]
+      inject.unittest.fixture.Storage=inject.unittest.fixture.FileSystem("/usr/local")
+   ');
+    $inject= new Injector(new ConfiguredBindings($prop, 'one'));
+    $this->assertEquals(new FileSystem('/usr/local'), $inject->get(Storage::class));
   }
 }

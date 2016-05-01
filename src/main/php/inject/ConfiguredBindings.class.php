@@ -2,7 +2,8 @@
 
 use util\PropertyAccess;
 use util\Properties;
-use lang\XPClass;
+use lang\ClassLoader;
+use lang\ClassNotFoundException;
 use lang\Type;
 
 /**
@@ -16,7 +17,6 @@ use lang\Type;
  * @test    xp://inject.unittest.ConfiguredBindingsTest
  */
 class ConfiguredBindings extends Bindings {
-  private $properties;
   private static $PRIMITIVES= [
     'string' => true,
     'int'    => true,
@@ -24,13 +24,23 @@ class ConfiguredBindings extends Bindings {
     'bool'   => true
   ];
 
-  /** @param util.PropertyAccess|string */
-  public function __construct($arg) {
-    if ($arg instanceof PropertyAccess) {
-      $this->properties= $arg;
+  private $properties;
+  private $section= null;
+
+  /**
+   * Creates new bindings from a given properties instance, reading the
+   * bindings only from a given section.
+   *
+   * @param  util.PropertyAccess|string $properties
+   * @param  string $section
+   */
+  public function __construct($properties, $section= null) {
+    if ($properties instanceof PropertyAccess) {
+      $this->properties= $properties;
     } else {
-      $this->properties= new Properties($arg);
+      $this->properties= new Properties($properties);
     }
+    $this->section= $section;
   }
 
   /**
@@ -92,26 +102,34 @@ class ConfiguredBindings extends Bindings {
   /**
    * Resolves a name
    *
-   * @param  string $namespace
+   * @param  string[] $namespaces
    * @param  string $name
    * @return lang.XPClass
    */
-  private function resolveType($namespace, $name) {
-    return XPClass::forName(strstr($name, '.') ? $name : $namespace.'.'.$name);
+  private function resolveType($namespaces, $name) {
+    $cl= ClassLoader::getDefault();
+    if (strstr($name, '.')) {
+      return $cl->loadClass($name);
+    } else {
+      foreach ($namespaces as $namespace) {
+        if ($cl->providesClass($qualified= $namespace.'.'.$name)) return $cl->loadClass($qualified);
+      }
+      throw new ClassNotFoundException('['.implode(', ', $namespaces).'].'.$name);
+    }
   }
 
   /**
    * Parse implementation from a string.
    *
-   * @param  string $namespace
+   * @param  string[] $namespaces
    * @param  string $input
    * @return var
    */
-  private function bindingTo($namespace, $input) {
+  private function bindingTo($namespaces, $input) {
     if (false === ($p= strpos($input, '('))) {
-      return $this->resolveType($namespace, $input);
+      return $this->resolveType($namespaces, $input);
     } else {
-      $class= $this->resolveType($namespace, substr($input, 0, $p));
+      $class= $this->resolveType($namespaces, substr($input, 0, $p));
       if ($class->hasConstructor()) {
         $arguments= $this->argumentsIn(substr($input, $p + 1, -1));
         return $class->getConstructor()->newInstance($arguments);
@@ -127,24 +145,29 @@ class ConfiguredBindings extends Bindings {
    * @param  inject.Injector $injector
    */
   public function configure($injector) {
-    $namespace= $this->properties->getFirstSection();
-    do {
-      foreach ($this->properties->readSection($namespace) as $type => $implementation) {
+    foreach (array_unique([null, $this->section]) as $section) {
+      $namespaces= [];
+      foreach ($this->properties->readSection($section) as $type => $implementation) {
+        if ('use' === $type) {
+          $namespaces= $implementation;
+          continue;
+        }
+
         if (isset(self::$PRIMITIVES[$type])) {
           foreach ($implementation as $name => $value) {
             $injector->bind($type, $this->valueIn($value), $name);
           }
         } else {
-          $resolved= $this->resolveType($namespace, $type);
+          $resolved= $this->resolveType($namespaces, $type);
           if (is_array($implementation)) {
             foreach ($implementation as $name => $impl) {
-              $injector->bind($resolved, $this->bindingTo($namespace, $impl), $name);
+              $injector->bind($resolved, $this->bindingTo($namespaces, $impl), $name);
             }
           } else {
-            $injector->bind($resolved, $this->bindingTo($namespace, $implementation));
+            $injector->bind($resolved, $this->bindingTo($namespaces, $implementation));
           }
         }
       }
-    } while ($namespace= $this->properties->getNextSection());
+    }
   }
 }
