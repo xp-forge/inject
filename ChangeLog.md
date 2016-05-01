@@ -3,6 +3,12 @@ Dependency injection for the XP Framework change log
 
 ## ?.?.? / ????-??-??
 
+## 1.1.0 / 2016-05-01
+
+* Merged PR #9: Support instances without lang.Object as base, adding
+  support for baseless classes and `Value` instances (see xp-framework/rfc#297)
+  (@thekid)
+
 ## 1.0.2 / 2016-04-15
 
 * Fixed primitive bindings containing commas in ConfiguredBindings class.
