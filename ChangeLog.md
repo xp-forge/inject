@@ -3,7 +3,7 @@ Dependency injection for the XP Framework change log
 
 ## ?.?.? / ????-??-??
 
-## 2.0.0 / ????-??-??
+## 2.0.0 / 2016-05-01
 
 * Merged PR #11: Remove support for field and method injection - @thekid
 * Merged PR #10: Add support for inheritance via property file section.
