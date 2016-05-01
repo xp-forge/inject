@@ -5,6 +5,7 @@ Dependency injection for the XP Framework change log
 
 ## 2.0.0 / ????-??-??
 
+* Merged PR #11: Remove support for field and method injection - @thekid
 * Merged PR #10: Add support for inheritance via property file section.
   **Heads up: Changes namespace import syntax in property files!** - read
   the pull request for details on why and how to migrate.
