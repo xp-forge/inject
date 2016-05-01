@@ -2,7 +2,6 @@
 
 use lang\Type;
 use lang\XPClass;
-use lang\Generic;
 use lang\Throwable;
 use lang\IllegalArgumentException;
 use lang\reflect\TargetInvocationException;
@@ -211,7 +210,7 @@ class Injector extends \lang\Object {
    *
    * @param   lang.XPClass $class
    * @param   [:var] $named Named arguments
-   * @return  lang.Generic
+   * @return  var
    * @throws  inject.ProvisionException
    */
   public function newInstance(XPClass $class, $named= []) {
