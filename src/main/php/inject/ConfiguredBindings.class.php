@@ -105,12 +105,12 @@ class ConfiguredBindings extends Bindings {
   /**
    * Resolves a name
    *
+   * @param  lang.ClassLoader $cl
    * @param  string[] $namespaces
    * @param  string $name
    * @return lang.XPClass
    */
-  private function resolveType($namespaces, $name) {
-    $cl= ClassLoader::getDefault();
+  private function resolveType($cl, $namespaces, $name) {
     if (strstr($name, '.')) {
       return $cl->loadClass($name);
     } else {
@@ -124,15 +124,16 @@ class ConfiguredBindings extends Bindings {
   /**
    * Parse implementation from a string.
    *
+   * @param  lang.ClassLoader $cl
    * @param  string[] $namespaces
    * @param  string $input
    * @return var
    */
-  private function bindingTo($namespaces, $input) {
+  private function bindingTo($cl, $namespaces, $input) {
     if (false === ($p= strpos($input, '('))) {
-      return $this->resolveType($namespaces, $input);
+      return $this->resolveType($cl, $namespaces, $input);
     } else {
-      $class= $this->resolveType($namespaces, substr($input, 0, $p));
+      $class= $this->resolveType($cl, $namespaces, substr($input, 0, $p));
       if ($class->hasConstructor()) {
         $arguments= $this->argumentsIn(substr($input, $p + 1, -1));
         return $class->getConstructor()->newInstance($arguments);
@@ -148,6 +149,7 @@ class ConfiguredBindings extends Bindings {
    * @param  inject.Injector $injector
    */
   public function configure($injector) {
+    $cl= ClassLoader::getDefault();
     foreach (array_unique([null, $this->section]) as $section) {
       $namespaces= [];
       foreach ($this->properties->readSection($section) as $type => $implementation) {
@@ -161,13 +163,13 @@ class ConfiguredBindings extends Bindings {
             $injector->bind($type, $this->valueIn($value), $name);
           }
         } else {
-          $resolved= $this->resolveType($namespaces, $type);
+          $resolved= $this->resolveType($cl, $namespaces, $type);
           if (is_array($implementation)) {
             foreach ($implementation as $name => $impl) {
-              $injector->bind($resolved, $this->bindingTo($namespaces, $impl), $name);
+              $injector->bind($resolved, $this->bindingTo($cl, $namespaces, $impl), $name);
             }
           } else {
-            $injector->bind($resolved, $this->bindingTo($namespaces, $implementation));
+            $injector->bind($resolved, $this->bindingTo($cl, $namespaces, $implementation));
           }
         }
       }
