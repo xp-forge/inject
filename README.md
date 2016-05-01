@@ -71,14 +71,14 @@ Injection is performed by looking at a type's constructor. If it's annotated wit
 
 ```php
 // Single parameter
-class ReportImpl extends \lang\Object implements Report {
+class ReportImpl implements Report {
 
   #[@inject]
   public function __construct(ReportWriter $writer) { ... }
 }
 
 // Multiple parameters
-class ReportImpl extends \lang\Object implements Report {
+class ReportImpl implements Report {
 
   #[@inject]
   public function __construct(ReportWriter $writer, Format $format) { ... }
@@ -88,7 +88,7 @@ class ReportImpl extends \lang\Object implements Report {
 You can supply name and type by using parameter annotations:
 
 ```php
-class ReportImpl extends \lang\Object implements Report {
+class ReportImpl implements Report {
 
   #[@inject, @$title: inject(type= 'string', name= 'title')]
   public function __construct(ReportWriter $writer, Format $format, $title) { ... }
@@ -98,7 +98,7 @@ class ReportImpl extends \lang\Object implements Report {
 When a required parameter is encountered and there is no bound value for this parameter, an `inject.ProvisionException` is raised.
 
 ```php
-class ReportWriter extends \lang\Object implements Writer {
+class ReportWriter implements Writer {
 
   #[@inject]
   public function __construct(Storage $storage) { ... }
