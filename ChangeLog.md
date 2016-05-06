@@ -3,6 +3,11 @@ Dependency injection for the XP Framework change log
 
 ## ?.?.? / ????-??-??
 
+* Fixed `lang.NullPointerException (Undefined variable: type)` when 
+  performing constructor injection where a required parameter's value
+  is not existant (e.g., because it hasn't been bound).
+  (@thekid)
+
 ## 2.0.0 / 2016-05-01
 
 * Merged PR #11: Remove support for field and method injection - @thekid

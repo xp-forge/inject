@@ -132,7 +132,7 @@ class Injector extends \lang\Object {
       } else {
         throw new ProvisionException(sprintf(
           'Unknown injection type %s%s for %s\'s %s() parameter %s',
-          $type,
+          isset($inject['type']) ? $inject['type'] : $param->getTypeName(),
           isset($inject['name']) ? ' named "'.$inject['name'].'"' : '',
           $routine->getDeclaringClass()->getName(),
           $routine->getName(),

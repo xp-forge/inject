@@ -1,6 +1,7 @@
 <?php namespace inject\unittest;
 
 use inject\Injector;
+use inject\ProvisionException;
 use unittest\TestCase;
 use util\Currency;
 use lang\ClassLoader;
@@ -22,6 +23,22 @@ class NewInstanceTest extends TestCase {
       [Storage::class],
       $definition
     );
+  }
+
+  /**
+   * Calls Injector::newInstance(), unwrapping ProvisionException's cause
+   *
+   * @param  inject.Injector $inject
+   * @param  var $type
+   * @return var
+   * @throws lang.Throwable
+   */
+  private function newInstance(Injector $inject, $type) {
+    try {
+      return $inject->newInstance($type);
+    } catch (ProvisionException $e) {
+      throw $e->getCause();
+    }
   }
 
   #[@test]
@@ -67,13 +84,22 @@ class NewInstanceTest extends TestCase {
     $this->assertEquals([$this, true], $inject->newInstance($storage)->injected);
   }
 
-  #[@test, @expect(class= 'inject.ProvisionException', withMessage= '/Error creating an instance of .+/')]
+  #[@test, @expect(class= 'lang.IllegalAccessException', withMessage= '/Cannot invoke private constructor/')]
   public function newInstance_catches_iae_when_creating_class_instances() {
     $inject= new Injector();
     $storage= $this->newStorage('{
       #[@inject]
       private function __construct() { }
     }');
-    $inject->newInstance($storage);
+    $this->newInstance($inject, $storage);
+  }
+
+  #[@test, @expect(class= 'inject.ProvisionException', withMessage= '/Unknown injection type string named "endpoint"/')]
+  public function newInstance_throws_when_value_for_required_parameter_not_found() {
+    $inject= new Injector();
+    $storage= $this->newStorage([
+      '#[@inject(type= "string", name= "endpoint")] __construct' => function($param) { }
+    ]);
+    $this->newInstance($inject, $storage);
   }
 }
