@@ -3,6 +3,9 @@ Dependency injection for the XP Framework change log
 
 ## ?.?.? / ????-??-??
 
+## 2.1.0 / 2016-05-06
+
+* Merged PR #12: Add support for type unions - @thekid
 * Fixed `lang.NullPointerException (Undefined variable: type)` when 
   performing constructor injection where a required parameter's value
   is not existant (e.g., because it hasn't been bound).
