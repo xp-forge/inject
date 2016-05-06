@@ -149,4 +149,29 @@ class InjectorTest extends TestCase {
     $inject->bind($type, $impl, 'test');
     $this->assertNull($inject->get($type, 'another-name-than-the-one-bound'));
   }
+
+  #[@test]
+  public function get_given_a_typeunion_searches_all_types() {
+    $fs= new FileSystem('/usr');
+    $inject= new Injector();
+    $inject->bind(FileSystem::class, $fs);
+    $this->assertEquals($fs, $inject->get('string|inject.unittest.fixture.FileSystem'));
+  }
+
+  #[@test]
+  public function get_given_a_typeunion_searches_all_named_types() {
+    $path= '/usr';
+    $inject= new Injector();
+    $inject->bind('string', $path, 'path');
+    $this->assertEquals($path, $inject->get('string|inject.unittest.fixture.FileSystem', 'path'));
+  }
+
+  #[@test]
+  public function get_given_a_typeunion_searches_all_named_types_and_uses_first() {
+    $path= '/usr';
+    $inject= new Injector();
+    $inject->bind('string', $path, 'path');
+    $inject->bind(FileSystem::class, new FileSystem('/usr'));
+    $this->assertEquals($path, $inject->get('string|inject.unittest.fixture.FileSystem', 'path'));
+  }
 }
