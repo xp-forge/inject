@@ -2,6 +2,7 @@
 
 use lang\Type;
 use lang\XPClass;
+use lang\TypeUnion;
 use lang\Throwable;
 use lang\IllegalArgumentException;
 use lang\reflect\TargetInvocationException;
@@ -94,7 +95,11 @@ class Injector extends \lang\Object {
   public function get($type, $name= null) {
     $t= $type instanceof Type ? $type : Type::forName($type);
 
-    if (self::$PROVIDER->isAssignableFrom($t)) {
+    if ($t instanceof TypeUnion) {
+      foreach ($t->types() as $type) {
+        if ($instance= $this->get($type, $name)) return $instance;
+      }
+    } else if (self::$PROVIDER->isAssignableFrom($t)) {
       $literal= $t->genericArguments()[0]->literal();
       if (isset($this->bindings[$literal][$name])) {
         return $this->bindings[$literal][$name]->provider($this);
