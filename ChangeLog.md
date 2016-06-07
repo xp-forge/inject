@@ -3,6 +3,10 @@ Dependency injection for the XP Framework change log
 
 ## ?.?.? / ????-??-??
 
+## 2.2.0 / 2016-06-07
+
+* Merged PR #13: Array binding - @thekid
+
 ## 2.1.0 / 2016-05-06
 
 * Merged PR #12: Add support for type unions - @thekid
