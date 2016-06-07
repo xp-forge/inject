@@ -3,6 +3,7 @@
 use lang\Type;
 use lang\XPClass;
 use lang\TypeUnion;
+use lang\Primitive;
 use lang\Throwable;
 use lang\IllegalArgumentException;
 use lang\reflect\TargetInvocationException;
@@ -35,16 +36,18 @@ class Injector extends \lang\Object {
   /**
    * Returns a binding
    *
-   * @param  lang.XPClass $t
+   * @param  lang.Type $t
    * @param  var $impl
    */
-  protected function asBinding($t, $impl) {
+  public static function asBinding($t, $impl) {
     if ($impl instanceof XPClass) {
       return new ClassBinding($impl, $t);
     } else if (self::$PROVIDER->isInstance($impl) || $impl instanceof Provider) {
       return new ProviderBinding($impl);
     } else if (is_object($impl)) {
       return new InstanceBinding($impl, $t);
+    } else if (is_array($impl)) {
+      return new ArrayBinding($impl, $t);
     } else {
       return new ClassBinding(XPClass::forName((string)$impl), $t);
     }
@@ -75,12 +78,13 @@ class Injector extends \lang\Object {
 
     if ($impl instanceof Named) {
       $this->bindings[$t->literal()]= $impl;
-    } else if ($t instanceof XPClass) {
-      $this->bindings[$t->literal()][$name]= $this->asBinding($t, $impl);
-    } else if (null === $name) {
-      throw new IllegalArgumentException('Cannot bind non-class type '.$t.' without a name');
-    } else {
+    } else if ($t instanceof Primitive) {
+      if (null === $name) {
+        throw new IllegalArgumentException('Cannot bind primitive type '.$t.' without a name');
+      }
       $this->bindings[$t->literal()][$name]= new InstanceBinding($impl, $t);
+    } else {
+      $this->bindings[$t->literal()][$name]= self::asBinding($t, $impl);
     }
     return $this;
   }
