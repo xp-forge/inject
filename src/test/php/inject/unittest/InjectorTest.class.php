@@ -147,6 +147,18 @@ class InjectorTest extends TestCase {
     $inject->bind(Storage::class, '@non.existant.class@');
   }
 
+  #[@test, @expect(IllegalArgumentException::class)]
+  public function cannot_bind_array_type_to_non_array() {
+    $inject= new Injector();
+    $inject->bind('inject.unittest.fixture.Storage[]', Storage::class);
+  }
+
+  #[@test, @expect(IllegalArgumentException::class)]
+  public function cannot_bind_non_array_type_to_array() {
+    $inject= new Injector();
+    $inject->bind('inject.unittest.fixture.Storage', [Storage::class]);
+  }
+
   #[@test, @values('bindings')]
   public function get_named_implementation_bound_to_interface($type, $impl) {
     $inject= new Injector();

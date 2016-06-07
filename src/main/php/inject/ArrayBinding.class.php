@@ -16,7 +16,11 @@ class ArrayBinding extends \lang\Object implements Binding {
    * @param  lang.ArrayType $type
    * @throws lang.IllegalArgumentException
    */
-  public function __construct($binding, ArrayType $type) {
+  public function __construct($binding, $type) {
+    if (!($type instanceof ArrayType)) {
+      throw new IllegalArgumentException('Cannot bind an array to a non-array type');
+    }
+
     $this->type= $type;
     $component= $type->componentType();
     foreach ($binding as $impl) {
