@@ -8,6 +8,7 @@ use lang\ClassNotFoundException;
 use unittest\TestCase;
 use util\Currency;
 use inject\unittest\fixture\FileSystem;
+use inject\unittest\fixture\InMemory;
 use inject\unittest\fixture\Storage;
 use inject\unittest\fixture\AbstractStorage;
 
@@ -24,6 +25,15 @@ class InjectorTest extends TestCase {
       [XPClass::forName($name), XPClass::forName(FileSystem::class)],
       [XPClass::forName($name), FileSystem::class],
       [XPClass::forName($name), $instance]
+    ];
+  }
+
+  /** @return var[][] */
+  protected function storages() {
+    return [
+      [[XPClass::forName(FileSystem::class), XPClass::forName(InMemory::class)]],
+      [[FileSystem::class, InMemory::class]],
+      [[new FileSystem(), new InMemory()]]
     ];
   }
 
@@ -55,6 +65,13 @@ class InjectorTest extends TestCase {
     $inject= new Injector();
     $inject->bind($type, $impl);
     $this->assertInstanceOf(FileSystem::class, $inject->get($type));
+  }
+
+  #[@test, @values('storages')]
+  public function bind_array($impl) {
+    $inject= new Injector();
+    $inject->bind('inject.unittest.fixture.Storage[]', $impl);
+    $this->assertEquals([new FileSystem(), new InMemory()], $inject->get('inject.unittest.fixture.Storage[]'));
   }
 
   #[@test]
