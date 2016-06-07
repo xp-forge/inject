@@ -3,15 +3,11 @@
 use lang\IllegalArgumentException;
 use lang\XPClass;
 use lang\Type;
+use lang\ArrayType;
 
 class ArrayBinding extends \lang\Object implements Binding {
-  private static $PROVIDER;
   private $type;
   private $binding= [];
-
-  static function __static() {
-    self::$PROVIDER= Type::forName('inject.Provider<?>');
-  }
 
   /**
    * Creates a new instance binding
@@ -20,19 +16,11 @@ class ArrayBinding extends \lang\Object implements Binding {
    * @param  lang.ArrayType $type
    * @throws lang.IllegalArgumentException
    */
-  public function __construct($binding, $type) {
+  public function __construct($binding, ArrayType $type) {
     $this->type= $type;
-    $component= $this->type->componentType();
+    $component= $type->componentType();
     foreach ($binding as $impl) {
-      if ($impl instanceof XPClass) {
-        $this->binding[]= new ClassBinding($impl, $component);
-      } else if (self::$PROVIDER->isInstance($impl) || $impl instanceof Provider) {
-        $this->binding[]= new ProviderBinding($impl);
-      } else if (is_object($impl)) {
-        $this->binding[]= new InstanceBinding($impl, $component);
-      } else {
-        $this->binding[]= new ClassBinding(XPClass::forName((string)$impl), $component);
-      }
+      $this->binding[]= Injector::asBinding($component, $impl);
     }
   }
 
@@ -43,7 +31,7 @@ class ArrayBinding extends \lang\Object implements Binding {
    * @param  inject.Provider<?>
    */
   public function provider($injector) {
-    //return new TypeProvider($this->class, $injector);
+    return new ResolvingProvider($this, $injector);
   }
 
   /**

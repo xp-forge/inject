@@ -2,7 +2,6 @@
 
 use lang\Type;
 use lang\XPClass;
-use lang\ArrayType;
 use lang\TypeUnion;
 use lang\Primitive;
 use lang\Throwable;
@@ -40,7 +39,7 @@ class Injector extends \lang\Object {
    * @param  lang.Type $t
    * @param  var $impl
    */
-  protected function asBinding($t, $impl) {
+  public static function asBinding($t, $impl) {
     if ($impl instanceof XPClass) {
       return new ClassBinding($impl, $t);
     } else if (self::$PROVIDER->isInstance($impl) || $impl instanceof Provider) {
@@ -85,7 +84,7 @@ class Injector extends \lang\Object {
       }
       $this->bindings[$t->literal()][$name]= new InstanceBinding($impl, $t);
     } else {
-      $this->bindings[$t->literal()][$name]= $this->asBinding($t, $impl);
+      $this->bindings[$t->literal()][$name]= self::asBinding($t, $impl);
     }
     return $this;
   }
