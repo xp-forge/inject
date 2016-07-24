@@ -177,7 +177,7 @@ class Injector extends \lang\Object {
       } else if (!$param->isOptional()) {
         throw new ProvisionException(sprintf(
           'Value required for %s\'s %s() parameter %s',
-          $routine->getDeclaringClass()->getName(),
+          $routine->declaredIn()->name(),
           $routine->name(),
           $name
         ));
