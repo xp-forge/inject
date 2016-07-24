@@ -158,22 +158,21 @@ class Injector extends \lang\Object {
    *
    * @param  lang.mirrors.Routine $routine
    * @param  [:var] $named Named arguments
-   * @return var
+   * @return php.Generator
    * @throws inject.ProvisionException
    */
-  protected function args($routine, $named) {
+  private function args($routine, $named) {
     $inject= $routine->annotations()->present('inject');
-    $args= [];
     foreach ($routine->parameters() as $i => $param) {
       $name= $param->name();
       if (isset($named[$name])) {
-        $args[]= $named[$name];
+        yield $named[$name];
       } else if ($param->annotations()->present('inject')) {
         $target= true;
-        $args[]= $this->param($param->annotations()->named('inject')->value(), $routine, $param);
+        yield $this->param($param->annotations()->named('inject')->value(), $routine, $param);
       } else if ($inject) {
         $target= true;
-        $args[]= $this->param(0 === $i ? $routine->annotations()->named('inject')->value() : [], $routine, $param);
+        yield $this->param(0 === $i ? $routine->annotations()->named('inject')->value() : [], $routine, $param);
       } else if (!$param->isOptional()) {
         throw new ProvisionException(sprintf(
           'Value required for %s\'s %s() parameter %s',
@@ -183,7 +182,6 @@ class Injector extends \lang\Object {
         ));
       }
     }
-    return $args;
   }
 
   /**
