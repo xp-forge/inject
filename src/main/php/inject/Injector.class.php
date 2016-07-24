@@ -125,8 +125,8 @@ class Injector extends \lang\Object {
    * Retrieve bound value for injection
    *
    * @param  var $inject The annotation
-   * @param  lang.reflect.Routine $routine
-   * @param  lang.reflect.Parameter $param
+   * @param  lang.mirrors.Routine $routine
+   * @param  lang.mirrors.Parameter $param
    * @return var
    * @throws inject.ProvisionException
    */
@@ -142,7 +142,7 @@ class Injector extends \lang\Object {
       } else {
         throw new ProvisionException(sprintf(
           'Unknown injection type %s%s for %s\'s %s() parameter %s',
-          isset($inject['type']) ? $inject['type'] : $param->getTypeName(),
+          isset($inject['type']) ? $inject['type'] : $param->type()->name(),
           isset($inject['name']) ? ' named "'.$inject['name'].'"' : '',
           $routine->declaredIn()->name(),
           $routine->name(),
