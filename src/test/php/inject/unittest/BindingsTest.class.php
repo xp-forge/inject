@@ -3,6 +3,7 @@
 use inject\Bindings;
 use inject\Injector;
 use inject\unittest\fixture\FileSystem;
+use inject\unittest\fixture\Storage;
 use util\Currency;
 use unittest\TestCase;
 
@@ -13,27 +14,27 @@ class BindingsTest extends TestCase {
    * Initializes bindings
    */
   public function setUp() {
-    $this->bindings= newinstance('inject.Bindings', [], [
-      'configure' => function($inject) { $inject->bind('inject.unittest.fixture.Storage', new FileSystem()); }
+    $this->bindings= newinstance(Bindings::class, [], [
+      'configure' => function($inject) { $inject->bind(Storage::class, new FileSystem()); }
     ]);
   }
 
   #[@test]
   public function can_optionally_be_given_binding() {
     $inject= new Injector($this->bindings);
-    $this->assertInstanceOf('inject.unittest.fixture.FileSystem', $inject->get('inject.unittest.fixture.Storage'));
+    $this->assertInstanceOf(FileSystem::class, $inject->get(Storage::class));
   }
 
   #[@test]
   public function can_optionally_be_given_bindings() {
     $inject= new Injector(
       $this->bindings,
-      newinstance('inject.Bindings', [], [
-        'configure' => function($inject) { $inject->bind('util.Currency', Currency::$EUR, 'EUR'); }
+      newinstance(Bindings::class, [], [
+        'configure' => function($inject) { $inject->bind(Currency::class, Currency::$EUR, 'EUR'); }
       ])
     );
-    $this->assertInstanceOf('inject.unittest.fixture.FileSystem', $inject->get('inject.unittest.fixture.Storage'));
-    $this->assertEquals(Currency::$EUR, $inject->get('util.Currency', 'EUR'));
+    $this->assertInstanceOf(FileSystem::class, $inject->get(Storage::class));
+    $this->assertEquals(Currency::$EUR, $inject->get(Currency::class, 'EUR'));
   }
 
   #[@test]
@@ -46,6 +47,6 @@ class BindingsTest extends TestCase {
   public function add() {
     $inject= new Injector();
     $inject->add($this->bindings);
-    $this->assertInstanceOf('inject.unittest.fixture.FileSystem', $inject->get('inject.unittest.fixture.Storage'));
+    $this->assertInstanceOf(FileSystem::class, $inject->get(Storage::class));
   }
 }
