@@ -3,6 +3,11 @@ Dependency injection for the XP Framework change log
 
 ## ?.?.? / ????-??-??
 
+## 3.0.0 / 2016-08-15
+
+* **Heads up: Dropped PHP 5.5 support**. Minimum PHP version is now PHP 5.6.0
+  (@thekid)
+
 ## 2.2.0 / 2016-06-07
 
 * Merged PR #13: Array binding - @thekid

@@ -26,9 +26,9 @@ class Injector extends \lang\Object {
    *
    * @param  inject.Bindings... $initial
    */
-  public function __construct() {
+  public function __construct(... $initial) {
     $this->bind(typeof($this), $this);
-    foreach (func_get_args() as $bindings) {
+    foreach ($initial as $bindings) {
       $this->add($bindings);
     }
   }
