@@ -3,6 +3,12 @@ Dependency injection for the XP Framework change log
 
 ## ?.?.? / ????-??-??
 
+## 3.1.0 / 2016-08-28
+
+* Added forward compatibility with XP 8.0.0: Refrain from using deprecated
+  `util.Properties::fromString()`
+  (@thekid)
+
 ## 3.0.0 / 2016-08-15
 
 * **Heads up: Dropped PHP 5.5 support**. Minimum PHP version is now PHP 5.6.0
