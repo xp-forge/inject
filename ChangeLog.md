@@ -3,6 +3,10 @@ Dependency injection for the XP Framework change log
 
 ## ?.?.? / ????-??-??
 
+## 4.0.0 / 2017-06-16
+
+* Added forward compatibility with XP 9.0.0 - @thekid
+
 ## 3.1.0 / 2016-08-28
 
 * Added forward compatibility with XP 8.0.0: Refrain from using deprecated
