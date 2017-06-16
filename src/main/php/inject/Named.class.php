@@ -5,7 +5,7 @@
  *
  * @test  xp://inject.unittest.NamedTest
  */
-abstract class Named extends \lang\Object implements \ArrayAccess {
+abstract class Named implements \ArrayAccess {
 
   /**
    * Returns whether this named instance provides a given name
@@ -23,11 +23,15 @@ abstract class Named extends \lang\Object implements \ArrayAccess {
    */
   public abstract function binding($name);
 
+  /** isset() overloading */
   public function offsetExists($offset) { return $this->provides($offset); }
 
+  /** =[] overloading */
   public function offsetGet($offset) { return $this->binding($offset); }
 
+  /** []= overloading */
   public function offsetSet($offset, $value) { /* Empty */ }
 
+  /** unset() overloading */
   public function offsetUnset($offset) { /* Empty */ }
 }

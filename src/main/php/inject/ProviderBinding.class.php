@@ -2,7 +2,7 @@
 
 use lang\IllegalArgumentException;
 
-class ProviderBinding extends \lang\Object implements Binding {
+class ProviderBinding implements Binding {
   protected $provider;
 
   /**

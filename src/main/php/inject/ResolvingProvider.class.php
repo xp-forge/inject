@@ -1,7 +1,7 @@
 <?php namespace inject;
 
 #[@generic(implements= ['var'])]
-class ResolvingProvider extends \lang\Object implements Provider {
+class ResolvingProvider implements Provider {
   private $binding, $injector;
 
   /**

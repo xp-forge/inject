@@ -6,7 +6,7 @@
  *
  * @test    xp://inject.unittest.BindingsTest
  */
-abstract class Bindings extends \lang\Object {
+abstract class Bindings {
 
   /**
    * Configures bindings on given injector
