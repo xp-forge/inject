@@ -3,7 +3,7 @@
 use lang\IllegalArgumentException;
 use util\Objects;
 
-class InstanceBinding extends \lang\Object implements Binding {
+class InstanceBinding implements Binding {
   protected $instance;
 
   /**

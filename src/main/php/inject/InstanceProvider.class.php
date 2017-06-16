@@ -1,7 +1,7 @@
 <?php namespace inject;
 
 #[@generic(implements= ['var'])]
-class InstanceProvider extends \lang\Object implements Provider {
+class InstanceProvider implements Provider {
   protected $instance= null;
 
   /** @param var */

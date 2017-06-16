@@ -2,7 +2,7 @@
 
 use lang\IllegalArgumentException;
 
-class ClassBinding extends \lang\Object implements Binding {
+class ClassBinding implements Binding {
   protected $class;
 
   /**

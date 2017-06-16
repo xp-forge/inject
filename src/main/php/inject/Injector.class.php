@@ -13,7 +13,7 @@ use lang\reflect\TargetInvocationException;
  *
  * @test    xp://inject.unittest.InjectorTest
  */
-class Injector extends \lang\Object {
+class Injector {
   protected static $PROVIDER;
   protected $bindings= [];
 

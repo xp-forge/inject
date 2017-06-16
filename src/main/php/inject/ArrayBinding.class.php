@@ -5,7 +5,7 @@ use lang\XPClass;
 use lang\Type;
 use lang\ArrayType;
 
-class ArrayBinding extends \lang\Object implements Binding {
+class ArrayBinding implements Binding {
   private $type;
   private $binding= [];
 
