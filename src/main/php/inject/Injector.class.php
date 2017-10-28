@@ -121,38 +121,6 @@ class Injector {
   }
 
   /**
-   * Retrieve bound value for injection
-   *
-   * @param  var $inject The annotation
-   * @param  lang.reflect.Routine $routine
-   * @param  lang.reflect.Parameter $param
-   * @return var
-   * @throws inject.ProvisionException
-   */
-  private function param($inject, $routine, $param) {
-    $binding= $this->get(
-      isset($inject['type']) ? $inject['type'] : ($param->getTypeRestriction() ?: $param->getType()),
-      isset($inject['name']) ? $inject['name'] : null
-    );
-
-    if (null === $binding) {
-      if ($param->isOptional()) {
-        return $param->getDefaultValue();
-      } else {
-        throw new ProvisionException(sprintf(
-          'Unknown injection type %s%s for %s\'s %s() parameter %s',
-          isset($inject['type']) ? $inject['type'] : $param->getTypeName(),
-          isset($inject['name']) ? ' named "'.$inject['name'].'"' : '',
-          $routine->getDeclaringClass()->getName(),
-          $routine->getName(),
-          $param->getName()
-        ));
-      }
-    }
-    return $binding;
-  }
-
-  /**
    * Retrieve args for a given routine
    *
    * @param  lang.reflect.Routine $routine
@@ -161,22 +129,37 @@ class Injector {
    * @throws inject.ProvisionException
    */
   protected function args($routine, $named) {
-    $inject= $routine->hasAnnotation('inject');
     $args= [];
     foreach ($routine->getParameters() as $i => $param) {
       $name= $param->getName();
       if (isset($named[$name])) {
         $args[]= $named[$name];
-      } else if ($param->hasAnnotation('inject')) {
-        $args[]= $this->param($param->getAnnotation('inject'), $routine, $param);
-      } else if ($inject) {
-        $args[]= $this->param(0 === $i ? $routine->getAnnotation('inject') : [], $routine, $param);
-      } else if (!$param->isOptional()) {
+        continue;
+      }
+
+      if ($param->hasAnnotation('inject')) {
+        $inject= $param->getAnnotation('inject');
+      } else if (0 === $i) {
+        $inject= $routine->hasAnnotation('inject') ? $routine->getAnnotation('inject') : [];
+      } else {
+        $inject= [];
+      }
+
+      $type= isset($inject['type']) ? Type::forName($inject['type']) : ($param->getTypeRestriction() ?: $param->getType());
+      $binding= $this->get($type, isset($inject['name']) ? $inject['name'] : null);
+
+      if (null !== $binding) {
+        $args[]= $binding;
+      } else if ($param->isOptional()) {
+        $args[]= $param->getDefaultValue();
+      } else {
         throw new ProvisionException(sprintf(
-          'Value required for %s\'s %s() parameter %s',
+          'No bound value for type %s%s in %s\'s %s() parameter %s',
+          $type->getName(),
+          isset($inject['name']) ? ' named "'.$inject['name'].'"' : '',
           $routine->getDeclaringClass()->getName(),
           $routine->getName(),
-          $name
+          $param->getName()
         ));
       }
     }

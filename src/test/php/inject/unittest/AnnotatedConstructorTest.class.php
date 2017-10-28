@@ -103,4 +103,24 @@ class AnnotatedConstructorTest extends AnnotationsTest {
     ]));
     $this->inject->get(Value::class);
   }
+
+  #[@test]
+  public function annotation_is_optional_single_parameter() {
+    $this->inject->bind(Value::class, $this->newInstance([
+      'injected' => null,
+      '__construct' => function(TestCase $test) { $this->injected= $test; }
+    ]));
+    $this->assertEquals($this, $this->inject->get(Value::class)->injected);
+  }
+
+  #[@test]
+  public function annotation_is_optional_multiple_parameters() {
+    $this->inject->bind(Value::class, $this->newInstance([
+      'injected' => null,
+      '__construct' => function(TestCase $test, Storage $storage) {
+        $this->injected= [$test, $storage];
+      }
+    ]));
+    $this->assertEquals([$this, new FileSystem()], $this->inject->get(Value::class)->injected);
+  }
 }
