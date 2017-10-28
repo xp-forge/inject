@@ -20,7 +20,7 @@ class NewInstanceTest extends TestCase {
   protected function newStorage($definition) {
     return ClassLoader::defineClass(
       'inject.unittest.fixture.'.$this->name,
-      'lang.Object',
+      'inject.unittest.fixture.Fixture',
       [Storage::class],
       $definition
     );
@@ -95,7 +95,7 @@ class NewInstanceTest extends TestCase {
     $this->newInstance($inject, $storage);
   }
 
-  #[@test, @expect(class= ProvisionException::class, withMessage= '/Unknown injection type string named "endpoint"/')]
+  #[@test, @expect(class= ProvisionException::class, withMessage= '/No bound value for type string named "endpoint"/')]
   public function newInstance_throws_when_value_for_required_parameter_not_found() {
     $inject= new Injector();
     $storage= $this->newStorage([

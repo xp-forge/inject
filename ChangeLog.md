@@ -3,6 +3,10 @@ Dependency injection for the XP Framework change log
 
 ## ?.?.? / ????-??-??
 
+* Made `@inject` annotation optional, now only needs to be supplied for
+  named bindings.
+  (@thekid)
+
 ## 4.0.0 / 2017-06-16
 
 * Added forward compatibility with XP 9.0.0 - @thekid
