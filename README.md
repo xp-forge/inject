@@ -49,7 +49,7 @@ $injector= new Injector(new ApplicationDefaults());
 
 Instance creation
 -----------------
-Keep in mind: ***"injector.get() is the new 'new'"***. To create objects and perform injection, use the Injector's get() method instead of using the `new` keyword or factories.
+Keep in mind: **"injector.get() is the new 'new'"**. To create objects and perform injection, use the Injector's get() method instead of using the `new` keyword or factories.
 
 ```php
 use inject\Injector;
@@ -67,12 +67,11 @@ Manual calls are usually not necessary though, instead you'll use injection:
 
 Injection
 ---------
-Injection is performed by looking at a type's constructor. If it's annotated with an `@inject` annotation, bound values will be passed according to the given type hint.
+Injection is performed by looking at a type's constructor. Bound values will be passed according to the given type hint.
 
 ```php
 class ReportImpl implements Report {
 
-  #[@inject]
   public function __construct(ReportWriter $writer) { ... }
 }
 ```
@@ -82,7 +81,7 @@ You can supply name and type by using parameter annotations:
 ```php
 class ReportImpl implements Report {
 
-  #[@inject, @$title: inject(type= 'string', name= 'title')]
+  #[@$title: inject(type= 'string', name= 'title')]
   public function __construct(ReportWriter $writer, Format $format, $title) { ... }
 }
 ```
@@ -92,7 +91,6 @@ When a required parameter is encountered and there is no bound value for this pa
 ```php
 class ReportWriter implements Writer {
 
-  #[@inject]
   public function __construct(Storage $storage) { ... }
 }
 
