@@ -3,6 +3,8 @@ Dependency injection for the XP Framework change log
 
 ## ?.?.? / ????-??-??
 
+## 4.1.0 / 2017-10-28
+
 * Made `@inject` annotation optional, now only needs to be supplied for
   named bindings.
   (@thekid)
