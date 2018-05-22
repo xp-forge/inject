@@ -123,4 +123,15 @@ class AnnotatedConstructorTest extends AnnotationsTest {
     ]));
     $this->assertEquals([$this, new FileSystem()], $this->inject->get(Value::class)->injected);
   }
+
+  #[@test]
+  public function name_defaults_to_parameter() {
+    $this->inject->bind(Value::class, $this->newInstance([
+      'injected' => null,
+      '#[@inject, @$name: inject(type= "string")] __construct' => function(TestCase $test, Storage $storage, $name) {
+        $this->injected= [$test, $storage, $name];
+      }
+    ]));
+    $this->assertEquals([$this, new FileSystem(), 'Test'], $this->inject->get(Value::class)->injected);
+  }
 }

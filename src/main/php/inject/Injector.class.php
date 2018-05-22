@@ -128,7 +128,7 @@ class Injector {
    * @return var
    * @throws inject.ProvisionException
    */
-  protected function args($routine, $named) {
+  public function args($routine, $named= []) {
     $args= [];
     foreach ($routine->getParameters() as $i => $param) {
       $name= $param->getName();
@@ -152,6 +152,8 @@ class Injector {
         $args[]= $binding;
       } else if ($param->isOptional()) {
         $args[]= $param->getDefaultValue();
+      } else if (null !== ($binding= $this->get($type, $name))) {
+        $args[]= $binding;
       } else {
         throw new ProvisionException(sprintf(
           'No bound value for type %s%s in %s\'s %s() parameter %s',

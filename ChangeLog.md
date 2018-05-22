@@ -3,6 +3,12 @@ Dependency injection for the XP Framework change log
 
 ## ?.?.? / ????-??-??
 
+## 4.2.0 / 2018-05-22
+
+* Implemented feature request #18: Injection names. Names are now calculated
+  from parameter names if omitted
+  (@thekid)
+
 ## 4.1.0 / 2017-10-28
 
 * Added PHP 7.2 to test matrix - @thekid
