@@ -1,12 +1,14 @@
 <?php namespace inject\unittest;
 
-use inject\Injector;
 use inject\ConfiguredBindings;
-use util\Properties;
-use inject\unittest\fixture\Value;
+use inject\Injector;
 use inject\unittest\fixture\FileSystem;
+use inject\unittest\fixture\InMemory;
 use inject\unittest\fixture\Storage;
+use inject\unittest\fixture\Value;
 use io\streams\MemoryInputStream;
+use lang\ClassNotFoundException;
+use util\Properties;
 
 class ConfiguredBindingsTest extends \unittest\TestCase {
 
@@ -41,6 +43,21 @@ class ConfiguredBindingsTest extends \unittest\TestCase {
       inject.unittest.fixture.Storage=inject.unittest.fixture.FileSystem("/usr")
     ')));
     $this->assertEquals(new FileSystem('/usr'), $inject->get(Storage::class));
+  }
+
+  #[@test]
+  public function bind_instance_without_constructor() {
+    $inject= new Injector(new ConfiguredBindings($this->loadProperties('
+      inject.unittest.fixture.Storage=inject.unittest.fixture.InMemory()
+    ')));
+    $this->assertEquals(new InMemory(), $inject->get(Storage::class));
+  }
+
+  #[@test, @expect(ClassNotFoundException::class)]
+  public function bind_class_to_nonexistant_impl() {
+    new Injector(new ConfiguredBindings($this->loadProperties('
+      inject.unittest.fixture.Storage=NonExistant
+    ')));
   }
 
   #[@test, @values([
