@@ -2,11 +2,13 @@
 
 use inject\Injector;
 use inject\InstanceProvider;
+use inject\ResolvingProvider;
 use inject\TypeProvider;
-use unittest\TestCase;
-use lang\XPClass;
 use inject\unittest\fixture\FileSystem;
 use inject\unittest\fixture\Storage;
+use lang\Type;
+use lang\XPClass;
+use unittest\TestCase;
 
 class ProvidersTest extends TestCase {
 
@@ -67,5 +69,14 @@ class ProvidersTest extends TestCase {
       FileSystem::class,
       $inject->get('inject.Provider<inject.unittest.fixture.Storage>')->get()
     );
+  }
+
+  #[@test]
+  public function resolving_provider_used_for_arrays() {
+    $storages= [new FileSystem()];
+
+    $inject= new Injector();
+    $inject->bind('inject.unittest.fixture.Storage[]', $storages);
+    $this->assertEquals($storages, $inject->get('inject.Provider<inject.unittest.fixture.Storage[]>')->get());
   }
 }
