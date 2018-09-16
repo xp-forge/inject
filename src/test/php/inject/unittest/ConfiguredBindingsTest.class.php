@@ -2,6 +2,7 @@
 
 use inject\ConfiguredBindings;
 use inject\Injector;
+use inject\unittest\fixture\Database;
 use inject\unittest\fixture\FileSystem;
 use inject\unittest\fixture\InMemory;
 use inject\unittest\fixture\Storage;
@@ -98,6 +99,22 @@ class ConfiguredBindingsTest extends \unittest\TestCase {
       [new FileSystem('~/.xp'), new FileSystem('/etc/xp')],
       [$inject->get(Storage::class, 'user'), $inject->get(Storage::class, 'system')]
     );
+  }
+
+  #[@test]
+  public function two_arguments() {
+    $inject= new Injector(new ConfiguredBindings($this->loadProperties('
+      inject.unittest.fixture.Storage=inject.unittest.fixture.FileSystem("/path", true)
+    ')));
+    $this->assertEquals(new FileSystem('/path', true), $inject->get(Storage::class));
+  }
+
+  #[@test]
+  public function array_argument() {
+    $inject= new Injector(new ConfiguredBindings($this->loadProperties('
+      inject.unittest.fixture.Storage=inject.unittest.fixture.Database(["mysql://one", "mysql://two"])
+    ')));
+    $this->assertEquals(new Database(['mysql://one', 'mysql://two']), $inject->get(Storage::class));
   }
 
   #[@test]
