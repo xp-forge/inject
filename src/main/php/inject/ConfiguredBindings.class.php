@@ -1,10 +1,10 @@
 <?php namespace inject;
 
-use util\PropertyAccess;
-use util\Properties;
 use lang\ClassLoader;
 use lang\ClassNotFoundException;
 use lang\Type;
+use util\Properties;
+use util\PropertyAccess;
 
 /**
  * Bindings from a properties file
@@ -90,42 +90,6 @@ class ConfiguredBindings extends Bindings {
   }
 
   /**
-   * Parse arguments from a string. Supports strings, booleans, null, and numbers.
-   *
-   * @param  string $input
-   * @return var[]
-   */
-  private function argumentsIn($input) {
-    if ('' === $input) return [];
-
-    $arguments= [];
-    for ($o= 0, $l= strlen($input); $o < $l; $o+= $p) {
-      if ('"' === $input{$o} || "'" === $input{$o}) {
-        $s= $o + 1;
-        $str= '';
-        do {
-          $p= strcspn($input, $input{$o}, $s);
-          if ('\\' === $input{$s + $p - 1}) {
-            $str.= substr($input, $s, $p - 1).$input{$o};
-            $s+= $p + 1;
-            continue;
-          } else {
-            $str.= substr($input, $s, $p);
-            $s+= $p + 1;
-            break;
-          }
-        } while ($s < $l);
-        $arguments[]= $str;
-        $p+= $s;
-      } else {
-        $p= strcspn($input, ',', $o);
-        $arguments[]= $this->valueIn(substr($input, $o, $p));
-      }
-    }
-    return $arguments;
-  }
-
-  /**
    * Resolves a name
    *
    * @param  lang.ClassLoader $cl
@@ -158,7 +122,7 @@ class ConfiguredBindings extends Bindings {
     } else {
       $class= $this->resolveType($cl, $namespaces, substr($input, 0, $p));
       if ($class->hasConstructor()) {
-        $arguments= $this->argumentsIn(substr($input, $p + 1, -1));
+        $arguments= eval('return ['.substr($input, $p + 1, -1).'];');
         return $class->getConstructor()->newInstance($arguments);
       } else {
         return $class->newInstance();
