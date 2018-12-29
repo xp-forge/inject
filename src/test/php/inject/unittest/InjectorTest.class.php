@@ -2,15 +2,16 @@
 
 use inject\Injector;
 use inject\InstanceProvider;
-use lang\XPClass;
-use lang\IllegalArgumentException;
-use lang\ClassNotFoundException;
-use unittest\TestCase;
-use util\Currency;
+use inject\unittest\fixture\AbstractStorage;
 use inject\unittest\fixture\FileSystem;
 use inject\unittest\fixture\InMemory;
 use inject\unittest\fixture\Storage;
-use inject\unittest\fixture\AbstractStorage;
+use lang\ClassNotFoundException;
+use lang\IllegalArgumentException;
+use lang\XPClass;
+use unittest\TestCase;
+use unittest\actions\RuntimeVersion;
+use util\Currency;
 
 class InjectorTest extends TestCase {
 
@@ -212,7 +213,7 @@ class InjectorTest extends TestCase {
     $this->assertEquals($path, $inject->get('string[]', 'path'));
   }
 
-  #[@test]
+  #[@test, @action(new RuntimeVersion('>=7.0'))]
   public function typeunion_with_primitive_and_primitive_array_type() {
     $path= ['/usr', '/usr/local'];
     $inject= new Injector();
