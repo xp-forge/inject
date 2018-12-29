@@ -203,4 +203,20 @@ class InjectorTest extends TestCase {
     $inject->bind(FileSystem::class, new FileSystem('/usr'));
     $this->assertEquals($path, $inject->get('string|inject.unittest.fixture.FileSystem', 'path'));
   }
+
+  #[@test]
+  public function primitive_array_type() {
+    $path= ['/usr', '/usr/local'];
+    $inject= new Injector();
+    $inject->bind('string[]', $path, 'path');
+    $this->assertEquals($path, $inject->get('string[]', 'path'));
+  }
+
+  #[@test]
+  public function typeunion_with_primitive_and_primitive_array_type() {
+    $path= ['/usr', '/usr/local'];
+    $inject= new Injector();
+    $inject->bind('string[]', $path, 'path');
+    $this->assertEquals($path, $inject->get('string|string[]', 'path'));
+  }
 }

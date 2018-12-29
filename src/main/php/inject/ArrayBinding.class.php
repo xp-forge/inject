@@ -4,6 +4,7 @@ use lang\IllegalArgumentException;
 use lang\XPClass;
 use lang\Type;
 use lang\ArrayType;
+use lang\Primitive;
 
 class ArrayBinding implements Binding {
   private $type;
@@ -22,9 +23,16 @@ class ArrayBinding implements Binding {
     }
 
     $this->type= $type;
-    $component= $type->componentType();
-    foreach ($binding as $impl) {
-      $this->binding[]= Injector::asBinding($component, $impl);
+
+    $c= $type->componentType();
+    if ($c instanceof Primitive) {
+      foreach ($binding as $impl) {
+        $this->binding[]= new InstanceBinding($impl, $c);
+      }
+    } else {
+      foreach ($binding as $impl) {
+        $this->binding[]= Injector::asBinding($c, $impl);
+      }
     }
   }
 
