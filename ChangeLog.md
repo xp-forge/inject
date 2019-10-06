@@ -3,6 +3,8 @@ Dependency injection for the XP Framework change log
 
 ## ?.?.? / ????-??-??
 
+## 4.3.0 / 2019-10-06
+
 * Merged PR #21: Add `[@inject("name")]` as short form of *(name= "name")*
   (@thekid)
 * Added PHP 7.3 and PHP 7.4 to test matrix - @thekid
