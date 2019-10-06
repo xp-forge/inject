@@ -2,12 +2,12 @@
 
 use inject\Injector;
 use inject\ProvisionException;
+use inject\unittest\fixture\Storage;
+use lang\ClassLoader;
+use lang\IllegalAccessException;
+use lang\Runnable;
 use unittest\TestCase;
 use util\Currency;
-use lang\ClassLoader;
-use lang\Runnable;
-use lang\IllegalAccessException;
-use inject\unittest\fixture\Storage;
 
 class NewInstanceTest extends TestCase {
 
@@ -49,6 +49,17 @@ class NewInstanceTest extends TestCase {
     $storage= $this->newStorage([
       'injected' => null,
       '#[@inject] __construct' => function(TestCase $param) { $this->injected= $param; }
+    ]);
+    $this->assertEquals($this, $inject->newInstance($storage)->injected);
+  }
+
+  #[@test]
+  public function newInstance_performs_named_injection() {
+    $inject= new Injector();
+    $inject->bind(TestCase::class, $this, 'test');
+    $storage= $this->newStorage([
+      'injected' => null,
+      '#[@inject(name= "test")] __construct' => function(TestCase $param) { $this->injected= $param; }
     ]);
     $this->assertEquals($this, $inject->newInstance($storage)->injected);
   }
