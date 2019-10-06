@@ -54,12 +54,23 @@ class NewInstanceTest extends TestCase {
   }
 
   #[@test]
-  public function newInstance_performs_named_injection() {
+  public function newInstance_performs_named_injection_using_array_form() {
     $inject= new Injector();
     $inject->bind(TestCase::class, $this, 'test');
     $storage= $this->newStorage([
       'injected' => null,
       '#[@inject(name= "test")] __construct' => function(TestCase $param) { $this->injected= $param; }
+    ]);
+    $this->assertEquals($this, $inject->newInstance($storage)->injected);
+  }
+
+  #[@test]
+  public function newInstance_performs_named_injection_using_string_form() {
+    $inject= new Injector();
+    $inject->bind(TestCase::class, $this, 'test');
+    $storage= $this->newStorage([
+      'injected' => null,
+      '#[@inject("test")] __construct' => function(TestCase $param) { $this->injected= $param; }
     ]);
     $this->assertEquals($this, $inject->newInstance($storage)->injected);
   }

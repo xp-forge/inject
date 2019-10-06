@@ -145,8 +145,13 @@ class Injector {
         $inject= [];
       }
 
-      $type= isset($inject['type']) ? Type::forName($inject['type']) : ($param->getTypeRestriction() ?: $param->getType());
-      $binding= $this->get($type, isset($inject['name']) ? $inject['name'] : null);
+      if (is_array($inject)) {
+        $type= isset($inject['type']) ? Type::forName($inject['type']) : ($param->getTypeRestriction() ?: $param->getType());
+        $binding= $this->get($type, isset($inject['name']) ? $inject['name'] : null);
+      } else {
+        $type= $param->getTypeRestriction() ?: $param->getType();
+        $binding= $this->get($type, $inject);
+      }
 
       if (null !== $binding) {
         $args[]= $binding;
