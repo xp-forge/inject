@@ -20,12 +20,8 @@ Values can be bound to the injector by using its `bind()` method. It accepts the
 * **Binding a named lookup**: If we want control over the binding lookups for a type, we can bind to a `Named` instance.
 
 ```php
-use inject\Injector;
-use inject\Bindings;
-use com\example\Report;
-use com\example\HtmlReport;
-use com\example\Storage;
-use com\example\InFileSystem;
+use inject\{Injector, Bindings};
+use com\example\{Report, HtmlReport, Storage, InFileSystem};
 
 // Manually
 $injector= new Injector();
@@ -133,9 +129,7 @@ Named lookups
 If we need control over the lookup, we can bind instances of `Named`:
 
 ```php
-use inject\Injector;
-use inject\Named;
-use inject\InstanceBinding;
+use inject\{Injector, Named, InstanceBinding};
 use com\example\Value;
 
 $inject= new Injector();
