@@ -3,22 +3,20 @@
 use lang\IllegalArgumentException;
 use lang\XPClass;
 
-class ClassBinding implements Binding {
-  protected $class;
+class SingletonBinding implements Binding {
+  private $class;
+  private $instance= null;
 
   /**
-   * Creates a new instance binding
+   * Creates a new singleton binding
    *
    * @param  string|lang.XPClass $class
-   * @param  lang.XPClass $type
    * @throws lang.IllegalArgumentException
    */
-  public function __construct($class, $type= null) {
+  public function __construct($class) {
     $c= $class instanceof XPClass ? $class : XPClass::forName($class);
-    if ($type && !$type->isAssignableFrom($c)) {
-      throw new IllegalArgumentException($c.' is not an instance of '.$type);
-    } else if ($c->isInterface() || $c->getModifiers() & MODIFIER_ABSTRACT) {
-      throw new IllegalArgumentException('Cannot bind to non-concrete type '.$type);
+    if ($c->isInterface() || $c->getModifiers() & MODIFIER_ABSTRACT) {
+      throw new IllegalArgumentException('Cannot bind to non-concrete type '.$c);
     }
 
     $this->class= $c;
@@ -31,7 +29,7 @@ class ClassBinding implements Binding {
    * @param  inject.Provider<?>
    */
   public function provider($injector) {
-    return new TypeProvider($this->class, $injector);
+    return new ResolvingProvider($this, $injector);
   }
 
   /**
@@ -41,6 +39,6 @@ class ClassBinding implements Binding {
    * @param  var
    */
   public function resolve($injector) {
-    return $injector->newInstance($this->class);
+    return $this->instance ?: $this->instance= $injector->newInstance($this->class);
   }
 }

@@ -90,6 +90,20 @@ class Injector {
   }
 
   /**
+   * Add a binding
+   *
+   * @param  string|lang.Type $type
+   * @param  iinject.Binding $binding
+   * @param  string $name
+   * @return self
+   */
+  public function binding($type, Binding $binding, $name= null) {
+    $t= $type instanceof Type ? $type : Type::forName($type);
+    $this->bindings[$t->literal()][$name]= $binding;
+    return $this;
+  }
+
+  /**
    * Get a binding
    *
    * @param  string|lang.Type $type
