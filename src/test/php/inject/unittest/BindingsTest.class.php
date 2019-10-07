@@ -4,8 +4,8 @@ use inject\Bindings;
 use inject\Injector;
 use inject\unittest\fixture\FileSystem;
 use inject\unittest\fixture\Storage;
-use util\Currency;
 use unittest\TestCase;
+use util\Currency;
 
 class BindingsTest extends TestCase {
   protected $bindings;
@@ -40,13 +40,13 @@ class BindingsTest extends TestCase {
   #[@test]
   public function add_returns_injector() {
     $inject= new Injector();
-    $this->assertEquals($inject, $inject->add($this->bindings));
+    $this->assertEquals($inject, $inject->with($this->bindings));
   }
 
   #[@test]
   public function add() {
     $inject= new Injector();
-    $inject->add($this->bindings);
+    $inject->with($this->bindings);
     $this->assertInstanceOf(FileSystem::class, $inject->get(Storage::class));
   }
 }

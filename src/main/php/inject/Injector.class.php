@@ -29,7 +29,7 @@ class Injector {
   public function __construct(... $initial) {
     $this->bind(typeof($this), $this);
     foreach ($initial as $bindings) {
-      $this->add($bindings);
+      $bindings->configure($this);
     }
   }
 
@@ -59,13 +59,27 @@ class Injector {
    * @param  inject.Bindings $bindings
    * @return self
    */
-  public function add(Bindings $bindings) {
+  public function with(Bindings $bindings) {
     $bindings->configure($this);
     return $this;
   }
 
   /**
-   * Add a binding
+   * Add a given binding for a given type
+   *
+   * @param  string|lang.Type $type
+   * @param  iinject.Binding $binding
+   * @param  string $name
+   * @return self
+   */
+  public function add($type, Binding $binding, $name= null) {
+    $t= $type instanceof Type ? $type : Type::forName($type);
+    $this->bindings[$t->literal()][$name]= $binding;
+    return $this;
+  }
+
+  /**
+   * Bind to a given type
    *
    * @param  string|lang.Type $type
    * @param  var $impl
@@ -86,20 +100,6 @@ class Injector {
     } else {
       $this->bindings[$t->literal()][$name]= self::asBinding($t, $impl);
     }
-    return $this;
-  }
-
-  /**
-   * Add a binding
-   *
-   * @param  string|lang.Type $type
-   * @param  iinject.Binding $binding
-   * @param  string $name
-   * @return self
-   */
-  public function binding($type, Binding $binding, $name= null) {
-    $t= $type instanceof Type ? $type : Type::forName($type);
-    $this->bindings[$t->literal()][$name]= $binding;
     return $this;
   }
 

@@ -66,7 +66,7 @@ class UseBindings extends Bindings {
    */
   public function configure($injector) {
     foreach ($this->bindings as $b) {
-      $injector->binding(...$b);
+      $injector->add(...$b);
     }
   }
 }
