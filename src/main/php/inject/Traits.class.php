@@ -1,7 +1,6 @@
 <?php namespace inject;
 
 use inject\Injector;
-use lang\reflect\TargetInvocationException;
 
 trait Traits {
 
