@@ -59,7 +59,7 @@ class NewInstanceTest extends TestCase {
     $inject->bind(TestCase::class, $this, 'test');
     $storage= $this->newStorage([
       'injected' => null,
-      '#[@inject(name= "test")] __construct' => function(TestCase $param) { $this->injected= $param; }
+      '#[@inject(["name" => "test"])] __construct' => function(TestCase $param) { $this->injected= $param; }
     ]);
     $this->assertEquals($this, $inject->newInstance($storage)->injected);
   }
@@ -121,7 +121,7 @@ class NewInstanceTest extends TestCase {
   public function newInstance_throws_when_value_for_required_parameter_not_found() {
     $inject= new Injector();
     $storage= $this->newStorage([
-      '#[@inject(type= "string", name= "endpoint")] __construct' => function($param) { }
+      '#[@inject(["type" => "string", "name" => "endpoint"])] __construct' => function($param) { }
     ]);
     $this->newInstance($inject, $storage);
   }
