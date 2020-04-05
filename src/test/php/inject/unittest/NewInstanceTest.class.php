@@ -109,7 +109,7 @@ class NewInstanceTest extends TestCase {
 
   #[@test, @expect([
   #  'class'       => IllegalAccessException::class,
-  #  'withMessage' => '/Cannot invoke private constructor/'
+  #  'withMessage' => '/Cannot invoke private constructor/',
   #])]
   public function newInstance_catches_iae_when_creating_class_instances() {
     $inject= new Injector();
@@ -122,8 +122,8 @@ class NewInstanceTest extends TestCase {
 
   #[@test, @expect([
   #  'class'       => ProvisionException::class,
-  #  'withMessage' => '/No bound value for type string named "endpoint"/'
-  #)]
+  #  'withMessage' => '/No bound value for type string named "endpoint"/',
+  #])]
   public function newInstance_throws_when_value_for_required_parameter_not_found() {
     $inject= new Injector();
     $storage= $this->newStorage([
