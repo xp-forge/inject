@@ -107,7 +107,10 @@ class NewInstanceTest extends TestCase {
     $this->assertEquals([$this, true], $inject->newInstance($storage)->injected);
   }
 
-  #[@test, @expect(class= IllegalAccessException::class, withMessage= '/Cannot invoke private constructor/')]
+  #[@test, @expect([
+  #  'class'       => IllegalAccessException::class,
+  #  'withMessage' => '/Cannot invoke private constructor/'
+  #])]
   public function newInstance_catches_iae_when_creating_class_instances() {
     $inject= new Injector();
     $storage= $this->newStorage('{
@@ -117,7 +120,10 @@ class NewInstanceTest extends TestCase {
     $this->newInstance($inject, $storage);
   }
 
-  #[@test, @expect(class= ProvisionException::class, withMessage= '/No bound value for type string named "endpoint"/')]
+  #[@test, @expect([
+  #  'class'       => ProvisionException::class,
+  #  'withMessage' => '/No bound value for type string named "endpoint"/'
+  #)]
   public function newInstance_throws_when_value_for_required_parameter_not_found() {
     $inject= new Injector();
     $storage= $this->newStorage([

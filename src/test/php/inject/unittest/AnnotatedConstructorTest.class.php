@@ -80,7 +80,7 @@ class AnnotatedConstructorTest extends AnnotationsTest {
     $this->assertEquals([$this, new FileSystem(), 'Test'], $this->inject->get(Value::class)->injected);
   }
 
-  #[@test, @expect(class= ProvisionException::class, withMessage= '/Error creating an instance/')]
+  #[@test, @expect(['class' => ProvisionException::class, 'withMessage' => '/Error creating an instance/'])]
   public function injecting_unbound_into_constructor_via_method_annotation() {
     $this->inject->bind(Value::class, $this->newInstance([
       '#[@inject] __construct' => function(Runnable $param) { /* Empty */ }
@@ -88,7 +88,7 @@ class AnnotatedConstructorTest extends AnnotationsTest {
     $this->inject->get(Value::class);
   }
 
-  #[@test, @expect(class= ProvisionException::class, withMessage= '/Error creating an instance/')]
+  #[@test, @expect(['class' => ProvisionException::class, 'withMessage' => '/Error creating an instance/'])]
   public function injecting_unbound_into_constructor_via_parameter_annotation() {
     $this->inject->bind(Value::class, $this->newInstance([
       '#[@$param: inject] __construct' => function(Runnable $param) { /* Empty */ }
@@ -96,7 +96,7 @@ class AnnotatedConstructorTest extends AnnotationsTest {
     $this->inject->get(Value::class);
   }
 
-  #[@test, @expect(class= ProvisionException::class, withMessage= '/Error creating an instance/')]
+  #[@test, @expect(['class' => ProvisionException::class, 'withMessage' => '/Error creating an instance/'])]
   public function throwing_an_exception_from_constructor_raises_ProvisionException() {
     $this->inject->bind(Value::class, $this->newInstance([
       '__construct' => function() { throw new IllegalArgumentException('Test'); }
