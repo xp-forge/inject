@@ -3,6 +3,10 @@ Dependency injection for the XP Framework change log
 
 ## ?.?.? / ????-??-??
 
+## 4.4.0 / 2020-04-05
+
+* Merged PR #23: Binding DSL - @thekid
+
 ## 4.3.2 / 2020-04-05
 
 * Implemented RFC #335: Remove deprecated key/value pair annotation syntax
