@@ -5,6 +5,7 @@ use inject\InstanceProvider;
 use inject\unittest\fixture\AbstractStorage;
 use inject\unittest\fixture\FileSystem;
 use inject\unittest\fixture\InMemory;
+use inject\unittest\fixture\S3Bucket;
 use inject\unittest\fixture\Storage;
 use lang\ClassNotFoundException;
 use lang\IllegalArgumentException;
@@ -219,5 +220,13 @@ class InjectorTest extends TestCase {
     $inject= new Injector();
     $inject->bind('string[]', $path, 'path');
     $this->assertEquals($path, $inject->get('string|string[]', 'path'));
+  }
+
+  #[@test]
+  public function uses_parameter_name() {
+    $bucket= 's3+latest://id:secret@us-west-2';
+    $inject= new Injector();
+    $inject->bind('string', $bucket, 'bucket');
+    $this->assertEquals(new S3Bucket($bucket), $inject->get(S3Bucket::class));
   }
 }

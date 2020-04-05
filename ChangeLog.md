@@ -3,6 +3,15 @@ Dependency injection for the XP Framework change log
 
 ## ?.?.? / ????-??-??
 
+## 4.3.2 / 2020-04-05
+
+* Implemented RFC #335: Remove deprecated key/value pair annotation syntax
+  (@thekid)
+
+## 4.3.1 / 2019-12-01
+
+* Made compatible with XP 10 - @thekid
+
 ## 4.3.0 / 2019-10-06
 
 * Merged PR #21: Add `[@inject("name")]` as short form of *(name= "name")*

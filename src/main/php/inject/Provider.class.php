@@ -12,7 +12,7 @@
  *
  * @see   xp://inject.Injector
  */
-#[@generic(self= 'T')]
+#[@generic(['self' => 'T'])]
 interface Provider {
   
   /**
@@ -20,6 +20,6 @@ interface Provider {
    *
    * @return  T
    */
-  #[@generic(return= 'T')]
+  #[@generic(['return' => 'T'])]
   public function get();
 }
