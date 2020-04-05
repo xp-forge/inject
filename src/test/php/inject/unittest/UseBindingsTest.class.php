@@ -5,7 +5,9 @@ use inject\Injector;
 use inject\UseBindings;
 use inject\unittest\fixture\FileSystem;
 use inject\unittest\fixture\Storage;
+use io\streams\MemoryInputStream;
 use unittest\TestCase;
+use util\Properties;
 
 class UseBindingsTest extends TestCase {
 
@@ -54,5 +56,13 @@ class UseBindingsTest extends TestCase {
     $cwd= new FileSystem('.');
     $inject= new Injector(Bindings::using()->instance($cwd));
     $this->assertEquals($cwd, $inject->get(FileSystem::class));
+  }
+
+  #[@test]
+  public function properties() {
+    $p= new Properties(null);
+    $p->load(new MemoryInputStream('inject.unittest.fixture.Storage=inject.unittest.fixture.FileSystem'));
+    $inject= new Injector(Bindings::using()->properties($p));
+    $this->assertEquals(new FileSystem('/'), $inject->get(Storage::class));
   }
 }

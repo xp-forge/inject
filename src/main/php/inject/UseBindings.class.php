@@ -1,5 +1,7 @@
 <?php namespace inject;
 
+use util\PropertyAccess;
+
 /**
  * Fluent interface
  *
@@ -7,7 +9,7 @@
  * @test  xp://inject.unittest.UseBindingsTest
  */
 class UseBindings extends Bindings {
-  private $bindings= [];
+  private $configure= [];
 
   /**
    * Binds a given type to a given implementing type, creating a new
@@ -18,7 +20,9 @@ class UseBindings extends Bindings {
    * @return self
    */
   public function typed($type, $impl= null) {
-    $this->bindings[]= [$type, new ClassBinding($impl ?: $type)];
+    $this->configure[]= function($injector) use($type, $impl) {
+      $injector->add($type, new ClassBinding($impl ?: $type));
+    };
     return $this;
   }
 
@@ -31,7 +35,9 @@ class UseBindings extends Bindings {
    * @return self
    */
   public function singleton($type, $impl= null) {
-    $this->bindings[]= [$type, new SingletonBinding($impl ?: $type)];
+    $this->configure[]= function($injector) use($type, $impl) {
+      $injector->add($type, new SingletonBinding($impl ?: $type));
+    };
     return $this;
   }
 
@@ -43,7 +49,9 @@ class UseBindings extends Bindings {
    * @return self
    */
   public function named($name, $instance) {
-    $this->bindings[]= [typeof($instance), new InstanceBinding($instance), $name];
+    $this->configure[]= function($injector) use($instance, $name) {
+      $injector->add(typeof($instance), new InstanceBinding($instance), $name);
+    };
     return $this;
   }
 
@@ -54,10 +62,24 @@ class UseBindings extends Bindings {
    * @return self
    */
   public function instance($instance) {
-    $this->bindings[]= [typeof($instance), new InstanceBinding($instance)];
+    $this->configure[]= function($injector) use($instance) {
+      $injector->add(typeof($instance), new InstanceBinding($instance));
+    };
     return $this;
   }
 
+  /**
+   * Add configured bindings
+   *
+   * @param  util.PropertyAccess $properties
+   * @return self
+   */
+  public function properties(PropertyAccess $properties) {
+    $this->configure[]= function($injector) use($properties) {
+      $injector->with(new ConfiguredBindings($properties));
+    };
+    return $this;
+  }
 
   /**
    * Configures bindings on given injector
@@ -65,8 +87,8 @@ class UseBindings extends Bindings {
    * @param  inject.Injector $injector
    */
   public function configure($injector) {
-    foreach ($this->bindings as $b) {
-      $injector->add(...$b);
+    foreach ($this->configure as $configure) {
+      $configure($injector);
     }
   }
 }
