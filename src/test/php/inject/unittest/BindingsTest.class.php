@@ -40,13 +40,13 @@ class BindingsTest extends TestCase {
   #[@test]
   public function add_returns_injector() {
     $inject= new Injector();
-    $this->assertEquals($inject, $inject->with($this->bindings));
+    $this->assertEquals($inject, $inject->add($this->bindings));
   }
 
   #[@test]
   public function add() {
     $inject= new Injector();
-    $inject->with($this->bindings);
+    $inject->add($this->bindings);
     $this->assertInstanceOf(FileSystem::class, $inject->get(Storage::class));
   }
 }

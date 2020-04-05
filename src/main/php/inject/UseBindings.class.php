@@ -76,7 +76,7 @@ class UseBindings extends Bindings {
    */
   public function properties(PropertyAccess $properties) {
     $this->configure[]= function($injector) use($properties) {
-      $injector->with(new ConfiguredBindings($properties));
+      $injector->add(new ConfiguredBindings($properties));
     };
     return $this;
   }
