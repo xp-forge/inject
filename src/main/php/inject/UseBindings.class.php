@@ -21,7 +21,7 @@ class UseBindings extends Bindings {
    */
   public function typed($type, $impl= null) {
     $this->configure[]= function($injector) use($type, $impl) {
-      $injector->add($type, new ClassBinding($impl ?: $type));
+      $injector->bind($type, new ClassBinding($impl ?: $type));
     };
     return $this;
   }
@@ -36,7 +36,7 @@ class UseBindings extends Bindings {
    */
   public function singleton($type, $impl= null) {
     $this->configure[]= function($injector) use($type, $impl) {
-      $injector->add($type, new SingletonBinding($impl ?: $type));
+      $injector->bind($type, new SingletonBinding($impl ?: $type));
     };
     return $this;
   }
@@ -50,7 +50,7 @@ class UseBindings extends Bindings {
    */
   public function named($name, $instance) {
     $this->configure[]= function($injector) use($instance, $name) {
-      $injector->add(typeof($instance), new InstanceBinding($instance), $name);
+      $injector->bind(typeof($instance), new InstanceBinding($instance), $name);
     };
     return $this;
   }
@@ -63,7 +63,7 @@ class UseBindings extends Bindings {
    */
   public function instance($instance) {
     $this->configure[]= function($injector) use($instance) {
-      $injector->add(typeof($instance), new InstanceBinding($instance));
+      $injector->bind(typeof($instance), new InstanceBinding($instance));
     };
     return $this;
   }

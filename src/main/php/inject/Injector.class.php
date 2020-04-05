@@ -59,22 +59,8 @@ class Injector {
    * @param  inject.Bindings $bindings
    * @return self
    */
-  public function with(Bindings $bindings) {
+  public function add(Bindings $bindings) {
     $bindings->configure($this);
-    return $this;
-  }
-
-  /**
-   * Add a given binding for a given type
-   *
-   * @param  string|lang.Type $type
-   * @param  iinject.Binding $binding
-   * @param  string $name
-   * @return self
-   */
-  public function add($type, Binding $binding, $name= null) {
-    $t= $type instanceof Type ? $type : Type::forName($type);
-    $this->bindings[$t->literal()][$name]= $binding;
     return $this;
   }
 
@@ -96,9 +82,9 @@ class Injector {
       if (null === $name) {
         throw new IllegalArgumentException('Cannot bind primitive type '.$t.' without a name');
       }
-      $this->bindings[$t->literal()][$name]= new InstanceBinding($impl, $t);
+      $this->bindings[$t->literal()][$name]= $impl instanceof Binding ? $impl : new InstanceBinding($impl, $t);
     } else {
-      $this->bindings[$t->literal()][$name]= self::asBinding($t, $impl);
+      $this->bindings[$t->literal()][$name]= $impl instanceof Binding ? $impl : self::asBinding($t, $impl);
     }
     return $this;
   }
