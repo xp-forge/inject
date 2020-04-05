@@ -4,8 +4,8 @@ use inject\Bindings;
 use inject\Injector;
 use inject\unittest\fixture\FileSystem;
 use inject\unittest\fixture\Storage;
-use util\Currency;
 use unittest\TestCase;
+use util\Currency;
 
 class BindingsTest extends TestCase {
   protected $bindings;

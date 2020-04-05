@@ -9,6 +9,13 @@
 abstract class Bindings {
 
   /**
+   * Creates a new fluent Bindings instance
+   *
+   * @return  self
+   */
+  public static function using() { return new UseBindings(); }
+
+  /**
    * Configures bindings on given injector
    *
    * @param  inject.Injector $injector
