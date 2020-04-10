@@ -1,10 +1,6 @@
 <?php namespace inject;
 
-use lang\IllegalArgumentException;
-use lang\XPClass;
-use lang\Type;
-use lang\ArrayType;
-use lang\Primitive;
+use lang\{ArrayType, IllegalArgumentException, Primitive, Type, XPClass};
 
 class ArrayBinding implements Binding {
   private $type;

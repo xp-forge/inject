@@ -1,7 +1,6 @@
 <?php namespace inject;
 
-use lang\IllegalArgumentException;
-use lang\XPClass;
+use lang\{IllegalArgumentException, XPClass};
 
 class ClassBinding implements Binding {
   protected $class;

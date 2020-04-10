@@ -1,13 +1,8 @@
 <?php namespace inject\unittest;
 
-use inject\Injector;
-use inject\InstanceProvider;
-use inject\ResolvingProvider;
-use inject\TypeProvider;
-use inject\unittest\fixture\FileSystem;
-use inject\unittest\fixture\Storage;
-use lang\Type;
-use lang\XPClass;
+use inject\{Injector, InstanceProvider, ResolvingProvider, TypeProvider};
+use inject\unittest\fixture\{FileSystem, Storage};
+use lang\{Type, XPClass};
 use unittest\TestCase;
 
 class ProvidersTest extends TestCase {

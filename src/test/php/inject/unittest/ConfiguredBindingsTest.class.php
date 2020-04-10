@@ -1,12 +1,7 @@
 <?php namespace inject\unittest;
 
-use inject\ConfiguredBindings;
-use inject\Injector;
-use inject\unittest\fixture\Database;
-use inject\unittest\fixture\FileSystem;
-use inject\unittest\fixture\InMemory;
-use inject\unittest\fixture\Storage;
-use inject\unittest\fixture\Value;
+use inject\{ConfiguredBindings, Injector};
+use inject\unittest\fixture\{Database, FileSystem, InMemory, Storage, Value};
 use io\streams\MemoryInputStream;
 use lang\ClassNotFoundException;
 use util\Properties;

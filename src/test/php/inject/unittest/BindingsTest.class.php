@@ -1,9 +1,7 @@
 <?php namespace inject\unittest;
 
-use inject\Bindings;
-use inject\Injector;
-use inject\unittest\fixture\FileSystem;
-use inject\unittest\fixture\Storage;
+use inject\{Bindings, Injector};
+use inject\unittest\fixture\{FileSystem, Storage};
 use unittest\TestCase;
 use util\Currency;
 

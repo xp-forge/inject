@@ -1,12 +1,10 @@
 <?php namespace inject\unittest;
 
 use inject\Injector;
+use inject\unittest\fixture\{FileSystem, Storage, Value};
+use lang\ClassLoader;
 use unittest\TestCase;
 use util\Currency;
-use lang\ClassLoader;
-use inject\unittest\fixture\Storage;
-use inject\unittest\fixture\FileSystem;
-use inject\unittest\fixture\Value;
 
 abstract class AnnotationsTest extends TestCase {
   protected $inject;

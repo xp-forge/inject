@@ -1,11 +1,8 @@
 <?php namespace inject\unittest;
 
 use inject\ProvisionException;
-use inject\unittest\fixture\FileSystem;
-use inject\unittest\fixture\Storage;
-use inject\unittest\fixture\Value;
-use lang\IllegalArgumentException;
-use lang\Runnable;
+use inject\unittest\fixture\{FileSystem, Storage, Value};
+use lang\{IllegalArgumentException, Runnable};
 use unittest\TestCase;
 use util\Currency;
 

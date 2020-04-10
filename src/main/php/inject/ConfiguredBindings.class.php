@@ -1,10 +1,7 @@
 <?php namespace inject;
 
-use lang\ClassLoader;
-use lang\ClassNotFoundException;
-use lang\Type;
-use util\Properties;
-use util\PropertyAccess;
+use lang\{ClassLoader, ClassNotFoundException, Type};
+use util\{Properties, PropertyAccess};
 
 /**
  * Bindings from a properties file

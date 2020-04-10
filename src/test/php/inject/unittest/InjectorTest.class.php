@@ -1,15 +1,8 @@
 <?php namespace inject\unittest;
 
-use inject\Injector;
-use inject\InstanceProvider;
-use inject\unittest\fixture\AbstractStorage;
-use inject\unittest\fixture\FileSystem;
-use inject\unittest\fixture\InMemory;
-use inject\unittest\fixture\S3Bucket;
-use inject\unittest\fixture\Storage;
-use lang\ClassNotFoundException;
-use lang\IllegalArgumentException;
-use lang\XPClass;
+use inject\{Injector, InstanceProvider};
+use inject\unittest\fixture\{AbstractStorage, FileSystem, InMemory, S3Bucket, Storage};
+use lang\{ClassNotFoundException, IllegalArgumentException, XPClass};
 use unittest\TestCase;
 use unittest\actions\RuntimeVersion;
 use util\Currency;

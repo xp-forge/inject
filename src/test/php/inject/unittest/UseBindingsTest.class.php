@@ -1,10 +1,7 @@
 <?php namespace inject\unittest;
 
-use inject\Bindings;
-use inject\Injector;
-use inject\UseBindings;
-use inject\unittest\fixture\FileSystem;
-use inject\unittest\fixture\Storage;
+use inject\{Bindings, Injector, UseBindings};
+use inject\unittest\fixture\{FileSystem, Storage};
 use io\streams\MemoryInputStream;
 use unittest\TestCase;
 use util\Properties;

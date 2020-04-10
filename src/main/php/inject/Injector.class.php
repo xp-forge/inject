@@ -1,11 +1,6 @@
 <?php namespace inject;
 
-use lang\IllegalArgumentException;
-use lang\Primitive;
-use lang\Throwable;
-use lang\Type;
-use lang\TypeUnion;
-use lang\XPClass;
+use lang\{IllegalArgumentException, Primitive, Throwable, Type, TypeUnion, XPClass};
 use lang\reflect\TargetInvocationException;
 
 /**

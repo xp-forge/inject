@@ -1,8 +1,6 @@
 <?php namespace inject\unittest;
 
-use inject\Injector;
-use inject\Named;
-use inject\InstanceBinding;
+use inject\{Injector, InstanceBinding, Named};
 use inject\unittest\fixture\Value;
 use lang\Type;
 
