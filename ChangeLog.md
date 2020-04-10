@@ -3,6 +3,15 @@ Dependency injection for the XP Framework change log
 
 ## ?.?.? / ????-??-??
 
+## 5.0.0 / 2020-04-10
+
+* Implemented xp-framework/rfc#334: Drop PHP 5.6:
+  . **Heads up:** Minimum required PHP version now is PHP 7.0.0
+  . Rewrote code base, grouping use statements
+  . Converted `newinstance` to anonymous classes
+  . Rewrote `isset(X) ? X : default` to `X ?? default`
+  (@thekid)
+
 ## 4.4.0 / 2020-04-05
 
 * Merged PR #23: Binding DSL - @thekid
