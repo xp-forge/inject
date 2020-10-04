@@ -70,13 +70,19 @@ class ReportImpl implements Report {
 }
 ```
 
-You can supply name and type by using parameter annotations:
+You can supply the type by using parameter attributes in case where the PHP type system is not concise enough. If the bound value's name differs from the parameter name, you can supply a name argument.
 
 ```php
+use inject\Inject;
+
 class ReportImpl implements Report {
 
-  #[@$title: inject(type= 'string', name= 'title')]
-  public function __construct(ReportWriter $writer, Format $format, $title) { ... }
+  public function __construct(
+    ReportWriter $writer,
+    Format $format,
+    [Inject(type: 'string[]', name: 'report-titles')]
+    $titles
+  ) { ... }
 }
 ```
 
