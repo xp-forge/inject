@@ -1,6 +1,8 @@
 <?php namespace inject;
 
-#[@generic(['implements' => ['var']])]
+use lang\Generic;
+
+#[Generic(implements: ['var'])]
 class TypeProvider implements Provider {
   protected $type;
   protected $injector;

@@ -1,5 +1,7 @@
 <?php namespace inject;
 
+use lang\Generic;
+
 /**
  * A provider can be used to perform lazy initialization.
  *
@@ -12,7 +14,7 @@
  *
  * @see   xp://inject.Injector
  */
-#[@generic(['self' => 'T'])]
+#[Generic(self: 'T')]
 interface Provider {
   
   /**
@@ -20,6 +22,6 @@ interface Provider {
    *
    * @return  T
    */
-  #[@generic(['return' => 'T'])]
+  #[Generic(return: 'T')]
   public function get();
 }

@@ -1,6 +1,8 @@
 <?php namespace inject;
 
-#[@generic(['implements' => ['var']])]
+use lang\Generic;
+
+#[Generic(implements: ['var'])]
 class InstanceProvider implements Provider {
   protected $instance= null;
 
