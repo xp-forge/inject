@@ -2,7 +2,7 @@
 
 use inject\unittest\fixture\{FileSystem, Storage};
 use inject\{Bindings, Injector};
-use unittest\TestCase;
+use unittest\{Test, TestCase};
 use util\Currency;
 
 class BindingsTest extends TestCase {
@@ -17,13 +17,13 @@ class BindingsTest extends TestCase {
     };
   }
 
-  #[@test]
+  #[Test]
   public function can_optionally_be_given_binding() {
     $inject= new Injector($this->bindings);
     $this->assertInstanceOf(FileSystem::class, $inject->get(Storage::class));
   }
 
-  #[@test]
+  #[Test]
   public function can_optionally_be_given_bindings() {
     $inject= new Injector($this->bindings, new class() extends Bindings {
       public function configure($inject) {
@@ -34,13 +34,13 @@ class BindingsTest extends TestCase {
     $this->assertEquals(Currency::$EUR, $inject->get(Currency::class, 'EUR'));
   }
 
-  #[@test]
+  #[Test]
   public function add_returns_injector() {
     $inject= new Injector();
     $this->assertEquals($inject, $inject->add($this->bindings));
   }
 
-  #[@test]
+  #[Test]
   public function add() {
     $inject= new Injector();
     $inject->add($this->bindings);

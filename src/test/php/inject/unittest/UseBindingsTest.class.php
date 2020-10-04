@@ -1,25 +1,25 @@
 <?php namespace inject\unittest;
 
-use inject\{Bindings, Injector, UseBindings};
 use inject\unittest\fixture\{FileSystem, Storage};
+use inject\{Bindings, Injector, UseBindings};
 use io\streams\MemoryInputStream;
-use unittest\TestCase;
+use unittest\{Test, TestCase};
 use util\Properties;
 
 class UseBindingsTest extends TestCase {
 
-  #[@test]
+  #[Test]
   public function using_creates_fluent_interface() {
     $this->assertInstanceOf(UseBindings::class, Bindings::using());
   }
 
-  #[@test]
+  #[Test]
   public function typed() {
     $inject= new Injector(Bindings::using()->typed(Storage::class, FileSystem::class));
     $this->assertInstanceOf(FileSystem::class, $inject->get(Storage::class));
   }
 
-  #[@test]
+  #[Test]
   public function typed_produces_different_instances() {
     $inject= new Injector(Bindings::using()->typed(Storage::class, FileSystem::class));
     $a= $inject->get(Storage::class);
@@ -27,13 +27,13 @@ class UseBindingsTest extends TestCase {
     $this->assertFalse($a === $b, 'same instance');
   }
 
-  #[@test]
+  #[Test]
   public function singleton() {
     $inject= new Injector(Bindings::using()->singleton(Storage::class, FileSystem::class));
     $this->assertInstanceOf(FileSystem::class, $inject->get(Storage::class));
   }
 
-  #[@test]
+  #[Test]
   public function singleton_produces_same_instance() {
     $inject= new Injector(Bindings::using()->singleton(Storage::class, FileSystem::class));
     $a= $inject->get(Storage::class);
@@ -41,21 +41,21 @@ class UseBindingsTest extends TestCase {
     $this->assertTrue($a === $b, 'same instance');
   }
 
-  #[@test]
+  #[Test]
   public function named() {
     $cwd= new FileSystem('.');
     $inject= new Injector(Bindings::using()->named('cwd', $cwd));
     $this->assertEquals($cwd, $inject->get(FileSystem::class, 'cwd'));
   }
 
-  #[@test]
+  #[Test]
   public function instance() {
     $cwd= new FileSystem('.');
     $inject= new Injector(Bindings::using()->instance($cwd));
     $this->assertEquals($cwd, $inject->get(FileSystem::class));
   }
 
-  #[@test]
+  #[Test]
   public function properties() {
     $p= new Properties(null);
     $p->load(new MemoryInputStream('inject.unittest.fixture.Storage=inject.unittest.fixture.FileSystem'));

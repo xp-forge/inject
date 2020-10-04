@@ -1,13 +1,13 @@
 <?php namespace inject\unittest;
 
-use inject\{Injector, InstanceProvider, ResolvingProvider, TypeProvider};
 use inject\unittest\fixture\{FileSystem, Storage};
+use inject\{Injector, InstanceProvider, ResolvingProvider, TypeProvider};
 use lang\{Type, XPClass};
-use unittest\TestCase;
+use unittest\{Test, TestCase};
 
 class ProvidersTest extends TestCase {
 
-  #[@test]
+  #[Test]
   public function type_provider() {
     $inject= new Injector();
     $inject->bind(Storage::class, XPClass::forName(FileSystem::class));
@@ -17,7 +17,7 @@ class ProvidersTest extends TestCase {
     );
   }
 
-  #[@test]
+  #[Test]
   public function type_provider_get() {
     $inject= new Injector();
     $inject->bind(Storage::class, XPClass::forName(FileSystem::class));
@@ -27,7 +27,7 @@ class ProvidersTest extends TestCase {
     );
   }
 
-  #[@test]
+  #[Test]
   public function type_provider_bound_to_type_provider() {
     $inject= new Injector();
     $provider= new TypeProvider(XPClass::forName(FileSystem::class), $inject);
@@ -35,7 +35,7 @@ class ProvidersTest extends TestCase {
     $this->assertEquals($provider, $inject->get('inject.Provider<inject.unittest.fixture.Storage>'));
   }
 
-  #[@test]
+  #[Test]
   public function type_bound_to_type_provider() {
     $inject= new Injector();
     $provider= new TypeProvider(XPClass::forName(FileSystem::class), $inject);
@@ -46,7 +46,7 @@ class ProvidersTest extends TestCase {
     );
   }
 
-  #[@test]
+  #[Test]
   public function instance_provider() {
     $inject= new Injector();
     $inject->bind(Storage::class, new FileSystem());
@@ -56,7 +56,7 @@ class ProvidersTest extends TestCase {
     );
   }
 
-  #[@test]
+  #[Test]
   public function instance_provider_get() {
     $inject= new Injector();
     $inject->bind(Storage::class, new FileSystem());
@@ -66,7 +66,7 @@ class ProvidersTest extends TestCase {
     );
   }
 
-  #[@test]
+  #[Test]
   public function resolving_provider_used_for_arrays() {
     $storages= [new FileSystem()];
 
