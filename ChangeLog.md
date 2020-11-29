@@ -3,6 +3,11 @@ Dependency injection for the XP Framework change log
 
 ## ?.?.? / ????-??-??
 
+## 5.0.1 / 2020-11-29
+
+* Fixed `ParseError (syntax error, unexpected token "@")` in PHP 8.0
+  (@thekid)
+
 ## 5.0.0 / 2020-04-10
 
 * Implemented xp-framework/rfc#334: Drop PHP 5.6:
