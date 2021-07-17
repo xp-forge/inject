@@ -1,7 +1,7 @@
 <?php namespace inject;
 
 use lang\reflect\TargetInvocationException;
-use lang\{IllegalArgumentException, Primitive, Throwable, Type, TypeUnion, XPClass};
+use lang\{IllegalArgumentException, Nullable, Primitive, Throwable, Type, TypeUnion, XPClass};
 
 /**
  * Injector
@@ -98,6 +98,8 @@ class Injector {
       foreach ($t->types() as $type) {
         if ($instance= $this->get($type, $name)) return $instance;
       }
+    } else if ($t instanceof Nullable) {
+      return $this->get($t->underlyingType(), $name);
     } else if (self::$PROVIDER->isAssignableFrom($t)) {
       $literal= $t->genericArguments()[0]->literal();
       if (isset($this->bindings[$literal][$name])) {

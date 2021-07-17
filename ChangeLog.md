@@ -3,6 +3,10 @@ Dependency injection for the XP Framework change log
 
 ## ?.?.? / ????-??-??
 
+## 5.0.2 / 2021-07-17
+
+* Fixed compatibility with XP 10.6.0's nullable types - @thekid
+
 ## 5.0.1 / 2020-11-29
 
 * Fixed `ParseError (syntax error, unexpected token "@")` in PHP 8.0
