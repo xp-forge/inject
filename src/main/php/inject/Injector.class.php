@@ -137,9 +137,9 @@ class Injector {
       if ($param->hasAnnotation('inject')) {
         $inject= $param->getAnnotation('inject');
       } else if (0 === $i) {
-        $inject= $routine->hasAnnotation('inject') ? $routine->getAnnotation('inject') : [];
+        $inject= $routine->hasAnnotation('inject') ? $routine->getAnnotation('inject') : null;
       } else {
-        $inject= [];
+        $inject= null;
       }
 
       if (is_array($inject)) {
