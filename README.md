@@ -81,7 +81,7 @@ class ReportImpl implements Report {
   public function __construct(
     ReportWriter $writer,
     Format $format,
-    [Inject(type: 'string[]', name: 'report-titles')]
+    #[Inject(type: 'string[]', name: 'report-titles')]
     $titles
   ) { ... }
 }
@@ -140,8 +140,8 @@ use com\example\Value;
 
 $inject= new Injector();
 $inject->bind(Value::class, newinstance(Named::class, [], [
-  'provides' => function($name) { return true; },
-  'binding'  => function($name) { return new InstanceBinding(new Value($name)); }
+  'provides' => fn($name) => true,
+  'binding'  => fn($name) => new InstanceBinding(new Value($name))
 ]));
 
 $value= $inject->get(Value::class, 'default');  // new Value("default")
