@@ -150,12 +150,10 @@ class Injector {
         $binding= $this->get($type, $inject);
       }
 
-      if (null !== $binding) {
+      if (null !== ($binding ?? $binding= $this->get($type, $name))) {
         $args[]= $binding;
       } else if ($param->isOptional()) {
         $args[]= $param->getDefaultValue();
-      } else if (null !== ($binding= $this->get($type, $name))) {
-        $args[]= $binding;
       } else {
         throw new ProvisionException(sprintf(
           'No bound value for type %s%s in %s\'s %s() parameter %s',

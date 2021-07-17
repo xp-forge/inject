@@ -45,6 +45,16 @@ class AnnotatedConstructorTest extends AnnotationsTest {
   }
 
   #[Test]
+  public function optional_bound_named_parameter() {
+    $this->inject->bind('string', 'Test', 'name');
+    $this->inject->bind(Value::class, $this->newInstance([
+      'injected' => null,
+      '#[Inject] __construct' => function(string $name= '') { $this->injected= $name; }
+    ]));
+    $this->assertEquals('Test', $this->inject->get(Value::class)->injected);
+  }
+
+  #[Test]
   public function with_inject_annotation_and_multiple_parameters() {
     $this->inject->bind(Value::class, $this->newInstance([
       'injected' => null,

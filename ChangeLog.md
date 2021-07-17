@@ -3,6 +3,12 @@ Dependency injection for the XP Framework change log
 
 ## ?.?.? / ????-??-??
 
+## 5.1.0 / 2021-07-17
+
+* Changed implementation to check named bindings before resorting to
+  parameters' default values
+  (@thekid)
+
 ## 5.0.2 / 2021-07-17
 
 * Fixed compatibility with XP 10.6.0's nullable types - @thekid
