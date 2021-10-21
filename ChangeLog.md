@@ -3,6 +3,9 @@ Dependency injection for the XP Framework change log
 
 ## ?.?.? / ????-??-??
 
+* Made compatible with PHP 8.1 - add `ReturnTypeWillChange` attributes to
+  array access, see https://wiki.php.net/rfc/internal_method_return_types
+
 ## 5.1.0 / 2021-07-17
 
 * Changed implementation to check named bindings before resorting to
