@@ -11,6 +11,7 @@ use lang\{IllegalArgumentException, Nullable, Primitive, Throwable, Type, TypeUn
 class Injector {
   protected static $PROVIDER;
   protected $bindings= [];
+  protected $protect= [];
 
   static function __static() {
     self::$PROVIDER= Type::forName('inject.Provider<?>');
