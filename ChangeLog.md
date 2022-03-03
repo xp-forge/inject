@@ -3,6 +3,13 @@ Dependency injection for the XP Framework change log
 
 ## ?.?.? / ????-??-??
 
+## 5.1.2 / 2022-03-03
+
+* Quickfixed #24: Endless loop when injecting webservices.rest.Endpoint
+  by raising an exception. This is not perfect yet but definitively an
+  improvement over a crashing program!
+  (@thekid)
+
 ## 5.1.1 / 2021-10-21
 
 * Made library compatible with XP 11 - @thekid

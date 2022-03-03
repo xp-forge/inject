@@ -94,27 +94,35 @@ class Injector {
   public function get($type, $name= null) {
     $t= $type instanceof Type ? $type : Type::forName($type);
 
-    if ($t instanceof TypeUnion) {
-      foreach ($t->types() as $type) {
-        if ($instance= $this->get($type, $name)) return $instance;
-      }
-    } else if ($t instanceof Nullable) {
-      return $this->get($t->underlyingType(), $name);
-    } else if (self::$PROVIDER->isAssignableFrom($t)) {
-      $literal= $t->genericArguments()[0]->literal();
-      if (isset($this->bindings[$literal][$name])) {
-        return $this->bindings[$literal][$name]->provider($this);
-      }
-    } else {
-      $literal= $t->literal();
-      if (isset($this->bindings[$literal][$name])) {
-        return $this->bindings[$literal][$name]->resolve($this);
-      } else if (null === $name && $t instanceof XPClass && !($t->isInterface() || $t->getModifiers() & MODIFIER_ABSTRACT)) {
-        return $this->newInstance($t);
-      }
-    }
+    // Prevent lookup loops, see https://github.com/xp-forge/inject/issues/24
+    $key= $t->getName().'@'.$name;
+    if (isset($this->protect[$key])) throw new IllegalArgumentException('Lookup loop created by '.$key);
 
-    return null;
+    try {
+      $this->protect[$key]= true;
+      if ($t instanceof TypeUnion) {
+        foreach ($t->types() as $type) {
+          if ($instance= $this->get($type, $name)) return $instance;
+        }
+      } else if ($t instanceof Nullable) {
+        return $this->get($t->underlyingType(), $name);
+      } else if (self::$PROVIDER->isAssignableFrom($t)) {
+        $literal= $t->genericArguments()[0]->literal();
+        if (isset($this->bindings[$literal][$name])) {
+          return $this->bindings[$literal][$name]->provider($this);
+        }
+      } else {
+        $literal= $t->literal();
+        if (isset($this->bindings[$literal][$name])) {
+          return $this->bindings[$literal][$name]->resolve($this);
+        } else if (null === $name && $t instanceof XPClass && !($t->isInterface() || $t->getModifiers() & MODIFIER_ABSTRACT)) {
+          return $this->newInstance($t);
+        }
+      }
+      return null;
+    } finally {
+      unset($this->protect[$key]);
+    }
   }
 
   /**

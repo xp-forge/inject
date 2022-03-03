@@ -1,7 +1,7 @@
 <?php namespace inject\unittest;
 
-use inject\unittest\fixture\{AbstractStorage, FileSystem, InMemory, S3Bucket, Storage};
-use inject\{Injector, InstanceProvider};
+use inject\unittest\fixture\{AbstractStorage, FileSystem, InMemory, S3Bucket, Storage, URI};
+use inject\{Injector, InstanceProvider, ProvisionException};
 use lang\{ClassNotFoundException, IllegalArgumentException, XPClass};
 use unittest\{Expect, Test, TestCase, Values};
 use util\Currency;
@@ -220,5 +220,25 @@ class InjectorTest extends TestCase {
     $inject= new Injector();
     $inject->bind('string', $bucket, 'bucket');
     $this->assertEquals(new S3Bucket($bucket), $inject->get(S3Bucket::class));
+  }
+
+  #[Test]
+  public function detects_lookup_loops() {
+    $inject= new Injector();
+    try {
+      $inject->get(URI::class);
+      $this->fail('No exception raised', null, IllegalArgumentException::class);
+    } catch (ProvisionException $expected) {
+
+      // Determine source cause
+      do {
+        $source= $expected;
+      } while ($expected= $expected->getCause());
+
+      $this->assertEquals(
+        'Exception lang.IllegalArgumentException (Lookup loop created by inject.unittest.fixture.URI@)',
+        $source->compoundMessage()
+      );
+    }
   }
 }
