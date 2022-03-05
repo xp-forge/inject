@@ -1,6 +1,6 @@
 <?php namespace inject;
 
-interface Provided {
+interface Lookup {
 
   /** @return var */
   public function get();

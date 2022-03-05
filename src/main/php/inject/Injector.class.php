@@ -91,7 +91,7 @@ class Injector {
    *
    * @param  lang.reflect.Routine $routine
    * @param  [:var] $named
-   * @return inject.Provided
+   * @return inject.Lookup
    * @throws inject.ProvisionException
    */
   private function argumentsOf($routine, $named= []) {
@@ -143,14 +143,14 @@ class Injector {
    *
    * @param  lang.XPClass $class
    * @param  [:var] $named
-   * @return inject.Provided
+   * @return inject.Lookup
    */
   private function instanceOf($class, $named= []) {
     if (!$class->hasConstructor()) return new Value($class->newInstance());
 
     $constructor= $class->getConstructor();
-    $pass= $this->argumentsOf($constructor, $named);
-    return $pass->provided() ? new Value($constructor->newInstance($pass->get())) : $pass;
+    $lookup= $this->argumentsOf($constructor, $named);
+    return $lookup->provided() ? new Value($constructor->newInstance($lookup->get())) : $lookup;
   }
 
   /**
@@ -158,7 +158,7 @@ class Injector {
    *
    * @param  string|lang.Type $type
    * @param  ?string $name
-   * @return inject.Provided
+   * @return inject.Lookup
    */
   public function lookup($type, $name= null) {
     $t= $type instanceof Type ? $type : Type::forName($type);
@@ -171,7 +171,7 @@ class Injector {
       $this->protect[$key]= true;
       if ($t instanceof TypeUnion) {
         foreach ($t->types() as $type) {
-          if ($return= $this->lookup($type, $name)->provided()) return $return;
+          if ($lookup= $this->lookup($type, $name)->provided()) return $lookup;
         }
       } else if ($t instanceof Nullable) {
         return $this->lookup($t->underlyingType(), $name);

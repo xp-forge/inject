@@ -1,11 +1,11 @@
 <?php namespace inject;
 
-class Value implements Provided {
+class Value implements Lookup {
   public static $ABSENT;
   private $value;
 
   static function __static() {
-    self::$ABSENT= new class() implements Provided {
+    self::$ABSENT= new class() implements Lookup {
       public function get() { return null; }
       public function provided() { return null; }
     };
