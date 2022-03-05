@@ -65,7 +65,7 @@ class Injector {
    *
    * @param  string|lang.Type $type
    * @param  var $impl
-   * @param  string $name
+   * @param  ?string $name
    * @return self
    * @throws lang.IllegalArgumentException
    */
@@ -156,11 +156,12 @@ class Injector {
   /**
    * Looks up a binding
    *
-   * @param  string|lang.Type $t
-   * @param  string $name
+   * @param  string|lang.Type $type
+   * @param  ?string $name
    * @return inject.Provided
    */
-  public function lookup($t, $name) {
+  public function lookup($type, $name= null) {
+    $t= $type instanceof Type ? $type : Type::forName($type);
 
     // Prevent lookup loops, see https://github.com/xp-forge/inject/issues/24
     $key= $t->getName().'@'.$name;
@@ -198,12 +199,12 @@ class Injector {
    * Get a binding
    *
    * @param  string|lang.Type $type
-   * @param  string $name
+   * @param  ?string $name
    * @return var or NULL if none exists
    * @throws inject.ProvisionException
    */
   public function get($type, $name= null) {
-    return $this->lookup($type instanceof Type ? $type : Type::forName($type), $name)->get();
+    return $this->lookup($type, $name)->get();
   }
 
   /**
