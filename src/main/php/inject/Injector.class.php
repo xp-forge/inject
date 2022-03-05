@@ -11,6 +11,7 @@ use lang\{IllegalArgumentException, Nullable, Primitive, Throwable, Type, TypeUn
 class Injector {
   protected static $PROVIDER;
   protected $bindings= [];
+  protected $protect= [];
 
   static function __static() {
     self::$PROVIDER= Type::forName('inject.Provider<?>');
@@ -96,13 +97,17 @@ class Injector {
 
     // Prevent lookup loops, see https://github.com/xp-forge/inject/issues/24
     $key= $t->getName().'@'.$name;
-    if (isset($this->protect[$key])) throw new IllegalArgumentException('Lookup loop created by '.$key);
+    if (isset($this->protect[$key])) return null;
 
     try {
       $this->protect[$key]= true;
       if ($t instanceof TypeUnion) {
         foreach ($t->types() as $type) {
-          if ($instance= $this->get($type, $name)) return $instance;
+          try {
+            if ($instance= $this->get($type, $name)) return $instance;
+          } catch (ProvisionException $e) {
+            // Try next type in union
+          }
         }
       } else if ($t instanceof Nullable) {
         return $this->get($t->underlyingType(), $name);

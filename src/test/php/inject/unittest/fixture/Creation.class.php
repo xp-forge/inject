@@ -2,6 +2,6 @@
 
 class Creation {
 
-  /** @param string|inject.unittest.fixture.URI $arg */
-  public function __construct($arg) { /* ... */ }
+  /** Create fluent interface for URIs */
+  public function __construct(URI $uri) { /* ... */ }
 }

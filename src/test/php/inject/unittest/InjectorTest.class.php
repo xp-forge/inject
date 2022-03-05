@@ -1,6 +1,6 @@
 <?php namespace inject\unittest;
 
-use inject\unittest\fixture\{AbstractStorage, FileSystem, InMemory, S3Bucket, Storage, URI};
+use inject\unittest\fixture\{AbstractStorage, FileSystem, InMemory, S3Bucket, Storage, URI, Endpoint};
 use inject\{Injector, InstanceProvider, ProvisionException};
 use lang\{ClassNotFoundException, IllegalArgumentException, XPClass};
 use unittest\{Expect, Test, TestCase, Values};
@@ -174,6 +174,12 @@ class InjectorTest extends TestCase {
   }
 
   #[Test]
+  public function get_given_a_typeunion_returns_null_for_unbound() {
+    $inject= new Injector();
+    $this->assertNull($inject->get('string|inject.unittest.fixture.Value'));
+  }
+
+  #[Test]
   public function get_given_a_typeunion_searches_all_types() {
     $fs= new FileSystem('/usr');
     $inject= new Injector();
@@ -227,18 +233,20 @@ class InjectorTest extends TestCase {
     $inject= new Injector();
     try {
       $inject->get(URI::class);
-      $this->fail('No exception raised', null, IllegalArgumentException::class);
+      $this->fail('No exception raised', null, ProvisionException::class);
     } catch (ProvisionException $expected) {
-
-      // Determine source cause
-      do {
-        $source= $expected;
-      } while ($expected= $expected->getCause());
-
       $this->assertEquals(
-        'Exception lang.IllegalArgumentException (Lookup loop created by inject.unittest.fixture.URI@)',
-        $source->compoundMessage()
+        'Exception inject.ProvisionException (Error creating an instance of inject.unittest.fixture.URI)',
+        $expected->compoundMessage()
       );
     }
+  }
+
+  #[Test]
+  public function type_union_returns_even_when_single_type_causes_lookup_loop() {
+    $inject= new Injector();
+    $inject->bind('string', 'http://test.local/api', 'uri');
+
+    $this->assertEquals('http://test.local/api', $inject->get(Endpoint::class)->uri);
   }
 }
