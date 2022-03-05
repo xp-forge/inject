@@ -3,7 +3,7 @@
 use lang\XPException;
 
 /** An error occurred when provisioning the object */
-class ProvisionException extends XPException implements Lookup {
+class ProvisionException extends XPException implements Binding {
  
   /**
    * Resolves this binding and returns the instance
@@ -12,6 +12,16 @@ class ProvisionException extends XPException implements Lookup {
    * @param  var
    */
   public function resolve($injector) {
+    throw $this;
+  }
+
+  /**
+   * Returns a provider for this binding
+   *
+   * @param  inject.Injector $injector
+   * @param  inject.Provider<?>
+   */
+  public function provider($injector) {
     throw $this;
   }
 }

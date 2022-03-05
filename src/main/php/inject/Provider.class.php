@@ -15,7 +15,7 @@ use lang\Generic;
  * @see   xp://inject.Injector
  */
 #[Generic(self: 'T')]
-interface Provider extends Lookup {
+interface Provider  {
   
   /**
    * Gets an instance of "T"
@@ -24,4 +24,5 @@ interface Provider extends Lookup {
    */
   #[Generic(return: 'T')]
   public function get();
+
 }

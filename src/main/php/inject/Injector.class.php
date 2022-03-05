@@ -9,12 +9,16 @@ use lang\{IllegalArgumentException, Nullable, Primitive, Throwable, Type, TypeUn
  * @test    xp://inject.unittest.InjectorTest
  */
 class Injector {
-  protected static $PROVIDER;
+  protected static $PROVIDER, $ABSENT;
   protected $bindings= [];
   protected $protect= [];
 
   static function __static() {
     self::$PROVIDER= Type::forName('inject.Provider<?>');
+    self::$ABSENT= new class() implements Binding {
+      public function resolve($inject) { return null; }
+      public function provider($inject) { return null; }
+    };
   }
 
   /**
@@ -89,11 +93,11 @@ class Injector {
   /**
    * Returns the lookup if it provides a value, null otherwise
    *
-   * @param  inject.Lookup $lookup
-   * @return ?inject.Lookup
+   * @param  inject.Binding $lookup
+   * @return ?inject.Binding
    */
   private function provided($lookup) {
-    return $lookup === Value::$ABSENT || $lookup instanceof ProvisionException ? null : $lookup;
+    return $lookup === self::$ABSENT || $lookup instanceof ProvisionException ? null : $lookup;
   }
 
   /**
@@ -101,8 +105,7 @@ class Injector {
    *
    * @param  lang.reflect.Routine $routine
    * @param  [:var] $named
-   * @return inject.Lookup
-   * @throws inject.ProvisionException
+   * @return var[]|inject.ProvisionException
    */
   private function argumentsOf($routine, $named= []) {
     $args= [];
@@ -123,13 +126,13 @@ class Injector {
 
       if (is_array($inject)) {
         $type= isset($inject['type']) ? Type::forName($inject['type']) : ($param->getTypeRestriction() ?: $param->getType());
-        $lookup= $this->lookup($type, $inject['name'] ?? null);
+        $lookup= $this->binding($type, $inject['name'] ?? null);
       } else {
         $type= $param->getTypeRestriction() ?: $param->getType();
-        $lookup= $this->lookup($type, $inject);
+        $lookup= $this->binding($type, $inject);
       }
 
-      if ($binding= $this->provided($lookup) ?? $this->provided($this->lookup($type, $name))) {
+      if ($binding= $this->provided($lookup) ?? $this->provided($this->binding($type, $name))) {
         $args[]= $binding->resolve($this);
       } else if ($param->isOptional()) {
         $args[]= $param->getDefaultValue();
@@ -145,24 +148,24 @@ class Injector {
       }
     }
 
-    return new Value($args);
+    return $args;
   }
 
   /**
-   * Creates an instance
+   * Implicitely creates an instance binding for a given class.
    *
    * @param  lang.XPClass $class
    * @param  [:var] $named
-   * @return inject.Lookup
+   * @return inject.Binding
    */
   private function instanceOf($class, $named= []) {
-    if (!$class->hasConstructor()) return new Value($class->newInstance());
+    if (!$class->hasConstructor()) return new InstanceBinding($class->newInstance());
 
     $constructor= $class->getConstructor();
-    $lookup= $this->argumentsOf($constructor, $named);
-    if ($lookup instanceof ProvisionException) return $lookup;
+    $arguments= $this->argumentsOf($constructor, $named);
+    if ($arguments instanceof ProvisionException) return $arguments;
 
-    return new Value($constructor->newInstance($lookup->resolve($this)));
+    return new InstanceBinding($constructor->newInstance($arguments));
   }
 
   /**
@@ -170,9 +173,9 @@ class Injector {
    *
    * @param  string|lang.Type $type
    * @param  ?string $name
-   * @return inject.Lookup
+   * @return inject.Binding
    */
-  public function lookup($type, $name= null) {
+  public function binding($type, $name= null) {
     $t= $type instanceof Type ? $type : Type::forName($type);
 
     // Prevent lookup loops, see https://github.com/xp-forge/inject/issues/24
@@ -183,15 +186,10 @@ class Injector {
       $this->protect[$key]= true;
       if ($t instanceof TypeUnion) {
         foreach ($t->types() as $t) {
-          if ($lookup= $this->provided($this->lookup($t, $name))) return $lookup;
+          if ($lookup= $this->provided($this->binding($t, $name))) return $lookup;
         }
       } else if ($t instanceof Nullable) {
-        return $this->lookup($t->underlyingType(), $name);
-      } else if (self::$PROVIDER->isAssignableFrom($t)) {
-        $literal= $t->genericArguments()[0]->literal();
-        if (isset($this->bindings[$literal][$name])) {
-          return $this->bindings[$literal][$name]->provider($this);
-        }
+        return $this->binding($t->underlyingType(), $name);
       } else {
         $literal= $t->literal();
         if (isset($this->bindings[$literal][$name])) {
@@ -201,7 +199,7 @@ class Injector {
         }
       }
 
-      return Value::$ABSENT;
+      return self::$ABSENT;
     } finally {
       unset($this->protect[$key]);
     }
@@ -216,7 +214,17 @@ class Injector {
    * @throws inject.ProvisionException
    */
   public function get($type, $name= null) {
-    return $this->lookup($type, $name)->resolve($this);
+    $t= $type instanceof Type ? $type : Type::forName($type);
+
+    // BC, use $inject->binding($type)->provider() instead!
+    if (self::$PROVIDER->isAssignableFrom($t)) {
+      $literal= $t->genericArguments()[0]->literal();
+      if (isset($this->bindings[$literal][$name])) {
+        return $this->bindings[$literal][$name]->provider($this);
+      }
+    }
+
+    return $this->binding($t, $name)->resolve($this);
   }
 
   /**

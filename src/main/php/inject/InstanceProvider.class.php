@@ -12,13 +12,4 @@ class InstanceProvider implements Provider {
   /** @return var */
   public function get() { return $this->instance; }
 
-  /**
-   * Resolves this lookup and returns the instance
-   *
-   * @param  inject.Injector $injector
-   * @param  var
-   */
-  public function resolve($injector) {
-    return $this;
-  }
 }
