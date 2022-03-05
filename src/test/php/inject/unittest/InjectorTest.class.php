@@ -228,18 +228,10 @@ class InjectorTest extends TestCase {
     $this->assertEquals(new S3Bucket($bucket), $inject->get(S3Bucket::class));
   }
 
-  #[Test]
+  #[Test, Expect(class: ProvisionException::class, withMessage: '/No bound value for.+URI.+arg/')]
   public function detects_lookup_loops() {
     $inject= new Injector();
-    try {
-      $inject->get(URI::class);
-      $this->fail('No exception raised', null, ProvisionException::class);
-    } catch (ProvisionException $expected) {
-      $this->assertEquals(
-        'Exception inject.ProvisionException (Error creating an instance of inject.unittest.fixture.URI)',
-        $expected->compoundMessage()
-      );
-    }
+    $inject->get(URI::class);
   }
 
   #[Test]
