@@ -5,9 +5,7 @@ class Value implements Lookup {
   private $value;
 
   static function __static() {
-    self::$ABSENT= new class() implements Lookup {
-      public function resolve($injector) { return null; }
-    };
+    self::$ABSENT= new self(null);
   }
 
   /** @param var $value */
