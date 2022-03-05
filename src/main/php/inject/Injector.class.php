@@ -168,12 +168,11 @@ class Injector {
   /**
    * Looks up a binding.
    *
-   * @param  string|lang.Type $type
+   * @param  lang.Type $t
    * @param  ?string $name
    * @return inject.Lookup
    */
-  public function lookup($type, $name= null) {
-    $t= $type instanceof Type ? $type : Type::forName($type);
+  public function lookup(Type $t, $name= null) {
 
     // Prevent lookup loops, see https://github.com/xp-forge/inject/issues/24
     $key= $t->getName().'@'.$name;
@@ -182,16 +181,11 @@ class Injector {
     try {
       $this->protect[$key]= true;
       if ($t instanceof TypeUnion) {
-        foreach ($t->types() as $type) {
-          if ($lookup= $this->provided($this->lookup($type, $name))) return $lookup;
+        foreach ($t->types() as $t) {
+          if ($lookup= $this->provided($this->lookup($t, $name))) return $lookup;
         }
       } else if ($t instanceof Nullable) {
         return $this->lookup($t->underlyingType(), $name);
-      } else if (self::$PROVIDER->isAssignableFrom($t)) {
-        $literal= $t->genericArguments()[0]->literal();
-        if (isset($this->bindings[$literal][$name])) {
-          return new Value($this->bindings[$literal][$name]->provider($this));
-        }
       } else {
         $literal= $t->literal();
         if (isset($this->bindings[$literal][$name])) {
@@ -216,7 +210,15 @@ class Injector {
    * @throws inject.ProvisionException
    */
   public function get($type, $name= null) {
-    return $this->lookup($type, $name)->resolve($this);
+    $t= $type instanceof Type ? $type : Type::forName($type);
+    if (self::$PROVIDER->isAssignableFrom($t)) {
+      $literal= $t->genericArguments()[0]->literal();
+      if (isset($this->bindings[$literal][$name])) {
+        return $this->bindings[$literal][$name]->provider($this);
+      }
+    }
+
+    return $this->lookup($t, $name)->resolve($this);
   }
 
   /**
