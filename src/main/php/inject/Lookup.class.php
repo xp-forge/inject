@@ -2,9 +2,12 @@
 
 interface Lookup {
 
-  /** @return var */
-  public function get();
+  /**
+   * Resolves this lookup and returns the instance
+   *
+   * @param  inject.Injector $injector
+   * @param  var
+   */
+  public function resolve($injector);
 
-  /** @return ?self */
-  public function provided();
 }

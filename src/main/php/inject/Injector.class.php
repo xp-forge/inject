@@ -87,6 +87,16 @@ class Injector {
   }
 
   /**
+   * Returns the lookup if it provides a value, null otherwise
+   *
+   * @param  inject.Lookup $lookup
+   * @return ?inject.Lookup
+   */
+  private function provided($lookup) {
+    return $lookup === Value::$ABSENT || $lookup instanceof ProvisionException ? null : $lookup;
+  }
+
+  /**
    * Retrieve arguments for a given routine
    *
    * @param  lang.reflect.Routine $routine
@@ -119,8 +129,8 @@ class Injector {
         $lookup= $this->lookup($type, $inject);
       }
 
-      if ($binding= $lookup->provided() ?? $this->lookup($type, $name)->provided()) {
-        $args[]= $binding->get();
+      if ($binding= $this->provided($lookup) ?? $this->provided($this->lookup($type, $name))) {
+        $args[]= $binding->resolve($this);
       } else if ($param->isOptional()) {
         $args[]= $param->getDefaultValue();
       } else {
@@ -150,11 +160,13 @@ class Injector {
 
     $constructor= $class->getConstructor();
     $lookup= $this->argumentsOf($constructor, $named);
-    return $lookup->provided() ? new Value($constructor->newInstance($lookup->get())) : $lookup;
+    if ($lookup instanceof ProvisionException) return $lookup;
+
+    return new Value($constructor->newInstance($lookup->resolve($this)));
   }
 
   /**
-   * Looks up a binding
+   * Looks up a binding.
    *
    * @param  string|lang.Type $type
    * @param  ?string $name
@@ -171,7 +183,7 @@ class Injector {
       $this->protect[$key]= true;
       if ($t instanceof TypeUnion) {
         foreach ($t->types() as $type) {
-          if ($lookup= $this->lookup($type, $name)->provided()) return $lookup;
+          if ($lookup= $this->provided($this->lookup($type, $name))) return $lookup;
         }
       } else if ($t instanceof Nullable) {
         return $this->lookup($t->underlyingType(), $name);
@@ -183,7 +195,7 @@ class Injector {
       } else {
         $literal= $t->literal();
         if (isset($this->bindings[$literal][$name])) {
-          return new Value($this->bindings[$literal][$name]->resolve($this));
+          return $this->bindings[$literal][$name];
         } else if (null === $name && $t instanceof XPClass && !($t->isInterface() || $t->getModifiers() & MODIFIER_ABSTRACT)) {
           return $this->instanceOf($t);
         }
@@ -196,19 +208,19 @@ class Injector {
   }
 
   /**
-   * Get a binding
+   * Get a binding. Returns null if no binding can be found.
    *
    * @param  string|lang.Type $type
    * @param  ?string $name
-   * @return var or NULL if none exists
+   * @return var
    * @throws inject.ProvisionException
    */
   public function get($type, $name= null) {
-    return $this->lookup($type, $name)->get();
+    return $this->lookup($type, $name)->resolve($this);
   }
 
   /**
-   * Retrieve args for a given routine
+   * Retrieve args for a given routine.
    *
    * @param  lang.reflect.Routine $routine
    * @param  [:var] $named Named arguments
@@ -216,7 +228,7 @@ class Injector {
    * @throws inject.ProvisionException
    */
   public function args($routine, $named= []) {
-    return $this->argumentsOf($routine, $named)->get();
+    return $this->argumentsOf($routine, $named)->resolve($this);
   }
 
   /**
@@ -231,7 +243,7 @@ class Injector {
    */
   public function newInstance(XPClass $class, $named= []) {
     try {
-      return $this->instanceOf($class, $named)->get();
+      return $this->instanceOf($class, $named)->resolve($this);
     } catch (TargetInvocationException $e) {
       throw new ProvisionException('Error creating an instance of '.$class->getName(), $e->getCause());
     } catch (Throwable $e) {

@@ -5,10 +5,13 @@ use lang\XPException;
 /** An error occurred when provisioning the object */
 class ProvisionException extends XPException implements Lookup {
  
-  /** @return var */
-  public function get() { throw $this; }
-
-  /** @return ?self */
-  public function provided() { return null; }
- 
+  /**
+   * Resolves this binding and returns the instance
+   *
+   * @param  inject.Injector $injector
+   * @param  var
+   */
+  public function resolve($injector) {
+    throw $this;
+  }
 }

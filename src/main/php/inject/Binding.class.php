@@ -1,6 +1,6 @@
 <?php namespace inject;
 
-interface Binding {
+interface Binding extends Lookup {
 
   /**
    * Returns a provider for this binding
@@ -9,13 +9,5 @@ interface Binding {
    * @param  inject.Provider<?>
    */
   public function provider($injector);
-
-  /**
-   * Resolves this binding and returns the instance
-   *
-   * @param  inject.Injector $injector
-   * @param  var
-   */
-  public function resolve($injector);
 
 }
