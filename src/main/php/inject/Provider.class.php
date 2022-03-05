@@ -6,9 +6,9 @@ use lang\Generic;
  * A provider can be used to perform lazy initialization.
  *
  * ```php
- * $injector->bind($intf, XPClass::forName($impl));
+ * $injector->bind(Closeable::class, XPClass::forName($impl));
  *
- * $provider= $injector->get($intf);
+ * $provider= $injector->get('inject.Provider<lang.Closeable>');
  * $instance= $provider->get();       // Instantiation happens here
  * ```
  *
