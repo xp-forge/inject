@@ -115,7 +115,7 @@ $injector= new Injector(
 The syntax for these INI files is simple:
 
 ```ini
-scriptlet.Session=com.example.session.FileSystem("/tmp")
+web.session.Sessions=web.session.InFileSystem("/tmp")
 string[name]="Application"
 ```
 
@@ -139,10 +139,10 @@ use inject\{Injector, Named, InstanceBinding};
 use com\example\Value;
 
 $inject= new Injector();
-$inject->bind(Value::class, newinstance(Named::class, [], [
-  'provides' => fn($name) => true,
-  'binding'  => fn($name) => new InstanceBinding(new Value($name))
-]));
+$inject->bind(Value::class, new class() extends Named {
+  public function provides($name) { return true; }
+  public function binding($name) { return new InstanceBinding(new Value($name)); }
+});
 
 $value= $inject->get(Value::class, 'default');  // new Value("default")
 ```
