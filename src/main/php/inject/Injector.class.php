@@ -6,7 +6,11 @@ use lang\{IllegalArgumentException, Nullable, Primitive, Throwable, Type, TypeUn
 /**
  * Injector
  *
- * @test    xp://inject.unittest.InjectorTest
+ * @test  inject.unittest.InjectorTest
+ * @test  inject.unittest.BindingTest
+ * @test  inject.unittest.BindingsTest
+ * @test  inject.unittest.ProvidersTest
+ * @test  inject.unittest.NewInstanceTest
  */
 class Injector {
   protected static $PROVIDER;
@@ -65,7 +69,7 @@ class Injector {
    *
    * @param  string|lang.Type $type
    * @param  var $impl
-   * @param  string $name
+   * @param  ?string $name
    * @return self
    * @throws lang.IllegalArgumentException
    */
@@ -82,59 +86,28 @@ class Injector {
     } else {
       $this->bindings[$t->literal()][$name]= $impl instanceof Binding ? $impl : self::asBinding($t, $impl);
     }
+
     return $this;
   }
 
   /**
-   * Get a binding
+   * Returns the lookup if it provides a value, null otherwise
    *
-   * @param  string|lang.Type $type
-   * @param  string $name
-   * @return var or NULL if none exists
+   * @param  inject.Binding $lookup
+   * @return ?inject.Binding
    */
-  public function get($type, $name= null) {
-    $t= $type instanceof Type ? $type : Type::forName($type);
-
-    // Prevent lookup loops, see https://github.com/xp-forge/inject/issues/24
-    $key= $t->getName().'@'.$name;
-    if (isset($this->protect[$key])) throw new IllegalArgumentException('Lookup loop created by '.$key);
-
-    try {
-      $this->protect[$key]= true;
-      if ($t instanceof TypeUnion) {
-        foreach ($t->types() as $type) {
-          if ($instance= $this->get($type, $name)) return $instance;
-        }
-      } else if ($t instanceof Nullable) {
-        return $this->get($t->underlyingType(), $name);
-      } else if (self::$PROVIDER->isAssignableFrom($t)) {
-        $literal= $t->genericArguments()[0]->literal();
-        if (isset($this->bindings[$literal][$name])) {
-          return $this->bindings[$literal][$name]->provider($this);
-        }
-      } else {
-        $literal= $t->literal();
-        if (isset($this->bindings[$literal][$name])) {
-          return $this->bindings[$literal][$name]->resolve($this);
-        } else if (null === $name && $t instanceof XPClass && !($t->isInterface() || $t->getModifiers() & MODIFIER_ABSTRACT)) {
-          return $this->newInstance($t);
-        }
-      }
-      return null;
-    } finally {
-      unset($this->protect[$key]);
-    }
+  private function provided($lookup) {
+    return $lookup === Bindings::$ABSENT || $lookup instanceof ProvisionException ? null : $lookup;
   }
 
   /**
-   * Retrieve args for a given routine
+   * Retrieve arguments for a given routine
    *
    * @param  lang.reflect.Routine $routine
-   * @param  [:var] $named Named arguments
-   * @return var
-   * @throws inject.ProvisionException
+   * @param  [:var] $named
+   * @return inject.Binding
    */
-  public function args($routine, $named= []) {
+  private function argumentsOf($routine, $named= []) {
     $args= [];
     foreach ($routine->getParameters() as $i => $param) {
       $name= $param->getName();
@@ -153,18 +126,18 @@ class Injector {
 
       if (is_array($inject)) {
         $type= isset($inject['type']) ? Type::forName($inject['type']) : ($param->getTypeRestriction() ?: $param->getType());
-        $binding= $this->get($type, $inject['name'] ?? null);
+        $lookup= $this->binding($type, $inject['name'] ?? null);
       } else {
         $type= $param->getTypeRestriction() ?: $param->getType();
-        $binding= $this->get($type, $inject);
+        $lookup= $this->binding($type, $inject);
       }
 
-      if (null !== ($binding ?? $binding= $this->get($type, $name))) {
-        $args[]= $binding;
+      if ($binding= $this->provided($lookup) ?? $this->provided($this->binding($type, $name))) {
+        $args[]= $binding->resolve($this);
       } else if ($param->isOptional()) {
         $args[]= $param->getDefaultValue();
       } else {
-        throw new ProvisionException(sprintf(
+        return new ProvisionException(sprintf(
           'No bound value for type %s%s in %s\'s %s() parameter %s',
           $type->getName(),
           isset($inject['name']) ? ' named "'.$inject['name'].'"' : '',
@@ -174,7 +147,93 @@ class Injector {
         ));
       }
     }
-    return $args;
+
+    return new InstanceBinding($args);
+  }
+
+  /**
+   * Implicitely creates an instance binding for a given class.
+   *
+   * @param  lang.XPClass $class
+   * @param  [:var] $named
+   * @return inject.Binding
+   */
+  private function instanceOf($class, $named= []) {
+    if (!$class->hasConstructor()) return new InstanceBinding($class->newInstance());
+
+    $constructor= $class->getConstructor();
+    $arguments= $this->argumentsOf($constructor, $named);
+
+    return $this->provided($arguments)
+      ? new InstanceBinding($constructor->newInstance($arguments->resolve($this)))
+      : $arguments
+    ;
+  }
+
+  /**
+   * Looks up a binding.
+   *
+   * @param  string|lang.Type $type
+   * @param  ?string $name
+   * @return inject.Binding
+   */
+  public function binding($type, $name= null) {
+    $t= $type instanceof Type ? $type : Type::forName($type);
+
+    // Prevent lookup loops, see https://github.com/xp-forge/inject/issues/24
+    $key= $t->getName().'@'.$name;
+    if (isset($this->protect[$key])) return new ProvisionException('Lookup loop for '.$key);
+
+    try {
+      $this->protect[$key]= true;
+      if ($t instanceof TypeUnion) {
+        foreach ($t->types() as $t) {
+          if ($lookup= $this->provided($this->binding($t, $name))) return $lookup;
+        }
+      } else if ($t instanceof Nullable) {
+        return $this->binding($t->underlyingType(), $name);
+      } else if (self::$PROVIDER->isAssignableFrom($t)) {
+        $literal= $t->genericArguments()[0]->literal();
+        if (isset($this->bindings[$literal][$name])) {
+          return new InstanceBinding($this->bindings[$literal][$name]->provider($this));
+        }
+      } else {
+        $literal= $t->literal();
+        if (isset($this->bindings[$literal][$name])) {
+          return $this->bindings[$literal][$name];
+        } else if (null === $name && $t instanceof XPClass && !($t->isInterface() || $t->getModifiers() & MODIFIER_ABSTRACT)) {
+          return $this->instanceOf($t);
+        }
+      }
+
+      return Bindings::$ABSENT;
+    } finally {
+      unset($this->protect[$key]);
+    }
+  }
+
+  /**
+   * Get a binding's value. Returns null if no binding can be found.
+   *
+   * @param  string|lang.Type $type
+   * @param  ?string $name
+   * @return var
+   * @throws inject.ProvisionException
+   */
+  public function get($type, $name= null) {
+    return $this->binding($type, $name)->resolve($this);
+  }
+
+  /**
+   * Retrieve args for a given routine.
+   *
+   * @param  lang.reflect.Routine $routine
+   * @param  [:var] $named Named arguments
+   * @return var[]
+   * @throws inject.ProvisionException
+   */
+  public function args($routine, $named= []) {
+    return $this->argumentsOf($routine, $named)->resolve($this);
   }
 
   /**
@@ -184,21 +243,16 @@ class Injector {
    *
    * @param   lang.XPClass $class
    * @param   [:var] $named Named arguments
-   * @return  var
+   * @return  object
    * @throws  inject.ProvisionException
    */
   public function newInstance(XPClass $class, $named= []) {
-    if ($class->hasConstructor()) {
-      $constructor= $class->getConstructor();
-      try {
-        return $constructor->newInstance($this->args($constructor, $named));
-      } catch (TargetInvocationException $e) {
-        throw new ProvisionException('Error creating an instance of '.$class->getName(), $e->getCause());
-      } catch (Throwable $e) {
-        throw new ProvisionException('Error creating an instance of '.$class->getName(), $e);
-      }
-    } else {
-      return $class->newInstance();
+    try {
+      return $this->instanceOf($class, $named)->resolve($this);
+    } catch (TargetInvocationException $e) {
+      throw new ProvisionException('Error creating an instance of '.$class->getName(), $e->getCause());
+    } catch (Throwable $e) {
+      throw new ProvisionException('Error creating an instance of '.$class->getName(), $e);
     }
   }
 }

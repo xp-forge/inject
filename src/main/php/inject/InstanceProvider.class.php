@@ -11,4 +11,5 @@ class InstanceProvider implements Provider {
 
   /** @return var */
   public function get() { return $this->instance; }
+
 }

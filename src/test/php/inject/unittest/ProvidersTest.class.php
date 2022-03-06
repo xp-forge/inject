@@ -1,6 +1,6 @@
 <?php namespace inject\unittest;
 
-use inject\unittest\fixture\{FileSystem, Storage};
+use inject\unittest\fixture\{FileSystem, Storage, UseProvider};
 use inject\{Injector, InstanceProvider, ResolvingProvider, TypeProvider};
 use lang\{Type, XPClass};
 use unittest\{Test, TestCase};
@@ -73,5 +73,13 @@ class ProvidersTest extends TestCase {
     $inject= new Injector();
     $inject->bind('inject.unittest.fixture.Storage[]', $storages);
     $this->assertEquals($storages, $inject->get('inject.Provider<inject.unittest.fixture.Storage[]>')->get());
+  }
+
+  #[Test]
+  public function parameter_with_provider() {
+    $inject= new Injector();
+    $inject->bind(Storage::class, new FileSystem());
+
+    $this->assertInstanceOf(InstanceProvider::class, $inject->get(UseProvider::class)->provider);
   }
 }
