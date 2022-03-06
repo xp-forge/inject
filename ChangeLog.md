@@ -3,6 +3,12 @@ Dependency injection for the XP Framework change log
 
 ## ?.?.? / ????-??-??
 
+## 5.2.0 / 2022-03-06
+
+* Merged PR #25: Try injecting all members in a type union, don't stop
+  at the first error. This is the correct fix for #24
+  (@thekid)
+
 ## 5.1.2 / 2022-03-03
 
 * Quickfixed #24: Endless loop when injecting webservices.rest.Endpoint
