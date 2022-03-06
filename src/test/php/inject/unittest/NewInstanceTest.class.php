@@ -36,7 +36,7 @@ class NewInstanceTest {
     try {
       return $inject->newInstance($type);
     } catch (ProvisionException $e) {
-      throw $e->getCause();
+      throw $e->getCause() ?? $e;
     }
   }
 

@@ -163,11 +163,15 @@ class Injector {
 
     $constructor= $class->getConstructor();
     $arguments= $this->argumentsOf($constructor, $named);
+    if (!$this->provided($arguments)) return $arguments;
 
-    return $this->provided($arguments)
-      ? new InstanceBinding($constructor->newInstance($arguments->resolve($this)))
-      : $arguments
-    ;
+    try {
+      return new InstanceBinding($constructor->newInstance($arguments->resolve($this)));
+    } catch (TargetInvocationException $e) {
+      return new ProvisionException('Error creating an instance of '.$class->getName(), $e->getCause());
+    } catch (Throwable $e) {
+      return new ProvisionException('Error creating an instance of '.$class->getName(), $e);
+    }
   }
 
   /**
@@ -247,12 +251,6 @@ class Injector {
    * @throws  inject.ProvisionException
    */
   public function newInstance(XPClass $class, $named= []) {
-    try {
-      return $this->instanceOf($class, $named)->resolve($this);
-    } catch (TargetInvocationException $e) {
-      throw new ProvisionException('Error creating an instance of '.$class->getName(), $e->getCause());
-    } catch (Throwable $e) {
-      throw new ProvisionException('Error creating an instance of '.$class->getName(), $e);
-    }
+    return $this->instanceOf($class, $named)->resolve($this);
   }
 }
