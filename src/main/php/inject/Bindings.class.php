@@ -7,6 +7,14 @@
  * @test    xp://inject.unittest.BindingsTest
  */
 abstract class Bindings {
+  public static $ABSENT;
+
+  static function __static() {
+    self::$ABSENT ?? self::$ABSENT= new class() implements Binding {
+      public function resolve($inject) { return null; }
+      public function provider($inject) { return null; }
+    };
+  }
 
   /**
    * Creates a new fluent Bindings instance

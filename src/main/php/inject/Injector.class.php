@@ -9,16 +9,12 @@ use lang\{IllegalArgumentException, Nullable, Primitive, Throwable, Type, TypeUn
  * @test    xp://inject.unittest.InjectorTest
  */
 class Injector {
-  protected static $PROVIDER, $ABSENT;
+  protected static $PROVIDER;
   protected $bindings= [];
   protected $protect= [];
 
   static function __static() {
     self::$PROVIDER= Type::forName('inject.Provider<?>');
-    self::$ABSENT= new class() implements Binding {
-      public function resolve($inject) { return null; }
-      public function provider($inject) { return null; }
-    };
   }
 
   /**
@@ -97,7 +93,7 @@ class Injector {
    * @return ?inject.Binding
    */
   private function provided($lookup) {
-    return $lookup === self::$ABSENT || $lookup instanceof ProvisionException ? null : $lookup;
+    return $lookup === Bindings::$ABSENT || $lookup instanceof ProvisionException ? null : $lookup;
   }
 
   /**
@@ -199,14 +195,14 @@ class Injector {
         }
       }
 
-      return self::$ABSENT;
+      return Bindings::$ABSENT;
     } finally {
       unset($this->protect[$key]);
     }
   }
 
   /**
-   * Get a binding. Returns null if no binding can be found.
+   * Get a binding's value. Returns null if no binding can be found.
    *
    * @param  string|lang.Type $type
    * @param  ?string $name
