@@ -7,6 +7,7 @@ use lang\{IllegalArgumentException, Nullable, Primitive, Throwable, Type, TypeUn
  * Injector
  *
  * @test  inject.unittest.InjectorTest
+ * @test  inject.unittest.BindingTest
  * @test  inject.unittest.BindingsTest
  * @test  inject.unittest.ProvidersTest
  * @test  inject.unittest.NewInstanceTest
