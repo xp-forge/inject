@@ -9,7 +9,7 @@ class ProvisionException extends XPException implements Binding {
    * Resolves this binding and returns the instance
    *
    * @param  inject.Injector $injector
-   * @param  var
+   * @return var
    */
   public function resolve($injector) {
     throw $this;
@@ -19,7 +19,7 @@ class ProvisionException extends XPException implements Binding {
    * Returns a provider for this binding
    *
    * @param  inject.Injector $injector
-   * @param  inject.Provider<?>
+   * @return inject.Provider<?>
    */
   public function provider($injector) {
     throw $this;
