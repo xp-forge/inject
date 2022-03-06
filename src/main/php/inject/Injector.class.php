@@ -188,6 +188,11 @@ class Injector {
         }
       } else if ($t instanceof Nullable) {
         return $this->binding($t->underlyingType(), $name);
+      } else if (self::$PROVIDER->isAssignableFrom($t)) {
+        $literal= $t->genericArguments()[0]->literal();
+        if (isset($this->bindings[$literal][$name])) {
+          return new InstanceBinding($this->bindings[$literal][$name]->provider($this));
+        }
       } else {
         $literal= $t->literal();
         if (isset($this->bindings[$literal][$name])) {
@@ -212,17 +217,7 @@ class Injector {
    * @throws inject.ProvisionException
    */
   public function get($type, $name= null) {
-    $t= $type instanceof Type ? $type : Type::forName($type);
-
-    // BC, use $inject->binding($type)->provider() instead!
-    if (self::$PROVIDER->isAssignableFrom($t)) {
-      $literal= $t->genericArguments()[0]->literal();
-      if (isset($this->bindings[$literal][$name])) {
-        return $this->bindings[$literal][$name]->provider($this);
-      }
-    }
-
-    return $this->binding($t, $name)->resolve($this);
+    return $this->binding($type, $name)->resolve($this);
   }
 
   /**
