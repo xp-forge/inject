@@ -6,7 +6,7 @@ interface Binding {
    * Resolves this lookup and returns the instance
    *
    * @param  inject.Injector $injector
-   * @param  var
+   * @return var
    */
   public function resolve($injector);
 
@@ -14,7 +14,7 @@ interface Binding {
    * Returns a provider for this binding
    *
    * @param  inject.Injector $injector
-   * @param  inject.Provider<?>
+   * @return inject.Provider<?>
    */
   public function provider($injector);
 
