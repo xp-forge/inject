@@ -101,7 +101,7 @@ class Injector {
    *
    * @param  lang.reflect.Routine $routine
    * @param  [:var] $named
-   * @return var[]|inject.ProvisionException
+   * @return inject.Binding
    */
   private function argumentsOf($routine, $named= []) {
     $args= [];
@@ -144,7 +144,7 @@ class Injector {
       }
     }
 
-    return $args;
+    return new InstanceBinding($args);
   }
 
   /**
@@ -159,9 +159,11 @@ class Injector {
 
     $constructor= $class->getConstructor();
     $arguments= $this->argumentsOf($constructor, $named);
-    if ($arguments instanceof ProvisionException) return $arguments;
 
-    return new InstanceBinding($constructor->newInstance($arguments));
+    return $this->provided($arguments)
+      ? new InstanceBinding($constructor->newInstance($arguments->resolve($this)))
+      : $arguments
+    ;
   }
 
   /**
