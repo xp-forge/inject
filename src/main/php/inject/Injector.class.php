@@ -165,12 +165,14 @@ class Injector {
     $arguments= $this->argumentsOf($constructor, $named);
     if (!$this->provided($arguments)) return $arguments;
 
+    // Wrap any exception caught during instance creation. These errors
+    // should not be simply returned as we risk them being overlooked!
     try {
       return new InstanceBinding($constructor->newInstance($arguments->resolve($this)));
     } catch (TargetInvocationException $e) {
-      return new ProvisionException('Error creating an instance of '.$class->getName(), $e->getCause());
+      throw new ProvisionException('Error creating an instance of '.$class->getName(), $e->getCause());
     } catch (Throwable $e) {
-      return new ProvisionException('Error creating an instance of '.$class->getName(), $e);
+      throw new ProvisionException('Error creating an instance of '.$class->getName(), $e);
     }
   }
 
