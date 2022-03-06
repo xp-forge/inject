@@ -15,7 +15,7 @@ use lang\Generic;
  * @see   xp://inject.Injector
  */
 #[Generic(self: 'T')]
-interface Provider  {
+interface Provider {
   
   /**
    * Gets an instance of "T"
