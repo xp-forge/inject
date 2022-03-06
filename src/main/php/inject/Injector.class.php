@@ -6,7 +6,10 @@ use lang\{IllegalArgumentException, Nullable, Primitive, Throwable, Type, TypeUn
 /**
  * Injector
  *
- * @test    xp://inject.unittest.InjectorTest
+ * @test  inject.unittest.InjectorTest
+ * @test  inject.unittest.BindingsTest
+ * @test  inject.unittest.ProvidersTest
+ * @test  inject.unittest.NewInstanceTest
  */
 class Injector {
   protected static $PROVIDER;
