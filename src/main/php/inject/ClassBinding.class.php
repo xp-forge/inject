@@ -15,7 +15,7 @@ class ClassBinding implements Binding {
   public function __construct($class, $type= null) {
     $c= $class instanceof XPClass ? $class : XPClass::forName($class);
     if ($type && !$type->isAssignableFrom($c)) {
-      throw new IllegalArgumentException($c.' is not an instance of '.$type);
+      throw new IllegalArgumentException($type.' is not assignable from '.$c);
     } else if ($c->isInterface() || $c->getModifiers() & MODIFIER_ABSTRACT) {
       throw new IllegalArgumentException('Cannot bind to non-concrete type '.$type);
     }
