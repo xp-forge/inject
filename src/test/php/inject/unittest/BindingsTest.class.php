@@ -2,14 +2,14 @@
 
 use inject\unittest\fixture\{FileSystem, Storage};
 use inject\{Bindings, Injector};
-use unittest\{Test, TestCase};
+use unittest\{Assert, Test};
 use util\Currency;
 
-class BindingsTest extends TestCase {
+class BindingsTest {
   protected $bindings;
 
-  /** @return void */
-  public function setUp() {
+  #[Before]
+  public function bindings() {
     $this->bindings= new class() extends Bindings {
       public function configure($inject) {
         $inject->bind(Storage::class, new FileSystem());
@@ -20,7 +20,7 @@ class BindingsTest extends TestCase {
   #[Test]
   public function can_optionally_be_given_binding() {
     $inject= new Injector($this->bindings);
-    $this->assertInstanceOf(FileSystem::class, $inject->get(Storage::class));
+    Assert::instance(FileSystem::class, $inject->get(Storage::class));
   }
 
   #[Test]
@@ -30,20 +30,20 @@ class BindingsTest extends TestCase {
         $inject->bind(Currency::class, Currency::$EUR, 'EUR');
       }
     });
-    $this->assertInstanceOf(FileSystem::class, $inject->get(Storage::class));
-    $this->assertEquals(Currency::$EUR, $inject->get(Currency::class, 'EUR'));
+    Assert::instance(FileSystem::class, $inject->get(Storage::class));
+    Assert::equals(Currency::$EUR, $inject->get(Currency::class, 'EUR'));
   }
 
   #[Test]
   public function add_returns_injector() {
     $inject= new Injector();
-    $this->assertEquals($inject, $inject->add($this->bindings));
+    Assert::equals($inject, $inject->add($this->bindings));
   }
 
   #[Test]
   public function add() {
     $inject= new Injector();
     $inject->add($this->bindings);
-    $this->assertInstanceOf(FileSystem::class, $inject->get(Storage::class));
+    Assert::instance(FileSystem::class, $inject->get(Storage::class));
   }
 }

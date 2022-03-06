@@ -4,10 +4,10 @@ use inject\unittest\fixture\{Database, FileSystem, InMemory, Storage, Value};
 use inject\{ConfiguredBindings, Injector};
 use io\streams\MemoryInputStream;
 use lang\ClassNotFoundException;
-use unittest\{Expect, Test, Values};
+use unittest\{Assert, Expect, Test, Values};
 use util\Properties;
 
-class ConfiguredBindingsTest extends \unittest\TestCase {
+class ConfiguredBindingsTest {
 
   #[Test]
   public function can_create_with_properties() {
@@ -31,7 +31,7 @@ class ConfiguredBindingsTest extends \unittest\TestCase {
     $inject= new Injector(new ConfiguredBindings($this->loadProperties('
       inject.unittest.fixture.Storage=inject.unittest.fixture.FileSystem
     ')));
-    $this->assertEquals(new FileSystem(), $inject->get(Storage::class));
+    Assert::equals(new FileSystem(), $inject->get(Storage::class));
   }
 
   #[Test]
@@ -39,7 +39,7 @@ class ConfiguredBindingsTest extends \unittest\TestCase {
     $inject= new Injector(new ConfiguredBindings($this->loadProperties('
       inject.unittest.fixture.Storage=inject.unittest.fixture.FileSystem("/usr")
     ')));
-    $this->assertEquals(new FileSystem('/usr'), $inject->get(Storage::class));
+    Assert::equals(new FileSystem('/usr'), $inject->get(Storage::class));
   }
 
   #[Test]
@@ -47,7 +47,7 @@ class ConfiguredBindingsTest extends \unittest\TestCase {
     $inject= new Injector(new ConfiguredBindings($this->loadProperties('
       inject.unittest.fixture.Storage=inject.unittest.fixture.InMemory()
     ')));
-    $this->assertEquals(new InMemory(), $inject->get(Storage::class));
+    Assert::equals(new InMemory(), $inject->get(Storage::class));
   }
 
   #[Test, Expect(ClassNotFoundException::class)]
@@ -60,7 +60,7 @@ class ConfiguredBindingsTest extends \unittest\TestCase {
   #[Test, Values([['string[test]="Test"', 'string', 'Test'], ['int[test]=6100', 'int', 6100], ['double[test]=1.5', 'double', 1.5], ['bool[test]=true', 'bool', true], ['bool[test]=false', 'bool', false]])]
   public function bind_primitive($line, $type, $expected) {
     $inject= new Injector(new ConfiguredBindings($this->loadProperties($line)));
-    $this->assertEquals($expected, $inject->get($type, 'test'));
+    Assert::equals($expected, $inject->get($type, 'test'));
   }
 
   #[Test]
@@ -68,7 +68,7 @@ class ConfiguredBindingsTest extends \unittest\TestCase {
     $inject= new Injector(new ConfiguredBindings($this->loadProperties('
       inject.unittest.fixture.Storage[files]=inject.unittest.fixture.FileSystem
     ')));
-    $this->assertEquals(new FileSystem(), $inject->get(Storage::class, 'files'));
+    Assert::equals(new FileSystem(), $inject->get(Storage::class, 'files'));
   }
 
   #[Test]
@@ -76,7 +76,7 @@ class ConfiguredBindingsTest extends \unittest\TestCase {
     $inject= new Injector(new ConfiguredBindings($this->loadProperties('
       inject.unittest.fixture.Storage[files]=inject.unittest.fixture.FileSystem("/usr")
     ')));
-    $this->assertEquals(new FileSystem('/usr'), $inject->get(Storage::class, 'files'));
+    Assert::equals(new FileSystem('/usr'), $inject->get(Storage::class, 'files'));
   }
 
   #[Test]
@@ -85,7 +85,7 @@ class ConfiguredBindingsTest extends \unittest\TestCase {
       inject.unittest.fixture.Storage[user]=inject.unittest.fixture.FileSystem("~/.xp")
       inject.unittest.fixture.Storage[system]=inject.unittest.fixture.FileSystem("/etc/xp")
     ')));
-    $this->assertEquals(
+    Assert::equals(
       [new FileSystem('~/.xp'), new FileSystem('/etc/xp')],
       [$inject->get(Storage::class, 'user'), $inject->get(Storage::class, 'system')]
     );
@@ -96,7 +96,7 @@ class ConfiguredBindingsTest extends \unittest\TestCase {
     $inject= new Injector(new ConfiguredBindings($this->loadProperties('
       inject.unittest.fixture.Storage=inject.unittest.fixture.FileSystem("/path", true)
     ')));
-    $this->assertEquals(new FileSystem('/path', true), $inject->get(Storage::class));
+    Assert::equals(new FileSystem('/path', true), $inject->get(Storage::class));
   }
 
   #[Test]
@@ -104,7 +104,7 @@ class ConfiguredBindingsTest extends \unittest\TestCase {
     $inject= new Injector(new ConfiguredBindings($this->loadProperties('
       inject.unittest.fixture.Storage=inject.unittest.fixture.Database(["mysql://one", "mysql://two"])
     ')));
-    $this->assertEquals(new Database(['mysql://one', 'mysql://two']), $inject->get(Storage::class));
+    Assert::equals(new Database(['mysql://one', 'mysql://two']), $inject->get(Storage::class));
   }
 
   #[Test]
@@ -112,7 +112,7 @@ class ConfiguredBindingsTest extends \unittest\TestCase {
     $inject= new Injector(new ConfiguredBindings($this->loadProperties('
       inject.unittest.fixture.Storage=inject.unittest.fixture.FileSystem("/path/with,commas/inside")
     ')));
-    $this->assertEquals(new FileSystem('/path/with,commas/inside'), $inject->get(Storage::class));
+    Assert::equals(new FileSystem('/path/with,commas/inside'), $inject->get(Storage::class));
   }
 
   #[Test]
@@ -120,7 +120,7 @@ class ConfiguredBindingsTest extends \unittest\TestCase {
     $inject= new Injector(new ConfiguredBindings($this->loadProperties('
       string[path]="/path/with,commas/inside"
     ')));
-    $this->assertEquals('/path/with,commas/inside', $inject->get('string', 'path'));
+    Assert::equals('/path/with,commas/inside', $inject->get('string', 'path'));
   }
 
   #[Test, Values([['null', null], ['true', true], ['false', false], ['0', 0], ['-1', -1], ['1', 1], ['0.0', 0.0], ['-1.5', -1.5], ['1.5', 1.5], ['"test"', 'test'], ['"\"test\""', '"test"'], ["'test'", 'test'], ["'\'test\''", "'test'"]])]
@@ -128,7 +128,7 @@ class ConfiguredBindingsTest extends \unittest\TestCase {
     $inject= new Injector(new ConfiguredBindings($this->loadProperties('
       inject.unittest.fixture.Value=inject.unittest.fixture.Value('.$param.')
     ')));
-    $this->assertEquals(new Value($expected), $inject->get('inject.unittest.fixture.Value'));
+    Assert::equals(new Value($expected), $inject->get('inject.unittest.fixture.Value'));
   }
 
   #[Test, Values(['Storage=FileSystem', 'Storage=FileSystem()', 'Storage=inject.unittest.fixture.FileSystem', 'Storage=inject.unittest.fixture.FileSystem()', 'inject.unittest.fixture.Storage=FileSystem', 'inject.unittest.fixture.Storage=FileSystem()', 'inject.unittest.fixture.Storage=inject.unittest.fixture.FileSystem', 'inject.unittest.fixture.Storage=inject.unittest.fixture.FileSystem()'])]
@@ -137,7 +137,7 @@ class ConfiguredBindingsTest extends \unittest\TestCase {
       use[]=inject.unittest.fixture
       '.$line.'
     ')));
-    $this->assertEquals(new FileSystem(), $inject->get(Storage::class));
+    Assert::equals(new FileSystem(), $inject->get(Storage::class));
   }
 
   #[Test]
@@ -147,7 +147,7 @@ class ConfiguredBindingsTest extends \unittest\TestCase {
       inject.unittest.fixture.Storage=inject.unittest.fixture.FileSystem()
     ');
     $inject= new Injector(new ConfiguredBindings($prop, 'one'));
-    $this->assertEquals(new FileSystem(), $inject->get(Storage::class));
+    Assert::equals(new FileSystem(), $inject->get(Storage::class));
   }
 
   #[Test]
@@ -157,7 +157,7 @@ class ConfiguredBindingsTest extends \unittest\TestCase {
       inject.unittest.fixture.Storage=inject.unittest.fixture.FileSystem()
     ');
     $inject= new Injector(new ConfiguredBindings($prop, 'two'));
-    $this->assertNull($inject->get(Storage::class));
+    Assert::null($inject->get(Storage::class));
   }
 
   #[Test]
@@ -168,7 +168,7 @@ class ConfiguredBindingsTest extends \unittest\TestCase {
       [one]
    ');
     $inject= new Injector(new ConfiguredBindings($prop, 'one'));
-    $this->assertEquals(new FileSystem(), $inject->get(Storage::class));
+    Assert::equals(new FileSystem(), $inject->get(Storage::class));
   }
 
   #[Test]
@@ -180,6 +180,6 @@ class ConfiguredBindingsTest extends \unittest\TestCase {
       inject.unittest.fixture.Storage=inject.unittest.fixture.FileSystem("/usr/local")
    ');
     $inject= new Injector(new ConfiguredBindings($prop, 'one'));
-    $this->assertEquals(new FileSystem('/usr/local'), $inject->get(Storage::class));
+    Assert::equals(new FileSystem('/usr/local'), $inject->get(Storage::class));
   }
 }

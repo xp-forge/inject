@@ -3,15 +3,15 @@
 use inject\unittest\fixture\{FileSystem, Storage, UseProvider};
 use inject\{Injector, InstanceProvider, ResolvingProvider, TypeProvider};
 use lang\{Type, XPClass};
-use unittest\{Test, TestCase};
+use unittest\{Assert, Test};
 
-class ProvidersTest extends TestCase {
+class ProvidersTest {
 
   #[Test]
   public function type_provider() {
     $inject= new Injector();
     $inject->bind(Storage::class, XPClass::forName(FileSystem::class));
-    $this->assertInstanceOf(
+    Assert::instance(
       'inject.TypeProvider',
       $inject->get('inject.Provider<inject.unittest.fixture.Storage>')
     );
@@ -21,7 +21,7 @@ class ProvidersTest extends TestCase {
   public function type_provider_get() {
     $inject= new Injector();
     $inject->bind(Storage::class, XPClass::forName(FileSystem::class));
-    $this->assertInstanceOf(
+    Assert::instance(
       FileSystem::class,
       $inject->get('inject.Provider<inject.unittest.fixture.Storage>')->get()
     );
@@ -32,7 +32,7 @@ class ProvidersTest extends TestCase {
     $inject= new Injector();
     $provider= new TypeProvider(XPClass::forName(FileSystem::class), $inject);
     $inject->bind(Storage::class, $provider);
-    $this->assertEquals($provider, $inject->get('inject.Provider<inject.unittest.fixture.Storage>'));
+    Assert::equals($provider, $inject->get('inject.Provider<inject.unittest.fixture.Storage>'));
   }
 
   #[Test]
@@ -40,7 +40,7 @@ class ProvidersTest extends TestCase {
     $inject= new Injector();
     $provider= new TypeProvider(XPClass::forName(FileSystem::class), $inject);
     $inject->bind(Storage::class, $provider);
-    $this->assertInstanceOf(
+    Assert::instance(
       FileSystem::class,
       $inject->get(Storage::class)
     );
@@ -50,7 +50,7 @@ class ProvidersTest extends TestCase {
   public function instance_provider() {
     $inject= new Injector();
     $inject->bind(Storage::class, new FileSystem());
-    $this->assertInstanceOf(
+    Assert::instance(
       InstanceProvider::class,
       $inject->get('inject.Provider<inject.unittest.fixture.Storage>')
     );
@@ -60,7 +60,7 @@ class ProvidersTest extends TestCase {
   public function instance_provider_get() {
     $inject= new Injector();
     $inject->bind(Storage::class, new FileSystem());
-    $this->assertInstanceOf(
+    Assert::instance(
       FileSystem::class,
       $inject->get('inject.Provider<inject.unittest.fixture.Storage>')->get()
     );
@@ -72,7 +72,7 @@ class ProvidersTest extends TestCase {
 
     $inject= new Injector();
     $inject->bind('inject.unittest.fixture.Storage[]', $storages);
-    $this->assertEquals($storages, $inject->get('inject.Provider<inject.unittest.fixture.Storage[]>')->get());
+    Assert::equals($storages, $inject->get('inject.Provider<inject.unittest.fixture.Storage[]>')->get());
   }
 
   #[Test]
@@ -80,6 +80,6 @@ class ProvidersTest extends TestCase {
     $inject= new Injector();
     $inject->bind(Storage::class, new FileSystem());
 
-    $this->assertInstanceOf(InstanceProvider::class, $inject->get(UseProvider::class)->provider);
+    Assert::instance(InstanceProvider::class, $inject->get(UseProvider::class)->provider);
   }
 }

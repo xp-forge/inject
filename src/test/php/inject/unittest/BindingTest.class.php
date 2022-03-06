@@ -1,7 +1,7 @@
 <?php namespace inject\unittest;
 
-use inject\unittest\fixture\{Storage, FileSystem};
-use inject\{Injector, Bindings, ArrayBinding, ClassBinding, InstanceBinding, ProviderBinding, Provider};
+use inject\unittest\fixture\{FileSystem, Storage};
+use inject\{ArrayBinding, Bindings, ClassBinding, Injector, InstanceBinding, Provider, ProviderBinding};
 use unittest\{Assert, Test};
 
 /** Tests Injector::binding() */

@@ -3,7 +3,7 @@
 use inject\ProvisionException;
 use inject\unittest\fixture\{FileSystem, Storage, Value};
 use lang\{IllegalArgumentException, Runnable};
-use unittest\{Expect, Test, TestCase};
+use unittest\{Assert, Expect, Test};
 use util\Currency;
 
 class AnnotatedConstructorTest extends AnnotationsTest {
@@ -14,7 +14,7 @@ class AnnotatedConstructorTest extends AnnotationsTest {
       'injected' => null,
       '#[Inject(["type" => "unittest.TestCase"])] __construct' => function($param) { $this->injected= $param; }
     ]));
-    $this->assertEquals($this, $this->inject->get(Value::class)->injected);
+    Assert::equals($this, $this->inject->get(Value::class)->injected);
   }
 
   #[Test]
@@ -23,7 +23,7 @@ class AnnotatedConstructorTest extends AnnotationsTest {
       'injected' => null,
       '#[Inject] __construct' => function(TestCase $param) { $this->injected= $param; }
     ]));
-    $this->assertEquals($this, $this->inject->get(Value::class)->injected);
+    Assert::equals($this, $this->inject->get(Value::class)->injected);
   }
 
   #[Test]
@@ -32,7 +32,7 @@ class AnnotatedConstructorTest extends AnnotationsTest {
       'injected' => null,
       '#[Inject] __construct' => function(TestCase $test= null) { $this->injected= $test; }
     ]));
-    $this->assertEquals($this, $this->inject->get(Value::class)->injected);
+    Assert::equals($this, $this->inject->get(Value::class)->injected);
   }
 
   #[Test]
@@ -41,7 +41,7 @@ class AnnotatedConstructorTest extends AnnotationsTest {
       'injected' => null,
       '#[Inject] __construct' => function(TestCase $test, $verify= true) { $this->injected= [$test, $verify]; }
     ]));
-    $this->assertEquals([$this, true], $this->inject->get(Value::class)->injected);
+    Assert::equals([$this, true], $this->inject->get(Value::class)->injected);
   }
 
   #[Test]
@@ -51,7 +51,7 @@ class AnnotatedConstructorTest extends AnnotationsTest {
       'injected' => null,
       '#[Inject] __construct' => function(string $name= '') { $this->injected= $name; }
     ]));
-    $this->assertEquals('Test', $this->inject->get(Value::class)->injected);
+    Assert::equals('Test', $this->inject->get(Value::class)->injected);
   }
 
   #[Test]
@@ -62,7 +62,7 @@ class AnnotatedConstructorTest extends AnnotationsTest {
         $this->injected= [$test, $storage];
       }
     ]));
-    $this->assertEquals([$this, new FileSystem()], $this->inject->get(Value::class)->injected);
+    Assert::equals([$this, new FileSystem()], $this->inject->get(Value::class)->injected);
   }
 
   #[Test]
@@ -79,7 +79,7 @@ class AnnotatedConstructorTest extends AnnotationsTest {
         $this->injected= [$test, $cur];
       }
     }'));
-    $this->assertEquals([$this, Currency::$EUR], $this->inject->get(Value::class)->injected);
+    Assert::equals([$this, Currency::$EUR], $this->inject->get(Value::class)->injected);
   }
 
   #[Test]
@@ -97,7 +97,7 @@ class AnnotatedConstructorTest extends AnnotationsTest {
         $this->injected= [$test, $storage, $name];
       }
     }'));
-    $this->assertEquals([$this, new FileSystem(), 'Test'], $this->inject->get(Value::class)->injected);
+    Assert::equals([$this, new FileSystem(), 'Test'], $this->inject->get(Value::class)->injected);
   }
 
   #[Test, Expect(['class' => ProvisionException::class, 'withMessage' => '/Error creating an instance/'])]
@@ -134,7 +134,7 @@ class AnnotatedConstructorTest extends AnnotationsTest {
       'injected' => null,
       '__construct' => function(TestCase $test) { $this->injected= $test; }
     ]));
-    $this->assertEquals($this, $this->inject->get(Value::class)->injected);
+    Assert::equals($this, $this->inject->get(Value::class)->injected);
   }
 
   #[Test]
@@ -145,7 +145,7 @@ class AnnotatedConstructorTest extends AnnotationsTest {
         $this->injected= [$test, $storage];
       }
     ]));
-    $this->assertEquals([$this, new FileSystem()], $this->inject->get(Value::class)->injected);
+    Assert::equals([$this, new FileSystem()], $this->inject->get(Value::class)->injected);
   }
 
   #[Test]
@@ -156,6 +156,6 @@ class AnnotatedConstructorTest extends AnnotationsTest {
         $this->injected= [$test, $storage, $name];
       }
     ]));
-    $this->assertEquals([$this, new FileSystem(), 'Test'], $this->inject->get(Value::class)->injected);
+    Assert::equals([$this, new FileSystem(), 'Test'], $this->inject->get(Value::class)->injected);
   }
 }

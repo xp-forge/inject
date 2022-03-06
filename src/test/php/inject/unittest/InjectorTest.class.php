@@ -1,34 +1,29 @@
 <?php namespace inject\unittest;
 
-use inject\unittest\fixture\{AbstractStorage, FileSystem, InMemory, S3Bucket, Storage, URI, Endpoint};
+use inject\unittest\fixture\{AbstractStorage, Endpoint, FileSystem, InMemory, S3Bucket, Storage, URI};
 use inject\{Injector, InstanceProvider, ProvisionException};
 use lang\{ClassNotFoundException, IllegalArgumentException, XPClass};
-use unittest\{Expect, Test, TestCase, Values};
+use unittest\{Assert, Expect, Test, TestCase, Values};
 use util\Currency;
 
-class InjectorTest extends TestCase {
+class InjectorTest {
 
-  /** @return var[][] */
+  /** @return iterable */
   protected function bindings() {
     $instance= new FileSystem();
-    $name= Storage::class;
-    return [
-      [$name, XPClass::forName(FileSystem::class)],
-      [$name, FileSystem::class],
-      [$name, $instance],
-      [XPClass::forName($name), XPClass::forName(FileSystem::class)],
-      [XPClass::forName($name), FileSystem::class],
-      [XPClass::forName($name), $instance]
-    ];
+    yield [Storage::class, XPClass::forName(FileSystem::class)];
+    yield [Storage::class, FileSystem::class];
+    yield [Storage::class, $instance];
+    yield [XPClass::forName(Storage::class), XPClass::forName(FileSystem::class)];
+    yield [XPClass::forName(Storage::class), FileSystem::class];
+    yield [XPClass::forName(Storage::class), $instance];
   }
 
-  /** @return var[][] */
+  /** @return iterable */
   protected function storages() {
-    return [
-      [[XPClass::forName(FileSystem::class), XPClass::forName(InMemory::class)]],
-      [[FileSystem::class, InMemory::class]],
-      [[new FileSystem(), new InMemory()]]
-    ];
+    yield [[XPClass::forName(FileSystem::class), XPClass::forName(InMemory::class)]];
+    yield [[FileSystem::class, InMemory::class]];
+    yield [[new FileSystem(), new InMemory()]];
   }
 
   #[Test]
@@ -45,58 +40,58 @@ class InjectorTest extends TestCase {
   #[Test, Values('bindings')]
   public function bind_returns_injector_instance($type, $impl) {
     $inject= new Injector();
-    $this->assertEquals($inject, $inject->bind($type, $impl));
+    Assert::equals($inject, $inject->bind($type, $impl));
   }
 
   #[Test]
   public function binds_self_per_default() {
     $inject= new Injector();
-    $this->assertEquals($inject, $inject->get(Injector::class));
+    Assert::equals($inject, $inject->get(Injector::class));
   }
 
   #[Test, Values('bindings')]
   public function get_implementation_bound_to_interface($type, $impl) {
     $inject= new Injector();
     $inject->bind($type, $impl);
-    $this->assertInstanceOf(FileSystem::class, $inject->get($type));
+    Assert::instance(FileSystem::class, $inject->get($type));
   }
 
   #[Test, Values('storages')]
   public function bind_array($impl) {
     $inject= new Injector();
     $inject->bind('inject.unittest.fixture.Storage[]', $impl);
-    $this->assertEquals([new FileSystem(), new InMemory()], $inject->get('inject.unittest.fixture.Storage[]'));
+    Assert::equals([new FileSystem(), new InMemory()], $inject->get('inject.unittest.fixture.Storage[]'));
   }
 
   #[Test]
   public function creates_implicit_binding_when_no_explicit_binding_exists_and_type_is_concrete() {
     $inject= new Injector();
     $impl= FileSystem::class;
-    $this->assertInstanceOf($impl, $inject->get($impl));
+    Assert::instance($impl, $inject->get($impl));
   }
 
   #[Test]
   public function no_implicit_binding_for_interfaces() {
-    $this->assertNull((new Injector())->get(Storage::class));
+    Assert::null((new Injector())->get(Storage::class));
   }
 
   #[Test]
   public function no_implicit_binding_for_abstract_classes() {
-    $this->assertNull((new Injector())->get(AbstractStorage::class));
+    Assert::null((new Injector())->get(AbstractStorage::class));
   }
 
   #[Test]
   public function bind_string_named() {
     $inject= new Injector();
     $inject->bind('string', '82523c0', 'API Key');
-    $this->assertEquals('82523c0', $inject->get('string', 'API Key'));
+    Assert::equals('82523c0', $inject->get('string', 'API Key'));
   }
 
   #[Test]
   public function bind_int_named() {
     $inject= new Injector();
     $inject->bind('int', 4, 'Timeout');
-    $this->assertEquals(4, $inject->get('int', 'Timeout'));
+    Assert::equals(4, $inject->get('int', 'Timeout'));
   }
 
   #[Test, Expect(IllegalArgumentException::class)]
@@ -157,26 +152,26 @@ class InjectorTest extends TestCase {
   public function get_named_implementation_bound_to_interface($type, $impl) {
     $inject= new Injector();
     $inject->bind($type, $impl, 'test');
-    $this->assertInstanceOf(FileSystem::class, $inject->get($type, 'test'));
+    Assert::instance(FileSystem::class, $inject->get($type, 'test'));
   }
 
   #[Test, Values('bindings')]
   public function get_unbound_named_type_returns_null($type, $impl) {
     $inject= new Injector();
-    $this->assertNull($inject->get($type, 'any-name-really'));
+    Assert::null($inject->get($type, 'any-name-really'));
   }
 
   #[Test, Values('bindings')]
   public function get_type_bound_by_different_name_returns_null($type, $impl) {
     $inject= new Injector();
     $inject->bind($type, $impl, 'test');
-    $this->assertNull($inject->get($type, 'another-name-than-the-one-bound'));
+    Assert::null($inject->get($type, 'another-name-than-the-one-bound'));
   }
 
   #[Test]
   public function get_given_a_typeunion_returns_null_for_unbound() {
     $inject= new Injector();
-    $this->assertNull($inject->get('string|inject.unittest.fixture.Value'));
+    Assert::null($inject->get('string|inject.unittest.fixture.Value'));
   }
 
   #[Test]
@@ -184,7 +179,7 @@ class InjectorTest extends TestCase {
     $fs= new FileSystem('/usr');
     $inject= new Injector();
     $inject->bind(FileSystem::class, $fs);
-    $this->assertEquals($fs, $inject->get('string|inject.unittest.fixture.FileSystem'));
+    Assert::equals($fs, $inject->get('string|inject.unittest.fixture.FileSystem'));
   }
 
   #[Test]
@@ -192,7 +187,7 @@ class InjectorTest extends TestCase {
     $path= '/usr';
     $inject= new Injector();
     $inject->bind('string', $path, 'path');
-    $this->assertEquals($path, $inject->get('string|inject.unittest.fixture.FileSystem', 'path'));
+    Assert::equals($path, $inject->get('string|inject.unittest.fixture.FileSystem', 'path'));
   }
 
   #[Test]
@@ -201,7 +196,7 @@ class InjectorTest extends TestCase {
     $inject= new Injector();
     $inject->bind('string', $path, 'path');
     $inject->bind(FileSystem::class, new FileSystem('/usr'));
-    $this->assertEquals($path, $inject->get('string|inject.unittest.fixture.FileSystem', 'path'));
+    Assert::equals($path, $inject->get('string|inject.unittest.fixture.FileSystem', 'path'));
   }
 
   #[Test]
@@ -209,7 +204,7 @@ class InjectorTest extends TestCase {
     $path= ['/usr', '/usr/local'];
     $inject= new Injector();
     $inject->bind('string[]', $path, 'path');
-    $this->assertEquals($path, $inject->get('string[]', 'path'));
+    Assert::equals($path, $inject->get('string[]', 'path'));
   }
 
   #[Test]
@@ -217,7 +212,7 @@ class InjectorTest extends TestCase {
     $path= ['/usr', '/usr/local'];
     $inject= new Injector();
     $inject->bind('string[]', $path, 'path');
-    $this->assertEquals($path, $inject->get('string|string[]', 'path'));
+    Assert::equals($path, $inject->get('string|string[]', 'path'));
   }
 
   #[Test]
@@ -225,7 +220,7 @@ class InjectorTest extends TestCase {
     $bucket= 's3+latest://id:secret@us-west-2';
     $inject= new Injector();
     $inject->bind('string', $bucket, 'bucket');
-    $this->assertEquals(new S3Bucket($bucket), $inject->get(S3Bucket::class));
+    Assert::equals(new S3Bucket($bucket), $inject->get(S3Bucket::class));
   }
 
   #[Test, Expect(class: ProvisionException::class, withMessage: '/No bound value for.+URI.+arg/')]
@@ -239,6 +234,6 @@ class InjectorTest extends TestCase {
     $inject= new Injector();
     $inject->bind('string', 'http://test.local/api', 'uri');
 
-    $this->assertEquals('http://test.local/api', $inject->get(Endpoint::class)->uri);
+    Assert::equals('http://test.local/api', $inject->get(Endpoint::class)->uri);
   }
 }

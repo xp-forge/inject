@@ -3,18 +3,14 @@
 use inject\Injector;
 use inject\unittest\fixture\{FileSystem, Storage, Value};
 use lang\ClassLoader;
-use unittest\TestCase;
+use unittest\Assert;
 use util\Currency;
 
-abstract class AnnotationsTest extends TestCase {
+abstract class AnnotationsTest {
   protected $inject;
 
-  /**
-   * Sets up test case and binds this test case
-   *
-   * @return void
-   */
-  public function setUp() {
+  #[Before]
+  public function inject() {
     $this->inject= new Injector();
     $this->inject->bind(TestCase::class, $this);
     $this->inject->bind(Storage::class, new FileSystem());
@@ -26,7 +22,7 @@ abstract class AnnotationsTest extends TestCase {
    * Creates a storage subtype from a given definition
    *
    * @param  [:var] $definition
-   * @return inject.unittest.fixture.Storage
+   * @return lang.XPClass
    */
   protected function newInstance($definition) {
     return ClassLoader::defineClass('inject.unittest.fixture.'.$this->name, Value::class, [], $definition);
