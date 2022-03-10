@@ -157,6 +157,7 @@ class Injector {
    * @param  lang.XPClass $class
    * @param  [:var] $named
    * @return inject.Binding
+   * @throws inject.ProvisionException
    */
   private function instanceOf($class, $named= []) {
     if (!$class->hasConstructor()) return new InstanceBinding($class->newInstance());
@@ -182,6 +183,7 @@ class Injector {
    * @param  string|lang.Type $type
    * @param  ?string $name
    * @return inject.Binding
+   * @throws inject.ProvisionException
    */
   public function binding($type, $name= null) {
     $t= $type instanceof Type ? $type : Type::forName($type);
