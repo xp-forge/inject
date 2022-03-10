@@ -3,6 +3,10 @@ Dependency injection for the XP Framework change log
 
 ## ?.?.? / ????-??-??
 
+## 5.3.0 / 2022-03-10
+
+* Merged PR #26: Wrap instance creation errors in instanceOf() - @thekid
+
 ## 5.2.0 / 2022-03-06
 
 * Merged PR #25: Try injecting all members in a type union, don't stop
