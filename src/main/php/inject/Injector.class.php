@@ -157,17 +157,24 @@ class Injector {
    * @param  lang.XPClass $class
    * @param  [:var] $named
    * @return inject.Binding
+   * @throws inject.ProvisionException
    */
   private function instanceOf($class, $named= []) {
     if (!$class->hasConstructor()) return new InstanceBinding($class->newInstance());
 
     $constructor= $class->getConstructor();
     $arguments= $this->argumentsOf($constructor, $named);
+    if (!$this->provided($arguments)) return $arguments;
 
-    return $this->provided($arguments)
-      ? new InstanceBinding($constructor->newInstance($arguments->resolve($this)))
-      : $arguments
-    ;
+    // Wrap any exception caught during instance creation. These errors
+    // should not be simply returned as we risk them being overlooked!
+    try {
+      return new InstanceBinding($constructor->newInstance($arguments->resolve($this)));
+    } catch (TargetInvocationException $e) {
+      throw new ProvisionException('Error creating an instance of '.$class->getName(), $e->getCause());
+    } catch (Throwable $e) {
+      throw new ProvisionException('Error creating an instance of '.$class->getName(), $e);
+    }
   }
 
   /**
@@ -176,6 +183,7 @@ class Injector {
    * @param  string|lang.Type $type
    * @param  ?string $name
    * @return inject.Binding
+   * @throws inject.ProvisionException
    */
   public function binding($type, $name= null) {
     $t= $type instanceof Type ? $type : Type::forName($type);
@@ -247,12 +255,6 @@ class Injector {
    * @throws  inject.ProvisionException
    */
   public function newInstance(XPClass $class, $named= []) {
-    try {
-      return $this->instanceOf($class, $named)->resolve($this);
-    } catch (TargetInvocationException $e) {
-      throw new ProvisionException('Error creating an instance of '.$class->getName(), $e->getCause());
-    } catch (Throwable $e) {
-      throw new ProvisionException('Error creating an instance of '.$class->getName(), $e);
-    }
+    return $this->instanceOf($class, $named)->resolve($this);
   }
 }
