@@ -64,6 +64,34 @@ class ConfiguredBindingsTest {
   }
 
   #[Test]
+  public function bind_string_when_plain_key_starts_with_lowercase() {
+    $inject= new Injector(new ConfiguredBindings($this->loadProperties('test=Test')));
+    Assert::equals('Test', $inject->get('string', 'test'));
+  }
+
+  #[Test, Expect(ClassNotFoundException::class)]
+  public function bind_implementation_when_plain_key_starts_with_uppercase() {
+    $inject= new Injector(new ConfiguredBindings($this->loadProperties('Test=Test')));
+    $inject->get('Test');
+  }
+
+  #[Test, Expect(ClassNotFoundException::class)]
+  public function plain_value_in_type_binding_yields_error() {
+    $inject= new Injector(new ConfiguredBindings($this->loadProperties('inject.unittest.fixture.Storage=test')));
+    $inject->get(Storage::class);
+  }
+
+  #[Test, Expect(ClassNotFoundException::class)]
+  public function bind_implementation_when_plain_key_starts_with_uppercase_with_use() {
+    $inject= new Injector(new ConfiguredBindings($this->loadProperties('
+      use[]=inject.unittest.fixture
+
+      Test=Test
+    ')));
+    $inject->get('Test');
+  }
+
+  #[Test]
   public function bind_named_class() {
     $inject= new Injector(new ConfiguredBindings($this->loadProperties('
       inject.unittest.fixture.Storage[files]=inject.unittest.fixture.FileSystem

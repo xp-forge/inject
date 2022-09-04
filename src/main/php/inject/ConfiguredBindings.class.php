@@ -93,16 +93,15 @@ class ConfiguredBindings extends Bindings {
    * @param  string[] $namespaces
    * @param  string $name
    * @return lang.XPClass
+   * @throws lang.ClassNotFoundException
    */
   private function resolveType($cl, $namespaces, $name) {
-    if (strstr($name, '.')) {
-      return $cl->loadClass($name);
-    } else {
-      foreach ($namespaces as $namespace) {
-        if ($cl->providesClass($qualified= $namespace.'.'.$name)) return $cl->loadClass($qualified);
-      }
-      throw new ClassNotFoundException('['.implode(', ', $namespaces).'].'.$name);
+    if (strstr($name, '.')) return $cl->loadClass($name);
+
+    foreach ($namespaces as $namespace) {
+      if ($cl->providesClass($qualified= $namespace.'.'.$name)) return $cl->loadClass($qualified);
     }
+    throw new ClassNotFoundException('['.implode(', ', $namespaces).'].'.$name);
   }
 
   /**
@@ -142,19 +141,29 @@ class ConfiguredBindings extends Bindings {
           continue;
         }
 
+        // Primitives: `string[named]=value`
         if (isset(self::$PRIMITIVES[$type])) {
           foreach ($implementation as $name => $value) {
             $injector->bind($type, $this->valueIn($value), $name);
           }
-        } else {
-          $resolved= $this->resolveType($cl, $namespaces, $type);
-          if (is_array($implementation)) {
-            foreach ($implementation as $name => $impl) {
-              $injector->bind($resolved, $this->bindingTo($cl, $namespaces, $impl), $name);
-            }
-          } else {
-            $injector->bind($resolved, $this->bindingTo($cl, $namespaces, $implementation));
+          continue;
+        }
+
+        // Strings: `named=value`, disambiguated from `Named=Value` (type binding)
+        if (false === strpos($type, '.') && $type >= 'a') {
+          $injector->bind('string', $implementation, $type);
+          continue;
+        }
+
+        // Implementations: `package.Storage=package.FileSystem`
+        // Named implementations: `package.Storage[files]=package.FileSystem`
+        $resolved= $this->resolveType($cl, $namespaces, $type);
+        if (is_array($implementation)) {
+          foreach ($implementation as $name => $impl) {
+            $injector->bind($resolved, $this->bindingTo($cl, $namespaces, $impl), $name);
           }
+        } else {
+          $injector->bind($resolved, $this->bindingTo($cl, $namespaces, $implementation));
         }
       }
     }
