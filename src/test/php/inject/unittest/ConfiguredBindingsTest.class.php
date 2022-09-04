@@ -72,7 +72,17 @@ class ConfiguredBindingsTest {
   #[Test, Expect(ClassNotFoundException::class)]
   public function bind_implementation_when_plain_key_starts_with_uppercase() {
     $inject= new Injector(new ConfiguredBindings($this->loadProperties('Test=Test')));
-    $inject->get('string', 'test');
+    $inject->get('Test');
+  }
+
+  #[Test, Expect(ClassNotFoundException::class)]
+  public function bind_implementation_when_plain_key_starts_with_uppercase_with_use() {
+    $inject= new Injector(new ConfiguredBindings($this->loadProperties('
+      use[]=inject.unittest.fixture
+
+      Test=Test
+    ')));
+    $inject->get('Test');
   }
 
   #[Test]
