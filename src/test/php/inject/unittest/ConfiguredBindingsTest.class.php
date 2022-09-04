@@ -3,7 +3,7 @@
 use inject\unittest\fixture\{Database, FileSystem, InMemory, Storage, Value};
 use inject\{ConfiguredBindings, Injector};
 use io\streams\MemoryInputStream;
-use lang\ClassNotFoundException;
+use lang\{ClassNotFoundException, ClassCastException};
 use unittest\{Assert, Expect, Test, Values};
 use util\Properties;
 
@@ -57,10 +57,46 @@ class ConfiguredBindingsTest {
     ')));
   }
 
-  #[Test, Values([['string[test]="Test"', 'string', 'Test'], ['int[test]=6100', 'int', 6100], ['double[test]=1.5', 'double', 1.5], ['bool[test]=true', 'bool', true], ['bool[test]=false', 'bool', false]])]
-  public function bind_primitive($line, $type, $expected) {
+  #[Test, Values([['int[test]=6100', 6100], ['int[test]=0', 0], ['int[test]=-1', -1]])]
+  public function bind_int_primitive($line, $expected) {
     $inject= new Injector(new ConfiguredBindings($this->loadProperties($line)));
-    Assert::equals($expected, $inject->get($type, 'test'));
+    Assert::equals($expected, $inject->get('int', 'test'));
+  }
+
+  #[Test, Values([['float[test]=1.5', 1.5], ['float[test]=0', 0.0], ['float[test]=-1.5', -1.5]])]
+  public function bind_float_primitive($line, $expected) {
+    $inject= new Injector(new ConfiguredBindings($this->loadProperties($line)));
+    Assert::equals($expected, $inject->get('float', 'test'));
+  }
+
+  #[Test, Values([['bool[test]=true', true], ['bool[test]=1', true], ['bool[test]=false', false], ['bool[test]=0', false]])]
+  public function bind_bool_primitive($line, $expected) {
+    $inject= new Injector(new ConfiguredBindings($this->loadProperties($line)));
+    Assert::equals($expected, $inject->get('bool', 'test'));
+  }
+
+  #[Test, Values([['string[test]="Test"', 'Test'], ['string[test]=', ''], ['string[test]=1', '1'], ['string[test]=true', 'true']])]
+  public function bind_string_primitive($line, $expected) {
+    $inject= new Injector(new ConfiguredBindings($this->loadProperties($line)));
+    Assert::equals($expected, $inject->get('string', 'test'));
+  }
+
+  #[Test, Expect(ClassCastException::class)]
+  public function illegal_int_primitive() {
+    $inject= new Injector(new ConfiguredBindings($this->loadProperties('int[test]=not.an.integer')));
+    $inject->get('int', 'test');
+  }
+
+  #[Test, Expect(ClassCastException::class)]
+  public function illegal_float_primitive() {
+    $inject= new Injector(new ConfiguredBindings($this->loadProperties('float[test]=not.a.float')));
+    $inject->get('float', 'test');
+  }
+
+  #[Test, Expect(ClassCastException::class)]
+  public function illegal_bool_primitive() {
+    $inject= new Injector(new ConfiguredBindings($this->loadProperties('bool[test]=not.a.boolean')));
+    $inject->get('bool', 'test');
   }
 
   #[Test]
