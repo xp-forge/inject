@@ -1,6 +1,6 @@
 <?php namespace inject;
 
-use lang\{ClassLoader, ClassNotFoundException, Type};
+use lang\{ClassLoader, ClassNotFoundException, ClassCastException};
 use util\{Properties, PropertyAccess};
 
 /**
@@ -41,13 +41,6 @@ use util\{Properties, PropertyAccess};
  * @test  xp://inject.unittest.ConfiguredBindingsTest
  */
 class ConfiguredBindings extends Bindings {
-  private static $PRIMITIVES= [
-    'string' => true,
-    'int'    => true,
-    'double' => true,
-    'bool'   => true
-  ];
-
   private $properties;
   private $section= null;
 
@@ -67,23 +60,44 @@ class ConfiguredBindings extends Bindings {
   }
 
   /**
-   * Converts a given literal to a value
+   * Converts a given string to an integer
    *
    * @param  string $literal
-   * @return var
+   * @return int
+   * @throws lang.ClassCastException
    */
-  private function valueIn($literal) {
-    if (0 === strncasecmp($literal, 'true', 4)) {
-      return true;
-    } else if (0 === strncasecmp($literal, 'false', 5)) {
-      return false;
-    } else if (0 === strncasecmp($literal, 'null', 4)) {
-      return null;
-    } else if (is_numeric($literal)) {
-      return strstr($literal, '.') ? (double)$literal : (int)$literal;
-    } else {
-      return $literal;
-    }
+  private function int($literal) {
+    if (is_numeric($literal)) return (int)$literal;
+
+    throw new ClassCastException('Expecting a numeric, have '.$literal);
+  }
+
+  /**
+   * Converts a given string to an float
+   *
+   * @param  string $literal
+   * @return float
+   * @throws lang.ClassCastException
+   */
+  private function float($literal) {
+    if (is_numeric($literal)) return (float)$literal;
+
+    throw new ClassCastException('Expecting a numeric, have '.$literal);
+  }
+
+  /**
+   * Converts a given string to a boolean value. Supports the strings
+   * `true`, `false` as well as `1` and `0`.
+   *
+   * @param  string $literal
+   * @return bool
+   * @throws lang.ClassCastException
+   */
+  private function bool($literal) {
+    if ('true' === $literal || '1' === $literal) return true;
+    if ('false' === $literal || '0' === $literal) return false;
+
+    throw new ClassCastException('Expecting either true or false, have '.$literal);
   }
 
   /**
@@ -141,17 +155,24 @@ class ConfiguredBindings extends Bindings {
           continue;
         }
 
-        // Primitives: `string[named]=value`
-        if (isset(self::$PRIMITIVES[$type])) {
-          foreach ($implementation as $name => $value) {
-            $injector->bind($type, $this->valueIn($value), $name);
-          }
+        // Primitives: `<T>[named]=value`
+        if ('string' === $type) {
+          foreach ($implementation as $name => $value) $injector->bind($type, (string)$value, $name);
+          continue;
+        } else if ('int' === $type) {
+          foreach ($implementation as $name => $value) $injector->bind($type, $this->int($value), $name);
+          continue;
+        } else if ('float' === $type || 'double' === $type) {
+          foreach ($implementation as $name => $value) $injector->bind($type, $this->float($value), $name);
+          continue;
+        } else if ('bool' === $type) {
+          foreach ($implementation as $name => $value) $injector->bind($type, $this->bool($value), $name);
           continue;
         }
 
         // Strings: `named=value`, disambiguated from `Named=Value` (type binding)
         if (false === strpos($type, '.') && $type >= 'a') {
-          $injector->bind('string', $implementation, $type);
+          $injector->bind('string', (string)$implementation, $type);
           continue;
         }
 
