@@ -3,6 +3,16 @@ Dependency injection for the XP Framework change log
 
 ## ?.?.? / ????-??-??
 
+## 5.4.0 / 2022-09-04
+
+* Prefer `float` over `double` for floating point numbers. Consistent
+  with PHP's type system, see xp-framework/core#213
+  (@thekid)
+* Merged PR #28: Fix type errors with primitive bindings - @thekid
+* Merged PR #27: Simplify string bindings (in `ConfiguredBindings`). Now,
+  string bindings can be intuitively written as `key=value`.
+  (@thekid)
+
 ## 5.3.0 / 2022-03-10
 
 * Merged PR #26: Wrap instance creation errors in instanceOf() - @thekid
