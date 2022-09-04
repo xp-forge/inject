@@ -76,6 +76,12 @@ class ConfiguredBindingsTest {
   }
 
   #[Test, Expect(ClassNotFoundException::class)]
+  public function plain_value_in_type_binding_yields_error() {
+    $inject= new Injector(new ConfiguredBindings($this->loadProperties('inject.unittest.fixture.Storage=test')));
+    $inject->get(Storage::class);
+  }
+
+  #[Test, Expect(ClassNotFoundException::class)]
   public function bind_implementation_when_plain_key_starts_with_uppercase_with_use() {
     $inject= new Injector(new ConfiguredBindings($this->loadProperties('
       use[]=inject.unittest.fixture
