@@ -116,7 +116,7 @@ The syntax for these INI files is simple:
 
 ```ini
 web.session.Sessions=web.session.InFileSystem("/tmp")
-string[name]="Application"
+name="Application"
 ```
 
 Providers
