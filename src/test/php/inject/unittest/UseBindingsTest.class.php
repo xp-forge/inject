@@ -3,7 +3,7 @@
 use inject\unittest\fixture\{FileSystem, Storage};
 use inject\{Bindings, Injector, UseBindings};
 use io\streams\MemoryInputStream;
-use unittest\{Assert, Test};
+use test\{Assert, Test};
 use util\Properties;
 
 class UseBindingsTest {

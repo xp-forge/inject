@@ -2,7 +2,7 @@
 
 use inject\unittest\fixture\{FileSystem, Storage};
 use inject\{ArrayBinding, Bindings, ClassBinding, Injector, InstanceBinding, Provider, ProviderBinding};
-use unittest\{Assert, Test};
+use test\{Assert, Test};
 
 /** Tests Injector::binding() */
 class BindingTest {

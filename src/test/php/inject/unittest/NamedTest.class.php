@@ -3,7 +3,7 @@
 use inject\unittest\fixture\Value;
 use inject\{Injector, InstanceBinding, Named};
 use lang\Type;
-use unittest\{Assert, Test};
+use test\{Assert, Test};
 
 class NamedTest {
 

@@ -3,7 +3,7 @@
 use inject\Injector;
 use inject\unittest\fixture\{FileSystem, Storage, Value};
 use lang\ClassLoader;
-use unittest\Assert;
+use test\{Assert, Before};
 use util\Currency;
 
 abstract class AnnotationsTest {

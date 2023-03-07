@@ -3,8 +3,8 @@
 use inject\unittest\fixture\{Database, FileSystem, InMemory, Storage, Value};
 use inject\{ConfiguredBindings, Injector};
 use io\streams\MemoryInputStream;
-use lang\{ClassNotFoundException, ClassCastException};
-use unittest\{Assert, Expect, Test, Values};
+use lang\{ClassCastException, ClassNotFoundException};
+use test\{Assert, Expect, Test, Values};
 use util\Properties;
 
 class ConfiguredBindingsTest {

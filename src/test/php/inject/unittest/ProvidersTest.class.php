@@ -3,7 +3,7 @@
 use inject\unittest\fixture\{FileSystem, Storage, UseProvider};
 use inject\{Injector, InstanceProvider, ResolvingProvider, TypeProvider};
 use lang\{Type, XPClass};
-use unittest\{Assert, Test};
+use test\{Assert, Test};
 
 class ProvidersTest {
 
