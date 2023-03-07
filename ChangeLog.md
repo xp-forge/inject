@@ -3,6 +3,8 @@ Dependency injection for the XP Framework change log
 
 ## ?.?.? / ????-??-??
 
+* Merged PR #29: Migrate to new testing library - @thekid
+
 ## 5.4.0 / 2022-09-04
 
 * Prefer `float` over `double` for floating point numbers. Consistent
