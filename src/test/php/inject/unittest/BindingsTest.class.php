@@ -2,7 +2,7 @@
 
 use inject\unittest\fixture\{FileSystem, Storage};
 use inject\{Bindings, Injector};
-use unittest\{Assert, Test};
+use test\{Assert, Before, Test};
 use util\Currency;
 
 class BindingsTest {

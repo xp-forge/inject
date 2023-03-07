@@ -3,7 +3,7 @@
 use inject\ProvisionException;
 use inject\unittest\fixture\{FileSystem, Storage, Value};
 use lang\{IllegalArgumentException, Runnable};
-use unittest\{Assert, Expect, Test};
+use test\{Assert, Expect, Test};
 use util\Currency;
 
 class AnnotatedConstructorTest extends AnnotationsTest {
@@ -102,7 +102,7 @@ class AnnotatedConstructorTest extends AnnotationsTest {
     Assert::equals([$this, new FileSystem(), 'Test'], $this->inject->get(Value::class)->injected);
   }
 
-  #[Test, Expect(class: ProvisionException::class, withMessage: '/No bound value for type lang.Runnable/')]
+  #[Test, Expect(class: ProvisionException::class, message: '/No bound value for type lang.Runnable/')]
   public function injecting_unbound_into_constructor_via_method_annotation() {
     $this->inject->bind(Value::class, $this->newInstance([
       '#[Inject] __construct' => function(Runnable $param) { /* Empty */ }
@@ -110,7 +110,7 @@ class AnnotatedConstructorTest extends AnnotationsTest {
     $this->inject->get(Value::class);
   }
 
-  #[Test, Expect(class: ProvisionException::class, withMessage: '/No bound value for type lang.Runnable/')]
+  #[Test, Expect(class: ProvisionException::class, message: '/No bound value for type lang.Runnable/')]
   public function injecting_unbound_into_constructor_via_parameter_annotation() {
     $this->inject->bind(Value::class, $this->newInstance('{
       #[Inject]
@@ -122,7 +122,7 @@ class AnnotatedConstructorTest extends AnnotationsTest {
     $this->inject->get(Value::class);
   }
 
-  #[Test, Expect(class: ProvisionException::class, withMessage: '/Error creating an instance/')]
+  #[Test, Expect(class: ProvisionException::class, message: '/Error creating an instance/')]
   public function throwing_an_exception_from_constructor_raises_ProvisionException() {
     $this->inject->bind(Value::class, $this->newInstance([
       '__construct' => function() { throw new IllegalArgumentException('Test'); }

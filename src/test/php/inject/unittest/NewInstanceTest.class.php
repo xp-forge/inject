@@ -1,9 +1,9 @@
 <?php namespace inject\unittest;
 
-use inject\unittest\fixture\{Storage, FileSystem};
+use inject\unittest\fixture\{FileSystem, Storage};
 use inject\{Injector, ProvisionException};
 use lang\{ClassLoader, IllegalAccessException, Runnable};
-use unittest\{Assert, Expect, Test};
+use test\{Assert, Before, Expect, Test};
 use util\Currency;
 
 class NewInstanceTest {
@@ -117,7 +117,7 @@ class NewInstanceTest {
     Assert::equals([$this->storage, true], $inject->newInstance($fixture)->injected);
   }
 
-  #[Test, Expect(class: IllegalAccessException::class, withMessage: '/Cannot invoke private constructor/')]
+  #[Test, Expect(class: IllegalAccessException::class, message: '/Cannot invoke private constructor/')]
   public function newInstance_catches_iae_when_creating_class_instances() {
     $this->newInstance(new Injector(), $this->newFixture('{
       #[Inject]
@@ -125,7 +125,7 @@ class NewInstanceTest {
     }'));
   }
 
-  #[Test, Expect(class: ProvisionException::class, withMessage: '/No bound value for type string named "endpoint"/')]
+  #[Test, Expect(class: ProvisionException::class, message: '/No bound value for type string named "endpoint"/')]
   public function newInstance_throws_when_value_for_required_parameter_not_found() {
     $this->newInstance(new Injector(), $this->newFixture('{
       #[Inject(["type" => "string", "name" => "endpoint"])]

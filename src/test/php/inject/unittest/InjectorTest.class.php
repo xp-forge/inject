@@ -3,7 +3,7 @@
 use inject\unittest\fixture\{AbstractStorage, Endpoint, FileSystem, InMemory, S3Bucket, Storage, URI};
 use inject\{Injector, InstanceProvider, ProvisionException};
 use lang\{ClassNotFoundException, IllegalArgumentException, XPClass};
-use unittest\{Assert, Expect, Test, TestCase, Values};
+use test\{Assert, Expect, Test, Values};
 use util\Currency;
 
 class InjectorTest {
@@ -31,13 +31,13 @@ class InjectorTest {
     new Injector();
   }
 
-  #[Test, Values('bindings')]
+  #[Test, Values(from: 'bindings')]
   public function bind_interface_to_implementation($type, $impl) {
     $inject= new Injector();
     $inject->bind($type, $impl);
   }
 
-  #[Test, Values('bindings')]
+  #[Test, Values(from: 'bindings')]
   public function bind_returns_injector_instance($type, $impl) {
     $inject= new Injector();
     Assert::equals($inject, $inject->bind($type, $impl));
@@ -49,14 +49,14 @@ class InjectorTest {
     Assert::equals($inject, $inject->get(Injector::class));
   }
 
-  #[Test, Values('bindings')]
+  #[Test, Values(from: 'bindings')]
   public function get_implementation_bound_to_interface($type, $impl) {
     $inject= new Injector();
     $inject->bind($type, $impl);
     Assert::instance(FileSystem::class, $inject->get($type));
   }
 
-  #[Test, Values('storages')]
+  #[Test, Values(from: 'storages')]
   public function bind_array($impl) {
     $inject= new Injector();
     $inject->bind('inject.unittest.fixture.Storage[]', $impl);
@@ -121,13 +121,13 @@ class InjectorTest {
   #[Test, Expect(IllegalArgumentException::class)]
   public function cannot_bind_uncompatible_class() {
     $inject= new Injector();
-    $inject->bind(Storage::class, XPClass::forName(TestCase::class));
+    $inject->bind(Storage::class, XPClass::forName(Currency::class));
   }
 
   #[Test, Expect(IllegalArgumentException::class)]
   public function cannot_bind_uncompatible_class_name() {
     $inject= new Injector();
-    $inject->bind(Storage::class, TestCase::class);
+    $inject->bind(Storage::class, Currency::class);
   }
 
   #[Test, Expect(ClassNotFoundException::class)]
@@ -148,20 +148,20 @@ class InjectorTest {
     $inject->bind('inject.unittest.fixture.Storage', [Storage::class]);
   }
 
-  #[Test, Values('bindings')]
+  #[Test, Values(from: 'bindings')]
   public function get_named_implementation_bound_to_interface($type, $impl) {
     $inject= new Injector();
     $inject->bind($type, $impl, 'test');
     Assert::instance(FileSystem::class, $inject->get($type, 'test'));
   }
 
-  #[Test, Values('bindings')]
+  #[Test, Values(from: 'bindings')]
   public function get_unbound_named_type_returns_null($type, $impl) {
     $inject= new Injector();
     Assert::null($inject->get($type, 'any-name-really'));
   }
 
-  #[Test, Values('bindings')]
+  #[Test, Values(from: 'bindings')]
   public function get_type_bound_by_different_name_returns_null($type, $impl) {
     $inject= new Injector();
     $inject->bind($type, $impl, 'test');
@@ -223,7 +223,7 @@ class InjectorTest {
     Assert::equals(new S3Bucket($bucket), $inject->get(S3Bucket::class));
   }
 
-  #[Test, Expect(class: ProvisionException::class, withMessage: '/No bound value for.+URI.+arg/')]
+  #[Test, Expect(class: ProvisionException::class, message: '/No bound value for.+URI.+arg/')]
   public function detects_lookup_loops() {
     $inject= new Injector();
     $inject->get(URI::class);
