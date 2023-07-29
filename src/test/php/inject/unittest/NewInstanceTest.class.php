@@ -2,7 +2,8 @@
 
 use inject\unittest\fixture\{FileSystem, Storage};
 use inject\{Injector, ProvisionException};
-use lang\{ClassLoader, IllegalAccessException, Runnable};
+use lang\reflection\CannotInstantiate;
+use lang\{ClassLoader, XPException, Runnable};
 use test\{Assert, Before, Expect, Test};
 use util\Currency;
 
@@ -49,7 +50,7 @@ class NewInstanceTest {
   public function newInstance_performs_injection() {
     $inject= (new Injector())->bind(Storage::class, $this->storage);
     $fixture= $this->newFixture([
-      '#[Inject] __construct' => function(Storage $param) { $this->injected= $param; }
+      '#[\inject\Inject] __construct' => function(Storage $param) { $this->injected= $param; }
     ]);
 
     Assert::equals($this->storage, $inject->newInstance($fixture)->injected);
@@ -59,7 +60,7 @@ class NewInstanceTest {
   public function newInstance_performs_named_injection_using_array_form() {
     $inject= (new Injector())->bind(Storage::class, $this->storage, 'test');
     $fixture= $this->newFixture([
-      '#[Inject(["name" => "test"])] __construct' => function(Storage $param) { $this->injected= $param; }
+      '#[\inject\Inject(name: "test")] __construct' => function(Storage $param) { $this->injected= $param; }
     ]);
 
     Assert::equals($this->storage, $inject->newInstance($fixture)->injected);
@@ -69,7 +70,7 @@ class NewInstanceTest {
   public function newInstance_performs_named_injection_using_string_form() {
     $inject= (new Injector())->bind(Storage::class, $this->storage, 'test');
     $fixture= $this->newFixture([
-      '#[Inject("test")] __construct' => function(Storage $param) { $this->injected= $param; }
+      '#[\inject\Inject("test")] __construct' => function(Storage $param) { $this->injected= $param; }
     ]);
 
     Assert::equals($this->storage, $inject->newInstance($fixture)->injected);
@@ -111,16 +112,16 @@ class NewInstanceTest {
     $inject= new Injector();
     $inject->bind(Storage::class, $this->storage);
     $fixture= $this->newFixture([
-      '#[Inject] __construct' => function(Storage $param, $verify= true) { $this->injected= [$param, $verify]; }
+      '#[\inject\Inject] __construct' => function(Storage $param, $verify= true) { $this->injected= [$param, $verify]; }
     ]);
 
     Assert::equals([$this->storage, true], $inject->newInstance($fixture)->injected);
   }
 
-  #[Test, Expect(class: IllegalAccessException::class, message: '/Cannot invoke private constructor/')]
-  public function newInstance_catches_iae_when_creating_class_instances() {
+  #[Test, Expect(class: CannotInstantiate::class, message: '/Cannot instantiate .+/')]
+  public function newInstance_catches_cannot_instantiate_when_creating_class_instances() {
     $this->newInstance(new Injector(), $this->newFixture('{
-      #[Inject]
+      #[\inject\Inject]
       private function __construct() { }
     }'));
   }
@@ -128,7 +129,7 @@ class NewInstanceTest {
   #[Test, Expect(class: ProvisionException::class, message: '/No bound value for type string named "endpoint"/')]
   public function newInstance_throws_when_value_for_required_parameter_not_found() {
     $this->newInstance(new Injector(), $this->newFixture('{
-      #[Inject(["type" => "string", "name" => "endpoint"])]
+      #[\inject\Inject(type: "string", name: "endpoint")]
       public function __construct($uri) { }
     }'));
   }
