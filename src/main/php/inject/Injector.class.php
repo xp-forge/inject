@@ -1,6 +1,5 @@
 <?php namespace inject;
 
-use lang\reflection\CannotInstantiate;
 use lang\{IllegalArgumentException, Nullable, Primitive, Throwable, Type, TypeUnion, XPClass, Reflection};
 
 /**
