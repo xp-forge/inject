@@ -1,5 +1,6 @@
 <?php namespace inject;
 
+use lang\Type;
 use util\PropertyAccess;
 
 /**
@@ -36,7 +37,13 @@ class UseBindings extends Bindings {
    */
   public function singleton($type, $impl= null) {
     $this->configure[]= function($injector) use($type, $impl) {
-      $injector->bind($type, new SingletonBinding($impl ?: $type));
+      if (null === $impl) {
+        $injector->bind($type, new SingletonBinding($type));
+      } else if (is_string($impl) || $impl instanceof Type) {
+        $injector->bind($type, new SingletonBinding($impl));
+      } else {
+        $injector->bind($type, new InstanceBinding($impl));
+      }
     };
     return $this;
   }
@@ -56,7 +63,7 @@ class UseBindings extends Bindings {
   }
 
   /**
-   * Binds a give instance to its type
+   * Binds a given instance to its type.
    *
    * @param  var $instance
    * @return self
