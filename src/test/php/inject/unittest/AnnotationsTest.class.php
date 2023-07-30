@@ -8,7 +8,6 @@ use util\Currency;
 
 abstract class AnnotationsTest {
   protected $inject;
-  protected $id= 0;
 
   #[Before]
   public function inject() {
@@ -27,7 +26,7 @@ abstract class AnnotationsTest {
    */
   protected function newInstance($definition) {
     return ClassLoader::defineClass(
-      'inject.unittest.fixture.AnnotationsTest_'.($this->id++),
+      'inject.AnnotationsTest_'.uniqid(),
       Value::class,
       [],
       $definition

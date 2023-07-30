@@ -12,7 +12,7 @@ class AnnotatedConstructorTest extends AnnotationsTest {
   public function with_inject_annotation_and_type() {
     $this->inject->bind(Value::class, $this->newInstance([
       'injected' => null,
-      '#[Inject(["type" => "inject.unittest.AnnotationsTest"])] __construct' => function($param) {
+      '#[Inject(type: "inject.unittest.AnnotationsTest")] __construct' => function($param) {
         $this->injected= $param;
       }
     ]));
