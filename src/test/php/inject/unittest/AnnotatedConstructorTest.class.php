@@ -12,7 +12,7 @@ class AnnotatedConstructorTest extends AnnotationsTest {
   public function with_inject_annotation_and_type() {
     $this->inject->bind(Value::class, $this->newInstance([
       'injected' => null,
-      '#[\inject\Inject(type: "inject.unittest.AnnotationsTest")] __construct' => function($param) {
+      '#[Inject(type: "inject.unittest.AnnotationsTest")] __construct' => function($param) {
         $this->injected= $param;
       }
     ]));
@@ -23,7 +23,7 @@ class AnnotatedConstructorTest extends AnnotationsTest {
   public function with_inject_annotation_and_restriction() {
     $this->inject->bind(Value::class, $this->newInstance([
       'injected' => null,
-      '#[\inject\Inject] __construct' => function(AnnotationsTest $param) { $this->injected= $param; }
+      '#[Inject] __construct' => function(AnnotationsTest $param) { $this->injected= $param; }
     ]));
     Assert::equals($this, $this->inject->get(Value::class)->injected);
   }
@@ -32,7 +32,7 @@ class AnnotatedConstructorTest extends AnnotationsTest {
   public function optional_bound_parameter() {
     $this->inject->bind(Value::class, $this->newInstance([
       'injected' => null,
-      '#[\inject\Inject] __construct' => function(AnnotationsTest $test= null) { $this->injected= $test; }
+      '#[Inject] __construct' => function(AnnotationsTest $test= null) { $this->injected= $test; }
     ]));
     Assert::equals($this, $this->inject->get(Value::class)->injected);
   }
@@ -41,7 +41,7 @@ class AnnotatedConstructorTest extends AnnotationsTest {
   public function optional_unbound_parameter() {
     $this->inject->bind(Value::class, $this->newInstance([
       'injected' => null,
-      '#[\inject\Inject] __construct' => function(AnnotationsTest $test, $verify= true) { $this->injected= [$test, $verify]; }
+      '#[Inject] __construct' => function(AnnotationsTest $test, $verify= true) { $this->injected= [$test, $verify]; }
     ]));
     Assert::equals([$this, true], $this->inject->get(Value::class)->injected);
   }
@@ -51,7 +51,7 @@ class AnnotatedConstructorTest extends AnnotationsTest {
     $this->inject->bind('string', 'Test', 'name');
     $this->inject->bind(Value::class, $this->newInstance([
       'injected' => null,
-      '#[\inject\Inject] __construct' => function(string $name= '') { $this->injected= $name; }
+      '#[Inject] __construct' => function(string $name= '') { $this->injected= $name; }
     ]));
     Assert::equals('Test', $this->inject->get(Value::class)->injected);
   }
@@ -60,7 +60,7 @@ class AnnotatedConstructorTest extends AnnotationsTest {
   public function with_inject_annotation_and_multiple_parameters() {
     $this->inject->bind(Value::class, $this->newInstance([
       'injected' => null,
-      '#[\inject\Inject] __construct' => function(AnnotationsTest $test, Storage $storage) {
+      '#[Inject] __construct' => function(AnnotationsTest $test, Storage $storage) {
         $this->injected= [$test, $storage];
       }
     ]));
@@ -73,9 +73,9 @@ class AnnotatedConstructorTest extends AnnotationsTest {
       public $injected;
 
       public function __construct(
-        #[\inject\Inject]
-        \inject\unittest\AnnotationsTest $test,
-        #[\inject\Inject(name: "EUR")]
+        #[Inject]
+        unittest\AnnotationsTest $test,
+        #[Inject(name: "EUR")]
         \util\Currency $cur
       ) {
         $this->injected= [$test, $cur];
@@ -89,11 +89,11 @@ class AnnotatedConstructorTest extends AnnotationsTest {
     $this->inject->bind(Value::class, $this->newInstance('{
       public $injected;
 
-      #[\inject\Inject]
+      #[Inject]
       public function __construct(
-        \inject\unittest\AnnotationsTest $test,
-        \inject\unittest\fixture\Storage $storage,
-        #[\inject\Inject(name: "name", type: "string")]
+        unittest\AnnotationsTest $test,
+        unittest\fixture\Storage $storage,
+        #[Inject(name: "name", type: "string")]
         $name
       ) {
         $this->injected= [$test, $storage, $name];
@@ -105,7 +105,7 @@ class AnnotatedConstructorTest extends AnnotationsTest {
   #[Test, Expect(class: ProvisionException::class, message: '/No bound value for type lang.Runnable/')]
   public function injecting_unbound_into_constructor_via_method_annotation() {
     $this->inject->bind(Value::class, $this->newInstance([
-      '#[\inject\Inject] __construct' => function(Runnable $param) { /* Empty */ }
+      '#[Inject] __construct' => function(Runnable $param) { /* Empty */ }
     ]));
     $this->inject->get(Value::class);
   }
@@ -113,9 +113,9 @@ class AnnotatedConstructorTest extends AnnotationsTest {
   #[Test, Expect(class: ProvisionException::class, message: '/No bound value for type lang.Runnable/')]
   public function injecting_unbound_into_constructor_via_parameter_annotation() {
     $this->inject->bind(Value::class, $this->newInstance('{
-      #[\inject\Inject]
+      #[Inject]
       public function __construct(
-        #[\inject\Inject]
+        #[Inject]
         \lang\Runnable $param
       ) { }
     }'));
@@ -154,7 +154,7 @@ class AnnotatedConstructorTest extends AnnotationsTest {
   public function name_defaults_to_parameter() {
     $this->inject->bind(Value::class, $this->newInstance([
       'injected' => null,
-      '#[\inject\Inject] __construct' => function(AnnotationsTest $test, Storage $storage, string $name) {
+      '#[Inject] __construct' => function(AnnotationsTest $test, Storage $storage, string $name) {
         $this->injected= [$test, $storage, $name];
       }
     ]));
