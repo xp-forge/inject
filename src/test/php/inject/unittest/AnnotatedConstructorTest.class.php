@@ -74,7 +74,7 @@ class AnnotatedConstructorTest extends AnnotationsTest {
 
       public function __construct(
         #[Inject]
-        unittest\AnnotationsTest $test,
+        \inject\unittest\AnnotationsTest $test,
         #[Inject(name: "EUR")]
         \util\Currency $cur
       ) {
@@ -91,8 +91,8 @@ class AnnotatedConstructorTest extends AnnotationsTest {
 
       #[Inject]
       public function __construct(
-        unittest\AnnotationsTest $test,
-        unittest\fixture\Storage $storage,
+        \inject\unittest\AnnotationsTest $test,
+        \inject\unittest\fixture\Storage $storage,
         #[Inject(name: "name", type: "string")]
         $name
       ) {
