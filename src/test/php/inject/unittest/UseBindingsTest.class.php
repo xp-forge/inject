@@ -34,6 +34,13 @@ class UseBindingsTest {
   }
 
   #[Test]
+  public function singleton_uses_same_instance() {
+    $fs= new FileSystem('/');
+    $inject= new Injector(Bindings::using()->singleton(Storage::class, $fs));
+    Assert::true($fs === $inject->get(Storage::class), 'same instance');
+  }
+
+  #[Test]
   public function singleton_produces_same_instance() {
     $inject= new Injector(Bindings::using()->singleton(Storage::class, FileSystem::class));
     $a= $inject->get(Storage::class);
