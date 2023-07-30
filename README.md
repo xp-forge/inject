@@ -24,10 +24,11 @@ use inject\{Injector, Bindings};
 use com\example\{Report, HtmlReport, Storage, InFileSystem};
 
 // Manually
-$injector= new Injector();
-$injector->bind(Report::class, HtmlReport::class);
-$injector->bind(Storage::class, new InFileSystem('.'));
-$injector->bind('string', 'Report title', 'title');
+$injector= new Injector(Bindings::using()
+  ->typed(Report::class, HtmlReport::class)
+  ->singleton(Storage::class, new InFileSystem('.'))
+  ->named('title', 'Report title')
+);
 
 // Reusable via Bindings instances
 class ApplicationDefaults extends Bindings {
