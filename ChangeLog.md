@@ -3,6 +3,10 @@ Dependency injection for the XP Framework change log
 
 ## ?.?.? / ????-??-??
 
+## 6.0.0 / ????-??-??
+
+* Merged PR #30: Migrate to new reflection API - @thekid
+
 ## 5.5.0 / 2023-07-30
 
 * Merged PR #31: Make it possible to pass instances to `singleton()`
