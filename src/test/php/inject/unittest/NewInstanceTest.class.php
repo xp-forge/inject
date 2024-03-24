@@ -2,7 +2,6 @@
 
 use inject\unittest\fixture\{FileSystem, Storage};
 use inject\{Injector, ProvisionException};
-use lang\reflection\CannotInstantiate;
 use lang\{ClassLoader, XPException, Runnable};
 use test\{Assert, Before, Expect, Test};
 use util\Currency;
@@ -118,7 +117,7 @@ class NewInstanceTest {
     Assert::equals([$this->storage, true], $inject->newInstance($fixture)->injected);
   }
 
-  #[Test, Expect(class: CannotInstantiate::class, message: '/Cannot instantiate .+/')]
+  #[Test, Expect(class: ProvisionException::class, message: '/Cannot instantiate .+/')]
   public function newInstance_catches_cannot_instantiate_when_creating_class_instances() {
     $this->newInstance(new Injector(), $this->newFixture('{
       #[Inject]

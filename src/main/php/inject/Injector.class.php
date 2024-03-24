@@ -154,7 +154,12 @@ class Injector {
    */
   private function instanceOf($class, $named= []) {
     $t= Reflection::type($class);
-    if (null === ($constructor= $t->constructor())) return new InstanceBinding($class->newInstance());
+    if (!$t->instantiable(true)) {
+      throw new ProvisionException('Cannot instantiate '.$class->getName().' with non-public constructor');
+    }
+
+    $constructor= $t->constructor();
+    if (null === $constructor) return new InstanceBinding($class->newInstance());
 
     $arguments= $this->argumentsOf($constructor, $named);
     if (!$this->provided($arguments)) return $arguments;
