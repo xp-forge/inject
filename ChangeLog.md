@@ -3,10 +3,11 @@ Dependency injection for the XP Framework change log
 
 ## ?.?.? / ????-??-??
 
+## 6.0.0 / 2024-03-24
+
+* Dropped support for XP <= 9, see xp-framework/rfc#341 - @thekid
+* Made compatible with XP 12 - @thekid
 * Added PHP 8.4 to the test matrix - @thekid
-
-## 6.0.0 / ????-??-??
-
 * Merged PR #30: Migrate to new reflection API - @thekid
 
 ## 5.5.0 / 2023-07-30
