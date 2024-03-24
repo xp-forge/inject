@@ -32,7 +32,7 @@ class AnnotatedConstructorTest extends AnnotationsTest {
   public function optional_bound_parameter() {
     $this->inject->bind(Value::class, $this->newInstance([
       'injected' => null,
-      '#[Inject] __construct' => function(AnnotationsTest $test= null) { $this->injected= $test; }
+      '#[Inject] __construct' => function(?AnnotationsTest $test= null) { $this->injected= $test; }
     ]));
     Assert::equals($this, $this->inject->get(Value::class)->injected);
   }
