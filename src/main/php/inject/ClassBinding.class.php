@@ -1,26 +1,26 @@
 <?php namespace inject;
 
-use lang\{IllegalArgumentException, XPClass};
+use lang\reflection\{Type, Kind};
+use lang\{IllegalArgumentException, Reflection};
 
 class ClassBinding implements Binding {
-  protected $class;
+  protected $type;
 
   /**
    * Creates a new instance binding
    *
-   * @param  string|lang.XPClass $class
+   * @param  string|lang.XPClass|lang.reflection.Type $class
    * @param  lang.XPClass $type
    * @throws lang.IllegalArgumentException
    */
   public function __construct($class, $type= null) {
-    $c= $class instanceof XPClass ? $class : XPClass::forName($class);
-    if ($type && !$type->isAssignableFrom($c)) {
-      throw new IllegalArgumentException($type.' is not assignable from '.$c);
-    } else if ($c->isInterface() || $c->getModifiers() & MODIFIER_ABSTRACT) {
-      throw new IllegalArgumentException('Cannot bind to non-concrete type '.$type);
-    }
+    $this->type= $class instanceof Type ? $class : Reflection::type($class);
 
-    $this->class= $c;
+    if ($type && !$type->isAssignableFrom($this->type->class())) {
+      throw new IllegalArgumentException($type.' is not assignable from '.$this->type->name());
+    } else if (Kind::$CLASS !== $this->type->kind() || $this->type->modifiers()->isAbstract()) {
+      throw new IllegalArgumentException('Cannot bind to non-concrete type '.$this->type->name());
+    }
   }
 
   /**
@@ -30,7 +30,7 @@ class ClassBinding implements Binding {
    * @return inject.Provider<?>
    */
   public function provider($injector) {
-    return new TypeProvider($this->class, $injector);
+    return new TypeProvider($this->type, $injector);
   }
 
   /**
@@ -40,6 +40,6 @@ class ClassBinding implements Binding {
    * @return var
    */
   public function resolve($injector) {
-    return $injector->newInstance($this->class);
+    return $injector->newInstance($this->type);
   }
 }

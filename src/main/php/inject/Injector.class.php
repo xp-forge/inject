@@ -48,7 +48,7 @@ class Injector {
     } else if (is_array($impl)) {
       return new ArrayBinding($impl, $t);
     } else {
-      return new ClassBinding(XPClass::forName((string)$impl), $t);
+      return new ClassBinding(Reflection::type((string)$impl), $t);
     }
   }
 
@@ -147,19 +147,18 @@ class Injector {
   /**
    * Implicitely creates an instance binding for a given class.
    *
-   * @param  lang.XPClass $class
+   * @param  lang.reflection.Type $type
    * @param  [:var] $named
    * @return inject.Binding
    * @throws inject.ProvisionException
    */
-  private function instanceOf($class, $named= []) {
-    $t= Reflection::type($class);
-    if (!$t->instantiable(true)) {
-      throw new ProvisionException('Cannot instantiate '.$class->getName().' with non-public constructor');
+  private function instanceOf($type, $named= []) {
+    if (!$type->instantiable(true)) {
+      throw new ProvisionException('Cannot instantiate '.$type->name().' with non-public constructor');
     }
 
-    $constructor= $t->constructor();
-    if (null === $constructor) return new InstanceBinding($class->newInstance());
+    $constructor= $type->constructor();
+    if (null === $constructor) return new InstanceBinding($type->newInstance());
 
     $arguments= $this->argumentsOf($constructor, $named);
     if (!$this->provided($arguments)) return $arguments;
@@ -169,7 +168,7 @@ class Injector {
     try {
       return new InstanceBinding($constructor->newInstance($arguments->resolve($this)));
     } catch (Throwable $e) {
-      throw new ProvisionException('Error creating an instance of '.$class->getName(), $e);
+      throw new ProvisionException('Error creating an instance of '.$type->name(), $e);
     }
   }
 
@@ -204,8 +203,9 @@ class Injector {
         $literal= $t->literal();
         if ($binding= $this->bindings[$literal][$name] ?? null) {
           return $binding;
-        } else if (null === $name && $t instanceof XPClass && !($t->isInterface() || $t->getModifiers() & MODIFIER_ABSTRACT)) {
-          return $this->instanceOf($t);
+        } else if (null === $name && $t instanceof XPClass) {
+          $type= Reflection::type($t);
+          if ($type->instantiable()) return $this->instanceOf($type);
         }
       }
 
@@ -244,12 +244,13 @@ class Injector {
    * injection, the arguments are compiled from the relevant annotations.
    * Otherwise, optional constructor arguments may be passed.
    *
-   * @param   lang.XPClass $class
+   * @param   lang.XPClass|lang.reflection.Type $class
    * @param   [:var] $named Named arguments
    * @return  object
    * @throws  inject.ProvisionException
    */
-  public function newInstance(XPClass $class, $named= []) {
-    return $this->instanceOf($class, $named)->resolve($this);
+  public function newInstance($class, $named= []) {
+    $type= $class instanceof XPClass ? Reflection::type($class) : $class;
+    return $this->instanceOf($type, $named)->resolve($this);
   }
 }

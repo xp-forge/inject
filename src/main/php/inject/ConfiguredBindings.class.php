@@ -1,6 +1,6 @@
 <?php namespace inject;
 
-use lang\{ClassLoader, ClassNotFoundException, ClassCastException};
+use lang\{ClassLoader, ClassNotFoundException, ClassCastException, Reflection};
 use util\{Properties, PropertyAccess};
 
 /**
@@ -130,13 +130,9 @@ class ConfiguredBindings extends Bindings {
     if (false === ($p= strpos($input, '('))) {
       return $this->resolveType($cl, $namespaces, $input);
     } else {
-      $class= $this->resolveType($cl, $namespaces, substr($input, 0, $p));
-      if ($class->hasConstructor()) {
-        $arguments= eval('return ['.substr($input, $p + 1, -1).'];');
-        return $class->getConstructor()->newInstance($arguments);
-      } else {
-        return $class->newInstance();
-      }
+      $type= $this->resolveType($cl, $namespaces, substr($input, 0, $p));
+      $arguments= eval('return ['.substr($input, $p + 1, -1).'];');
+      return Reflection::type($type)->newInstance(...$arguments);
     }
   }
 

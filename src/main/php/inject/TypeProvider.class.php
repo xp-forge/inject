@@ -10,7 +10,7 @@ class TypeProvider implements Provider {
   /**
    * Creates a new type provider
    *
-   * @param  lang.XPClass $type
+   * @param  lang.XPClass|lang.reflection.Type $type
    * @param  inject.Injector $injector
    */
   public function __construct($type, $injector) {
