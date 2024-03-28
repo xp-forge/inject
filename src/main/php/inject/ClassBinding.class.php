@@ -27,7 +27,7 @@ class ClassBinding implements Binding {
    * Returns a provider for this binding
    *
    * @param  inject.Injector $injector
-   * @param  inject.Provider<?>
+   * @return inject.Provider<?>
    */
   public function provider($injector) {
     return new TypeProvider($this->class, $injector);
@@ -37,7 +37,7 @@ class ClassBinding implements Binding {
    * Resolves this binding and returns the instance
    *
    * @param  inject.Injector $injector
-   * @param  var
+   * @return var
    */
   public function resolve($injector) {
     return $injector->newInstance($this->class);
