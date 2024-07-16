@@ -36,7 +36,7 @@ class Implementations {
    * @throws inject.ProvisionException if there is no such implementation
    */
   #[Generic(return: 'T')]
-  public function named($name) {
+  public function named(string $name) {
     if ($binding= $this->bindings[$name] ?? null) {
       return $binding->resolve($this->inject);
     }
