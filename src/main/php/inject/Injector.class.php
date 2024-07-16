@@ -90,6 +90,22 @@ class Injector {
   }
 
   /**
+   * Returns implementations for a given type
+   *
+   * @param  string|lang.Type $type
+   * @return inject.Implementations
+   * @throws inject.ProvisionException
+   */
+  public function implementations($type) {
+    $t= $type instanceof Type ? $type : Type::forName($type);
+    if ($bindings= $this->bindings[$t->literal()] ?? null) {
+      return new Implementations($this, $bindings);
+    }
+
+    throw new ProvisionException('No implementations for type '.$t);
+  }
+
+  /**
    * Returns the lookup if it provides a value, null otherwise
    *
    * @param  inject.Binding $lookup
