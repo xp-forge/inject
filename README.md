@@ -6,13 +6,13 @@ Inject
 [![BSD Licence](https://raw.githubusercontent.com/xp-framework/web/master/static/licence-bsd.png)](https://github.com/xp-framework/core/blob/master/LICENCE.md)
 [![Requires PHP 7.4+](https://raw.githubusercontent.com/xp-framework/web/master/static/php-7_4plus.svg)](http://php.net/)
 [![Supports PHP 8.0+](https://raw.githubusercontent.com/xp-framework/web/master/static/php-8_0plus.svg)](http://php.net/)
-[![Latest Stable Version](https://poser.pugx.org/xp-forge/inject/version.png)](https://packagist.org/packages/xp-forge/inject)
+[![Latest Stable Version](https://poser.pugx.org/xp-forge/inject/version.svg)](https://packagist.org/packages/xp-forge/inject)
 
 The inject package contains the XP framework's dependency injection API. Its entry point class is the "Injector".
 
 Binding
 -------
-Values can be bound to the injector by using its `bind()` method. It accepts the type to bind to, an optional name and these different scenarios:
+Implementations can be bound to the injector by using its `bind()` method. It accepts the type to bind to, an optional name and these different scenarios:
 
 * **Binding a class**: The typical usecase, where we bind an interface to its concrete implementation.
 * **Binding an instance**: By binding a type to an existing instance, we can create a *singleton* model.
