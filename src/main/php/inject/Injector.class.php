@@ -12,11 +12,12 @@ use lang\{IllegalArgumentException, Nullable, Primitive, Throwable, Type, TypeUn
  * @test  inject.unittest.NewInstanceTest
  */
 class Injector {
-  protected static $PROVIDER;
+  protected static $IMPLEMENTATIONS, $PROVIDER;
   protected $bindings= [];
   protected $protect= [];
 
   static function __static() {
+    self::$IMPLEMENTATIONS= Type::forName('inject.Implementations<?>');
     self::$PROVIDER= Type::forName('inject.Provider<?>');
   }
 
@@ -93,13 +94,13 @@ class Injector {
    * Returns implementations for a given type
    *
    * @param  string|lang.Type $type
-   * @return inject.Implementations
+   * @return inject.Implementations<?>
    * @throws inject.ProvisionException
    */
   public function implementations($type) {
     $t= $type instanceof Type ? $type : Type::forName($type);
     if ($bindings= $this->bindings[$t->literal()] ?? null) {
-      return new Implementations($this, $bindings);
+      return self::$IMPLEMENTATIONS->base()->newGenericType([$t])->newInstance($this, $bindings);
     }
 
     throw new ProvisionException('No implementations for type '.$t);
@@ -210,6 +211,8 @@ class Injector {
         }
       } else if ($t instanceof Nullable) {
         return $this->binding($t->underlyingType(), $name);
+      } else if (self::$IMPLEMENTATIONS->isAssignableFrom($t)) {
+        return new InstanceBinding($this->implementations($t->genericArguments()[0]));
       } else if (self::$PROVIDER->isAssignableFrom($t)) {
         $literal= $t->genericArguments()[0]->literal();
         if ($binding= $this->bindings[$literal][$name] ?? null) {

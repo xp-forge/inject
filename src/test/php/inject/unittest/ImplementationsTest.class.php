@@ -1,6 +1,6 @@
 <?php namespace inject\unittest;
 
-use inject\unittest\fixture\{URI, Endpoint};
+use inject\unittest\fixture\{URI, Endpoint, Service};
 use inject\{Injector, ProvisionException};
 use test\{Assert, Before, Expect, Test, Values};
 
@@ -42,5 +42,11 @@ class ImplementationsTest {
   #[Test, Expect(ProvisionException::class)]
   public function unknown_implementation() {
     $this->fixture()->implementations(URI::class)->named('stage');
+  }
+
+  #[Test]
+  public function inject() {
+    $fixture= $this->fixture();
+    Assert::equals($this->uris, $fixture->get(Service::class)->uris);
   }
 }

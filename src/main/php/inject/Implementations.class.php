@@ -18,14 +18,20 @@ class Implementations {
     $this->bindings= $bindings;
   }
 
-  /**
-   * Returns the default implementation
-   * 
-   * @return T
-   */
+  /** Returns the default implementation */
   #[Generic(return: 'T')]
   public function default() {
     return current($this->bindings)->resolve($this->inject);
+  }
+
+  /** Returns all implementations */
+  #[Generic(return: '[:T]')]
+  public function all() {
+    $r= [];
+    foreach ($this->bindings as $name => $binding) {
+      $r[$name]= $binding->resolve($this->inject);
+    }
+    return $r;
   }
 
   /**
