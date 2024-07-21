@@ -34,13 +34,13 @@ class ImplementationsTest {
     Assert::equals($this->uris['dev'], $this->fixture()->implementations(URI::class)->default());
   }
 
-  #[Test, Expect(ProvisionException::class)]
-  public function no_implementations() {
-    $this->fixture()->implementations(Endpoint::class);
+  #[Test]
+  public function no_implementations_returning_null() {
+    Assert::null($this->fixture()->implementations(Endpoint::class));
   }
 
   #[Test, Expect(ProvisionException::class)]
-  public function unknown_implementation() {
+  public function unknown_named_implementation() {
     $this->fixture()->implementations(URI::class)->named('stage');
   }
 

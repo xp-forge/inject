@@ -94,16 +94,14 @@ class Injector {
    * Returns implementations for a given type
    *
    * @param  string|lang.Type $type
-   * @return inject.Implementations<?>
-   * @throws inject.ProvisionException
+   * @return ?inject.Implementations<?>
    */
   public function implementations($type) {
     $t= $type instanceof Type ? $type : Type::forName($type);
     if ($bindings= $this->bindings[$t->literal()] ?? null) {
       return self::$IMPLEMENTATIONS->base()->newGenericType([$t])->newInstance($this, $bindings);
     }
-
-    throw new ProvisionException('No implementations for type '.$t);
+    return null;
   }
 
   /**
@@ -212,7 +210,7 @@ class Injector {
       } else if ($t instanceof Nullable) {
         return $this->binding($t->underlyingType(), $name);
       } else if (self::$IMPLEMENTATIONS->isAssignableFrom($t)) {
-        return $this->implementations($t->genericArguments()[0]);
+        return $this->implementations($t->genericArguments()[0]) ?? Bindings::$ABSENT;
       } else if (self::$PROVIDER->isAssignableFrom($t)) {
         $literal= $t->genericArguments()[0]->literal();
         if ($binding= $this->bindings[$literal][$name] ?? null) {
