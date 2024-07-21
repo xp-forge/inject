@@ -12,7 +12,7 @@ The inject package contains the XP framework's dependency injection API. Its ent
 
 Binding
 -------
-Values can be bound to the injector by using its `bind()` method. It accepts the type to bind to, an optional name and these different scenarios:
+Implementations can be bound to the injector by using its `bind()` method. It accepts the type to bind to, an optional name and these different scenarios:
 
 * **Binding a class**: The typical usecase, where we bind an interface to its concrete implementation.
 * **Binding an instance**: By binding a type to an existing instance, we can create a *singleton* model.
