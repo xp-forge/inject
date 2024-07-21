@@ -212,7 +212,7 @@ class Injector {
       } else if ($t instanceof Nullable) {
         return $this->binding($t->underlyingType(), $name);
       } else if (self::$IMPLEMENTATIONS->isAssignableFrom($t)) {
-        return new InstanceBinding($this->implementations($t->genericArguments()[0]));
+        return $this->implementations($t->genericArguments()[0]);
       } else if (self::$PROVIDER->isAssignableFrom($t)) {
         $literal= $t->genericArguments()[0]->literal();
         if ($binding= $this->bindings[$literal][$name] ?? null) {

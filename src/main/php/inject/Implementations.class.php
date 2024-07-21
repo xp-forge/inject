@@ -4,7 +4,7 @@ use lang\Generic;
 
 /** @test inject.unittest.ImplementationsTest */
 #[Generic(self: 'T')]
-class Implementations {
+class Implementations implements Binding {
   private $inject, $bindings;
 
   /**
@@ -48,5 +48,25 @@ class Implementations {
     }
 
     throw new ProvisionException('No implementation named "'.$name.'"');
+  }
+
+  /**
+   * Resolves this binding and returns the instance
+   *
+   * @param  inject.Injector $injector
+   * @return var
+   */
+  public function resolve($injector) {
+    return $this;
+  }
+
+  /**
+   * Returns a provider for this binding
+   *
+   * @param  inject.Injector $injector
+   * @return inject.Provider<?>
+   */
+  public function provider($injector) {
+    return $this;
   }
 }
