@@ -81,9 +81,9 @@ class Injector {
       if (null === $name) {
         throw new IllegalArgumentException('Cannot bind primitive type '.$t.' without a name');
       }
-      $this->bindings[$t->literal()][$name]= $impl instanceof Binding ? $impl : new InstanceBinding($impl, $t);
+      $this->bindings[$t->literal()][(string)$name]= $impl instanceof Binding ? $impl : new InstanceBinding($impl, $t);
     } else {
-      $this->bindings[$t->literal()][$name]= $impl instanceof Binding ? $impl : self::asBinding($t, $impl);
+      $this->bindings[$t->literal()][(string)$name]= $impl instanceof Binding ? $impl : self::asBinding($t, $impl);
     }
 
     return $this;
@@ -196,12 +196,12 @@ class Injector {
         return $this->binding($t->underlyingType(), $name);
       } else if (self::$PROVIDER->isAssignableFrom($t)) {
         $literal= $t->genericArguments()[0]->literal();
-        if ($binding= $this->bindings[$literal][$name] ?? null) {
+        if ($binding= $this->bindings[$literal][(string)$name] ?? null) {
           return new InstanceBinding($binding->provider($this));
         }
       } else {
         $literal= $t->literal();
-        if ($binding= $this->bindings[$literal][$name] ?? null) {
+        if ($binding= $this->bindings[$literal][(string)$name] ?? null) {
           return $binding;
         } else if (null === $name && $t instanceof XPClass) {
           $type= Reflection::type($t);
