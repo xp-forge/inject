@@ -3,8 +3,11 @@ Dependency injection for the XP Framework change log
 
 ## ?.?.? / ????-??-??
 
+## 6.1.0 / 2026-08-01
+
 * Fixed *Using null as an array offset is deprecated* (PHP 8.5+) - @thekid
 * Added PHP 8.5 and PHP 8.6 to the test matrix - @thekid
+* Refactored bindings to use new reflection library - @thekid
 
 ## 6.0.0 / 2024-03-24
 
